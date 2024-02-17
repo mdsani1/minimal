@@ -1,0 +1,62 @@
+.buy-btn{
+    background-color: coral;
+    border-radius: 0;
+}
+.buy-btn:hover{
+    color: #fff;
+}
+.buy-btn{
+    background: transparent;
+    color: black;
+    width: 150px;
+    background-color: coral;
+    border: none;
+    border-radius: 25px;
+    padding: 10px;
+    font-size: 16px;
+    box-shadow: 20px 30px 49px -14px gray;
+    cursor: pointer;
+    transition: 0.3s all;
+}
+
+.wish-btn{
+    background: transparent;
+    color: black;
+    border: 2px solid #fff;
+    border-radius: 25px;
+    padding: 10px;
+    font-size: 16px;
+    box-shadow: 7px 7px 63px -14px coral;
+    cursor: pointer;
+}
+.wish-btn:hover{
+    border: 2px solid black;
+}
+
+/* rating */
+.rating-css div {
+    color: #ffe400;
+    font-size: 30px;
+    font-family: sans-serif;
+    font-weight: 800;
+    text-align: center;
+    text-transform: uppercase;
+    padding: 20px 0;
+  }
+  .rating-css input {
+    display: none;
+  }
+  .rating-css input + label {
+    font-size: 60px;
+    text-shadow: 1px 1px 0 #8f8420;
+    cursor: pointer;
+  }
+  .rating-css input:checked + label ~ label {
+    color: #b4afaf;
+  }
+  .rating-css label:active {
+    transform: scale(0.8);
+    transition: 0.3s ease;
+  }
+
+/* End of Star Rating */
