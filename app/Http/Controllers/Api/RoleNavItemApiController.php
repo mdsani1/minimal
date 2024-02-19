@@ -12,7 +12,7 @@ class RoleNavItemApiController extends Controller
     {
         $role = Role::find($roleId);
 
-        $navitems = NavItem::all()->sortBy('title');
+        $navitems = NavItem::all();
 
         $collection = [];
         foreach($navitems as $navitem)
@@ -23,16 +23,8 @@ class RoleNavItemApiController extends Controller
                 $collection[] = ['id'=>$navitem->id,'title'=>$navitem->title,'isSelected'=>0];
             }
         }
-        
-        // Check if the count of the collection is greater than 0
-        if (count($collection) > 1) {
-            $navItems = collect($collection)->chunk(count($collection)/2);
-            return response()->json($navItems, 200);
-        } else {
-            // Handle the case where the collection is empty
-            $navItems = collect($collection)->chunk(count($collection)/1);
-            return response()->json($navItems, 200);
-        }
+        $navItems = collect($collection)->chunk(count($collection));
+        return response()->json($navItems, 200);
     }
 
 }

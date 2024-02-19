@@ -15,11 +15,6 @@ class NavItem extends Model
     {
         return $this->belongsTo(Role::class);
     }
-    
-    // public function roles()
-    // {
-    //     return $this->belongsToMany(Role::class)->withTimestamps();
-    // }
 
     public function roles()
     {

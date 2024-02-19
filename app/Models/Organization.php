@@ -6,14 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class RoleNavItem extends Model
+class Organization extends Model
 {
-    use HasFactory, SoftDeletes;
-    protected $table = 'nav_item_role';
+    use HasFactory;
+    use SoftDeletes;
+    
     protected $guarded = [];
 
-    public function role()
+    public function user()
     {
-        return $this->hasOne(Role::class);
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

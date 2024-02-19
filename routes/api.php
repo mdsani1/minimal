@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\RoleNavItemApiController;
+use App\Http\Controllers\Api\SubCategoryApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,5 +22,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['middleware' => 'api', 'as' => 'api.'], function () {
     Route::get('get-role-navitems-with-selected/{id}', [RoleNavItemApiController::class,'getnavitemWithSelected']);
+    Route::get('/get-sub-category/{category_id}', [SubCategoryApiController::class, 'getSubCategory']);
+    Route::get('/get-category', [SubCategoryApiController::class, 'getCategory']);
+    Route::get('/quotationitem-delete/{id}', [SubCategoryApiController::class, 'quotationitemDelete']);
 });
 
