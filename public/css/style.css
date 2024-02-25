@@ -1,0 +1,272 @@
+/* Add your custom styles here */
+.editable-table td:hover {
+    background-color: #f5f5f5;
+    cursor: pointer;
+}
+
+.editable-table td.editing {
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+.editable-table td.textarea {
+    height: 50px; /* Adjust height for magnification */
+}
+
+.editable-table td input,
+.editable-table td textarea {
+    width: 100%;
+    padding: 5px;
+    border: none;
+}
+
+
+/* Add border to table headers for the first three columns */
+#editableTable th:nth-child(-n+3) {
+    border: 1px solid #ddd; /* Add border for the first three headers */
+}
+
+
+/* Prevent the table from being boxed */
+#editableTable {
+    width: auto; /* Allow the table to expand horizontally */
+    table-layout: auto; /* Allow the table's layout to adjust based on content */
+}
+
+/* Set fixed width for the first column */
+#editableTable td:nth-child(1),
+#editableTable th:nth-child(1) {
+    width: 20px; /* Make the first column narrower */
+    white-space: nowrap; /* Prevent cell content from wrapping */
+}
+
+/* Set fixed widths for the second and third columns */
+#editableTable td:nth-child(2),
+#editableTable th:nth-child(2),
+#editableTable td:nth-child(3),
+#editableTable th:nth-child(3) {
+    width: 400px; /* Set the second and third columns to be wider */
+    white-space: normal; /* Allow cell content to wrap */
+}
+
+/* Optional: Adjust cell styles */
+#editableTable td, 
+#editableTable th {
+    padding: 8px; /* Adjust cell padding */
+    border: 1px solid #ddd; /* Set border color and width */
+    vertical-align: top; /* Align the content to the top */
+}
+
+/* Set min-width for all columns */
+#editableTable td, 
+#editableTable th {
+    min-width: 100px; /* Set minimum width for all columns, adjust as needed */
+    white-space: nowrap; /* Prevent cell content from wrapping */
+}
+
+
+.autosuggestion-dropdown {
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none; /* Initially hide the dropdown */
+}
+
+.autosuggestion-dropdown ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.autosuggestion-dropdown li {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.autosuggestion-dropdown li:hover {
+    background-color: #f5f5f5;
+}
+
+
+
+/* Slim border for table cells */
+#editableTable td {
+    border: 1px solid #ddd; /* Set the border to 1px solid with a light gray color */
+    padding: 8px; /* Add some padding to the cells */
+}
+
+/* Optional: Add hover effect */
+#editableTable td:hover {
+    background-color: #f9f9f9; /* Change background color on hover */
+}
+
+
+
+/* Table cell hover icons  */
+
+/* style.css */
+
+/* Partition icon styles */
+.partition-icon {
+    display: none; /* Hide the partition icon by default */
+    position: relative; /* Position relative to the cell */
+}
+
+/* Show the partition icon on hover */
+td:hover .partition-icon {
+    display: inline-block; /* Show the icon when hovering over the cell */
+    position: absolute; /* Position absolutely within the cell */
+    top: 0; /* Align the icon to the top edge of the cell */
+    right: 0; /* Align the icon to the right edge of the cell */
+}
+
+.focused {
+    background-color: #e9ecef; /* Example focused color */
+}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 2; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.4); /* Black with opacity */
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #333; /* Darker background for contrast */
+    color: #fff; /* White text color */
+    margin: auto; /* Center the modal box */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%; /* Modal width to 90% of the viewport width */
+    max-width: none; /* Allows modal to expand up to 90% of the viewport width */
+    height: 80%; /* Modal height */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+/* The Close Button */
+.modal-content .close {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-content .close:hover,
+.modal-content .close:focus {
+    color: #fff; /* Change color on hover/focus for better visibility */
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* The iframe containing the PDF */
+#pdfPreviewIframe {
+    width: 100%;
+    height: 100%; /* Set height to take up the full height of the modal-content */
+    border: none; /* Remove any default border */
+}
+
+/* Download button inside the modal */
+#downloadPdfButton {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px; /* Increase font size for better readability */
+}
+
+#downloadPdfButton:hover {
+    background-color: #0056b3;
+}
+
+
+
+
+#editableTable {
+    border-collapse: collapse; /* Collapsed borders for a clean look */
+    width: 100%; /* Table takes full width of the container */
+    margin: 20px 0; /* Adds margin above and below the table */
+    font-size: 14px; /* Adjust font size as per your requirements */
+}
+
+#editableTable th, 
+#editableTable td {
+    border: 1px solid #ddd; /* Light grey border for each cell */
+    padding: 8px; /* Padding within each cell */
+    text-align: left; /* Align text to the left */
+    vertical-align: top; /* Align content to the top of the cell */
+}
+
+#editableTable th {
+    background-color: #f2f2f2; /* Light grey background for header cells */
+    text-align: center; /* Center-align the text in header cells */
+}
+
+/* Style the first column differently if required */
+#editableTable td:first-child, 
+#editableTable th:first-child {
+    text-align: left; /* Align text to the left for the first column */
+}
+
+/* Style for rows when hovered */
+#editableTable tr:hover {
+    background-color: #e8e8e8; /* Slight change in background color on hover */
+}
+
+/* Style for table header */
+#editableTable thead th {
+    font-weight: bold; /* Make the header text bold */
+}
+
+/* Style for editable cells */
+[contenteditable="true"] {
+    background-color: #fff; /* White background to indicate editability */
+    cursor: text; /* Text cursor for editable cells */
+}
+
+/* Ensure the table is not wider than its container */
+.table-container {
+    overflow-x: auto; /* Allow horizontal scrolling if table is too wide */
+}
+
+/* Scroll to top icon */
+#scrollToTopButton {
+    display: none; /* Hidden by default */
+    position: fixed; /* Fixed position */
+    bottom: 20px; /* 20px from the bottom */
+    right: 20px; /* 20px from the right */
+    z-index: 100; /* Above other elements */
+    padding: 10px; /* Padding inside the button */
+    background-color: #3498db; /* Blue background color */
+    color: white; /* White icon color */
+    border: none; /* No border */
+    outline: none; /* No outline */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 3px; /* Rounded corners */
+    opacity: 0.7; /* Slightly transparent */
+}
+
+#scrollToTopButton:hover {
+    opacity: 1; /* Fully opaque on hover */
+}

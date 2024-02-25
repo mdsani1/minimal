@@ -20,4 +20,9 @@ class DashboardController extends Controller
             return view('welcome');
         }
     }
+
+    public function editableTable()
+    {
+        return view('backend.editable');
+    }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\BackendApiController;
 use App\Http\Controllers\Api\RoleNavItemApiController;
 use App\Http\Controllers\Api\SubCategoryApiController;
 use Illuminate\Http\Request;
@@ -25,5 +26,6 @@ Route::group(['middleware' => 'api', 'as' => 'api.'], function () {
     Route::get('/get-sub-category/{category_id}', [SubCategoryApiController::class, 'getSubCategory']);
     Route::get('/get-category', [SubCategoryApiController::class, 'getCategory']);
     Route::get('/quotationitem-delete/{id}', [SubCategoryApiController::class, 'quotationitemDelete']);
+    Route::get('/suggestions', [BackendApiController::class, 'suggestions']);
 });
 

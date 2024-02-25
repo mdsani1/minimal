@@ -40,6 +40,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth','web'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/editable-table', [DashboardController::class, 'editableTable'])->name('editableTable');
 
     Route::resource('roles', RoleController::class);
     Route::resource('navitems', NavItemController::class);
