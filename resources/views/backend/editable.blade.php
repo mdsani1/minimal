@@ -75,7 +75,20 @@
                     <tr>
                         <td>3</td>
                         <td>Decorative CNC Ceiling</td>
-                        <td>Supply, fitting and fixing of Decorative CNC Ceiling with cove lighting arrangement suspended from roof by 2"x1" seasoned gorgion wood frame and made of 12mm MDF with cove lighting arrangement and Plastic paint finish, design pattern done by CNC Cutting and with modular coordinated arrangement fixed at the roof top with 2"x1" wood screw and rawl plug and other necessary accessories as per design and direction
+                        <td>Supply, fitting and fixing of Decorative CNC Ceiling with cove lighting arrangement suspended from roof by 2"x1" seasoned gorgion wood frame and made of 12mm MDF with cove lighting arrangement and Plastic paint finish, design pattern done by CNC Cutting and with modular coordinated arrangement fixed at the roof top with 2"x1" wood screw and rawl plug and other necessary accessories as per design and direction</td>
+                        <td contenteditable="true">-</td>
+                        <td>sft</td>
+                        <td contenteditable="true">400</td>
+                        <td contenteditable="true">-</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Decorative CNC Ceiling</td>
+                        <td>Supply, fitting and fixing of Decorative CNC Ceiling with cove lighting arrangement suspended from roof by 2"x1" seasoned gorgion wood frame and made of 12mm MDF with cove lighting arrangement and Plastic paint finish, design pattern done by CNC Cutting and with modular coordinated arrangement fixed at the roof top with 2"x1" wood screw and rawl plug and other necessary accessories as per design and direction</td>
+                        <td contenteditable="true">-</td>
+                        <td>sft</td>
+                        <td contenteditable="true">400</td>
+                        <td contenteditable="true">-</td>
                     </tr>
                 </tbody>
             </table>
@@ -99,5 +112,14 @@
         <script src="{{ asset('js/cellspliter.js') }}"></script>
         <script src="{{ asset('js/pdfHandler.js') }}"></script>
         <script src="{{ asset('js/scrollToTop.js') }}"></script>
+        <script>
+            $(document).ready(function(){
+                // Function to add a new row
+                $("#addRowBtn").click(function(){
+                    // Clone the last row and append it to the table
+                    $("#editableTable tbody tr:last").clone().appendTo("#editableTable tbody");
+                });
+            });
+        </script>
     @endpush
 </x-backend.layouts.master>
