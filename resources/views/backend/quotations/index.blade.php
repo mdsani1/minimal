@@ -37,6 +37,7 @@
                     <th class="text-center">Address</th>
                     <th class="text-center">Date</th>
                     <th class="text-center">Created By</th>
+                    <th class="text-center">Sheet</th>
                     <th class="text-center">Action</th>
                 </tr>
             </thead>
@@ -52,6 +53,9 @@
                         <td class="text-center">{{ $quotation->address ?? '' }}</td>
                         <td class="text-center">{{ $quotation->date ?? '' }}</td>
                         <td class="text-center">{{ $quotation->user->name ?? '' }}</td>
+                        <td class="text-center">
+                            <a class="btn btn-sm btn-info text-white" href="{{ route('editableTable',['id' => $quotation->id]) }}" role="button">Quotaion To Sheet</a>
+                        </td>
                         <td class="text-center">
                             <a class="btn btn-sm btn-primary" href="{{ route('quotations.show', ['quotation'=>$quotation->id]) }}" role="button" style="border-radius: 50%"><i class="far fa-eye text-white"></i></a>
                             <a class="btn btn-sm btn-warning" href="{{ route('quotations.edit',['quotation' => $quotation->id]) }}" role="button" style="border-radius: 50%"><i class="fas fa-pen-nib text-white"></i></a>

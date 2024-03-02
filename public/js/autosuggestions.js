@@ -1,5 +1,4 @@
 // autosuggestions.js
-let suggestionData; // Declare suggestionData variable outside AJAX request scope
 
 // Function to show suggestions in a dropdown
 function showSuggestions(cell, suggestions) {
@@ -12,8 +11,9 @@ function showSuggestions(cell, suggestions) {
 
     // Position the dropdown beneath the cell
     const cellRect = cell.getBoundingClientRect();
-    dropdown.style.top = `${cellRect.bottom}px`;
-    dropdown.style.left = `${cellRect.left}px`;
+    // dropdown.style.top = `10px`;
+    // dropdown.style.top = `${cellRect.bottom}px`;
+    // dropdown.style.left = `${cellRect.left}px`;
 
     // Show the dropdown
     dropdown.style.display = 'block';
@@ -106,7 +106,6 @@ function updateFocus(items, index) {
 }
 
 function getSuggestions(inputValue, cellIndex) {
-    console.log(suggestionData);
     // Define suggestion lists for each column
     const suggestionsForColumn = {
         1: suggestionData,
@@ -154,7 +153,7 @@ $(document).ready(function () {
     });
 
     // Attach event listener to the table, delegating to the 'td' elements
-    $('#editableTable').on('input', 'td', function() {
+    $('.editableTable').on('input', 'td', function() {
         const cell = this; // 'this' refers to the 'td' element that received the input
         const inputValue = cell.innerText.trim().toLowerCase();
         const cellIndex = cell.cellIndex; // cellIndex is 0-based

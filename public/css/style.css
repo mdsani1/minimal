@@ -184,7 +184,7 @@ td:hover .partition-icon {
 }
 
 /* Download button inside the modal */
-#downloadPdfButton {
+/* #downloadPdfButton {
     display: block;
     margin: 10px auto;
     padding: 10px 20px;
@@ -193,12 +193,12 @@ td:hover .partition-icon {
     border: none;
     cursor: pointer;
     border-radius: 5px;
-    font-size: 16px; /* Increase font size for better readability */
-}
+    font-size: 16px;
+} */
 
-#downloadPdfButton:hover {
+/* #downloadPdfButton:hover {
     background-color: #0056b3;
-}
+} */
 
 
 

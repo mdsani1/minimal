@@ -21,11 +21,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(['middleware' => 'api', 'as' => 'api.'], function () {
+Route::group(['middleware' => ['api', 'auth', 'web'], 'as' => 'api.'], function () {
     Route::get('get-role-navitems-with-selected/{id}', [RoleNavItemApiController::class,'getnavitemWithSelected']);
     Route::get('/get-sub-category/{category_id}', [SubCategoryApiController::class, 'getSubCategory']);
     Route::get('/get-category', [SubCategoryApiController::class, 'getCategory']);
     Route::get('/quotationitem-delete/{id}', [SubCategoryApiController::class, 'quotationitemDelete']);
     Route::get('/suggestions', [BackendApiController::class, 'suggestions']);
+    Route::post('/quotes/store', [BackendApiController::class, 'quotesStore']);
+    Route::put('/quotes/update/{id}', [BackendApiController::class, 'quotesUpdate']);
+    Route::get('/sheet/list', [BackendApiController::class, 'list']);
 });
 

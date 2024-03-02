@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var table = $('#editableTable'); // Adjust if your table has a different ID
+    var table = $('.editableTable'); // Adjust if your table has a different ID
 
     table.on('keydown', 'td', function(event) {
         if (event.ctrlKey && event.key === 'q') { // Ctrl+Q to add a new row

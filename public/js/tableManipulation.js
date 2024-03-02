@@ -1,102 +1,66 @@
-// Function to add a new row to the table
-function addRow() {
-    const table = document.getElementById('editableTable');
-    const newRow = table.insertRow();
-    const columns = table.rows[0].cells.length;
-
-    for (let i = 0; i < columns; i++) {
-        const newCell = newRow.insertCell();
-        newCell.contentEditable = 'true';
-        addCellEventListeners(newCell); // Add event listeners to the new cell
-    }
-}
-
-function addColumn() {
-    const table = document.getElementById('editableTable');
-    const rows = table.rows;
-    const newCellIndex = rows[0].cells.length;
-    const columnWidths = ['300px', '600px', '100px']; // Widths for the columns, adjust as needed
-
-    for (let i = 0; i < rows.length; i++) {
-        const newCell = rows[i].insertCell(newCellIndex);
-        newCell.contentEditable = 'true';
-        
-        // Set column width
-        if (newCellIndex === 1) {
-            newCell.style.width = '300px'; // Width for the second column
-        } else {
-            newCell.style.width = columnWidths[newCellIndex] || '100px'; // Default width for other columns
-        }
-
-        // Set generic header name for new columns
-        if (i === 0) {
-            const columnHeader = 'Column ' + (newCellIndex + 1);
-            newCell.innerText = columnHeader;
-        }
-
-        addCellEventListeners(newCell); // Add event listeners to the new cell
-    }
-}
-
-
-
-// Function to add event listeners to a cell
-function addCellEventListeners(cell) {
-    cell.addEventListener('mouseenter', () => {
-        cell.contentEditable = 'true';
+$(document).ready(function() {
+    // Attach the event listener for the "Add Row" button click
+    $('.addRowBtn').click(function() {
+        // Find the closest .tab-pane and then find the .editableTable inside it
+        let editableTable = $(this).closest('.tab-pane').find('.editableTable');
+        addRow(editableTable);
     });
 
-    cell.addEventListener('mouseleave', () => {
-        cell.contentEditable = 'false';
-        saveTableCellContent(cell);
-        hideSuggestions(cell); // Hide suggestions when mouse leaves the cell
+    $('.addColumnBtn').click(function() {
+        let editableTable = $(this).closest('.tab-pane').find('.editableTable');
+        addColumn(editableTable);
     });
 
-    cell.addEventListener('input', () => {
-        const inputValue = cell.innerText.trim().toLowerCase();
-        const suggestions = getSuggestions(inputValue);
+    // Function to dynamically add a new row to the editable table
+    // This function calculates the number of columns in the first row of the table
+    // to ensure consistency in the number of cells across all rows.
+    function addRow(table) {
+        // Get the number of columns in the first row
+        const columnCount = table.find('tr:first th').length || table.find('tr:first td').length;
+      
+        // Create a new row element
+        let newRow = $('<tr></tr>');
+      
+        // Append the appropriate number of cells to the new row
+        for (let i = 0; i < columnCount; i++) {
+            // Declare and initialize thValue inside the loop
+            let thValue = table.find('thead th').eq(i).text(); // Get the class value of the corresponding th
+            thValue = thValue.replace(/\s+/g, '_').toLowerCase(); // Should now log the correct class values
 
-        if (suggestions.length > 0) {
-            showSuggestions(cell, suggestions);
-        } else {
-            hideSuggestions(cell);
-        }
-    });
-
-    cell.addEventListener('click', () => {
-        hideSuggestions(cell);
-    });
-
-    cell.addEventListener('keydown', (event) => {
-        if (event.ctrlKey && event.shiftKey && cell.contentEditable === 'true') {
-            event.preventDefault();
-            showDropdown(cell);
-        } else if (event.key === 'Tab') {
-            event.preventDefault();
-            moveCursor(cell);
-        } else if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent form submission or newline insertion
-            selectSuggestion(cell);
-        } else if (event.key === 'Escape') {
-            hideSuggestions(cell); // Hide suggestions when Esc key is pressed
-        }
-    });
-
-    cell.addEventListener('keypress', (event) => {
-        if (cell.querySelector('select')) {
-            const dropdownMenu = cell.querySelector('select');
-            const input = String.fromCharCode(event.which);
-            const selectedIndex = parseInt(input) - 1;
-
-            if (!isNaN(selectedIndex) && selectedIndex >= 0 && selectedIndex < dropdownMenu.options.length) {
-                dropdownMenu.selectedIndex = selectedIndex;
-                dropdownMenu.dispatchEvent(new Event('change'));
+            let newCell;
+            if (i === 0) {
+                newCell = $('<td class="sl"></td>').addClass(thValue); // Add class from th to td
+            } else {
+                newCell = $('<td contenteditable="true"></td>').addClass(thValue); // Add class from th to td
             }
+            newRow.append(newCell); // Append each new cell to the row
         }
-    });
-}
 
+        // Append the newly created row to the table
+        table.find('tbody').append(newRow);
+        slHandler(table); // Call slHandler to update sl values
+    }
 
+    // Function to dynamically add a new column to the end of all rows in the editable table
+    // This function iterates through each row, appending a new cell to ensure the column is added uniformly across the table.
+    function addColumn(table) {
+        // Iterate over each row in the table
+        table.find('tr').each(function() {
+            // For header row, add a <th> element; for other rows, add a <td> element
+            if ($(this).find('th').length) {
+                $(this).append('<th style="background-color: #198754; color:#fff" contenteditable="true" class="newcloumnHeader">New Header</th>');
+            } else {
+                $(this).append('<td class="NewHeader" contenteditable="true"></td>');
+            }
+        });
+    }
 
+    // Function to update sl values
+    function slHandler(table) {
+        let sls = table.find('.sl');
 
-
+        $.each(sls, function(index,val){
+            $(val).html(index+1);
+        });
+    }
+});

@@ -11,19 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('interiors', function (Blueprint $table) {
+        Schema::create('quote_items', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('quote_id')->nullable();
             $table->unsignedBigInteger('category_id')->nullable();
-            $table->unsignedBigInteger('sub_category_id')->nullable();
-            $table->string('item');
-            $table->longText('default_detail')->nullable();
-            $table->float('qty')->nullable();
+            $table->string('sl')->nullable();
+            $table->string('item')->nullable();
+            $table->text('specification')->nullable();
+            $table->string('qty')->nullable();
             $table->string('unit')->nullable();
-            $table->float('rate')->nullable();
-            $table->float('amount')->nullable();
-            $table->string('length')->nullable();
-            $table->string('width')->nullable();
-            $table->string('height')->nullable();
+            $table->string('rate')->nullable();
+            $table->string('amount')->nullable();
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->string('deleted_by')->nullable();
@@ -37,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('interiors');
+        Schema::dropIfExists('quote_items');
     }
 };

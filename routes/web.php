@@ -40,7 +40,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth','web'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/editable-table', [DashboardController::class, 'editableTable'])->name('editableTable');
+    Route::get('/go-to-sheet', [DashboardController::class, 'goToSheet'])->name('go-to-sheet');
+    Route::get('/editable-table/{id?}', [DashboardController::class, 'editableTable'])->name('editableTable');
+    Route::get('/sheet-pdf/{id}', [DashboardController::class, 'pdf'])->name('sheet.pdf');
+    Route::delete('/sheet-delete/{id}', [DashboardController::class, 'destroy'])->name('sheet.delete');
+    Route::get('/go-to-sheet/edit/{id}', [DashboardController::class, 'edit'])->name('go-to-sheet-edit');
+
+
 
     Route::resource('roles', RoleController::class);
     Route::resource('navitems', NavItemController::class);
