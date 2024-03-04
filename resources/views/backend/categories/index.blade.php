@@ -1,24 +1,24 @@
 <x-backend.layouts.master>
     <x-slot name="page_title">
-        Categories
+        Work Scope 
     </x-slot>
 
     <x-slot name="breadcrumb">
         <x-backend.layouts.elements.breadcrumb>
             <x-slot name="pageHeader">
-                Categories
+                Work Scope 
             </x-slot>
             <x-slot name="add">
             </x-slot>
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                <li class="breadcrumb-item active">Categories</li>
+                <li class="breadcrumb-item active">Work Scope </li>
         </x-backend.layouts.elements.breadcrumb>
     </x-slot>
     
 <div class="card mb-4">
     <div class="card-header ">
         <div class="d-flex justify-content-between">
-            <span><i class="fas fa-table me-1"></i>Categories</span>
+            <span><i class="fas fa-table me-1"></i>Work Scope </span>
             <span>
                 <a class="btn btn-sm btn-primary text-left" href="{{ Route('categories.create') }}" role="button">Add</a>
                 <a class="btn btn-sm btn-danger text-left" href="{{ route('categories.trash') }}" role="button">Trash</a>

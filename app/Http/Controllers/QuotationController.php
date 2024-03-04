@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\QueryException;
 use App\Http\Requests\StoreQuotationRequest;
 use App\Http\Requests\UpdateQuotationRequest;
+use App\Models\ChangeHistories;
 use App\Models\Organization;
 
 class QuotationController extends Controller
@@ -32,7 +33,8 @@ class QuotationController extends Controller
      */
     public function create()
     {
-        return view('backend.quotations.create');
+        $categories = Category::get();
+        return view('backend.quotations.create', compact('categories'));
     }
 
     /**
@@ -44,17 +46,36 @@ class QuotationController extends Controller
     public function store(StoreQuotationRequest $request)
     {
         try{
-
             $quotationData = $request->except(['work_scope', 'amount']);
 
             $workScopes = $request->input('work_scope', []);
             $amounts = $request->input('amount', []);
 
+            if($request->purpose == 'Residential (R)' && $request->type != null) {
+                if($request->type == 'Basic (B)') {
+                    $refPurpose = 'RB';
+                } else if ($request->type == 'Premium (P)') {
+                    $refPurpose = 'RP';
+                } else if ($request->type == 'Compact Luxury (C)') {
+                    $refPurpose = 'RC';
+                } else if ($request->type == 'Luxury (L)') {
+                    $refPurpose = 'RL';
+                }
+            } else if($request->purpose == 'Residential (R)') {
+                $refPurpose = 'R';
+            } else if($request->purpose == 'Commercial (C)') {
+                $refPurpose = 'C';
+            } else if($request->purpose == 'Architectural (A)') {
+                $refPurpose = 'A';
+            }
+
+
             $currentYear = Carbon::now()->format('Y');
+            $currentYearLastTwoDigits = substr(date('Y'), -2);
             $nextReferenceNumber = Quotation::whereYear('created_at', $currentYear)->count() + 1;
             $referenceNumber = str_pad($nextReferenceNumber, 3, '0', STR_PAD_LEFT); // Pad with leading zeros
             
-            $referenceCode = 'MNML/' . $request->input('name') . '/' . $currentYear . '-' . $referenceNumber;
+            $referenceCode = 'MNML/' . $request->input('name') . '/' . $currentYearLastTwoDigits . '-' . $referenceNumber . '-' . $refPurpose;
             $quotationData['ref'] = $referenceCode;
 
             $quotation = Quotation::create([
@@ -72,6 +93,85 @@ class QuotationController extends Controller
             }
             
             return redirect()->route('quotations.index')->withMessage('Successful create :)');
+        }catch(QueryException $e){
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
+
+    public function changeHistories(StoreQuotationRequest $request, $id)
+    {
+        try{
+
+            $changeHistories = ChangeHistories::create([
+                'quotation_id'  => $id,
+                'version'       => $request->version,
+                'change'        => $request->change,
+                'date'          => now(),
+                'created_by'    => auth()->user()->id
+            ]);
+            
+            return redirect()->route('quotations.index')->withMessage('Successful Save :)');
+        }catch(QueryException $e){
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
+
+    public function duplicate(StoreQuotationRequest $request, $id)
+    {
+        try{
+            $quotation = Quotation::find($id);
+
+            $purpose = $quotation->purpose;
+            $type = $quotation->type;
+            $name = $quotation->name;
+
+            if($purpose == 'Residential (R)' && $type != null) {
+                if($type == 'Basic (B)') {
+                    $refPurpose = 'RB';
+                } else if ($type == 'Premium (P)') {
+                    $refPurpose = 'RP';
+                } else if ($type == 'Compact Luxury (C)') {
+                    $refPurpose = 'RC';
+                } else if ($type == 'Luxury (L)') {
+                    $refPurpose = 'RL';
+                }
+            } else if($purpose == 'Residential (R)') {
+                $refPurpose = 'R';
+            } else if($purpose == 'Commercial (C)') {
+                $refPurpose = 'C';
+            } else if($purpose == 'Architectural (A)') {
+                $refPurpose = 'A';
+            }
+
+
+            $currentYear = Carbon::now()->format('Y');
+            $currentYearLastTwoDigits = substr(date('Y'), -2);
+            $nextReferenceNumber = Quotation::whereYear('created_at', $currentYear)->count() + 1;
+            $referenceNumber = str_pad($nextReferenceNumber, 3, '0', STR_PAD_LEFT); // Pad with leading zeros
+            
+            $referenceCode = 'MNML/' . $name . '/' . $currentYearLastTwoDigits . '-' . $referenceNumber . '-' . $refPurpose;
+
+            $data = Quotation::create([
+                'ref'       => $referenceCode,
+                'name'      => $quotation->name,
+                'area'      => $quotation->area,
+                'address'   => $quotation->address,
+                'city'      => $quotation->city,
+                'purpose'   => $quotation->purpose,
+                'type'      => $quotation->type,
+                'date'      => now(),
+                'created_by' => auth()->user()->id
+            ]);
+
+            foreach ($quotation->quotationItems as $key => $value) {
+                QuotationItem::create([
+                    'quotation_id'  => $data->id,
+                    'work_scope'    => $value->work_scope,
+                    'created_by'    => auth()->user()->id
+                ]);
+            }
+            
+            return redirect()->route('quotations.index')->withMessage('Successful Duplicate :)');
         }catch(QueryException $e){
             return redirect()->back()->withInput()->withErrors($e->getMessage());
         }

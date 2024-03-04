@@ -54,16 +54,23 @@
             @if ($quotation != null)
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                  <button class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Quotation</button>
+                  <button class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Top Sheet</button>
                 </li>
                 @foreach ($quotation->quotationItems as $quotationItem)
                 <li class="nav-item" role="presentation">
                   <button class="nav-link" id="{{ str_replace(' ', '-', $quotationItem->category->title) }}-tab" data-toggle="tab" data-target="#{{ str_replace(' ', '-', $quotationItem->category->title) }}" type="button" role="tab" aria-controls="{{ str_replace(' ', '-', $quotationItem->category->title) }}" aria-selected="false">{{ $quotationItem->category->title }}</button>
                 </li>
                 @endforeach
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="term-tab" data-toggle="tab" data-target="#term" type="button" role="tab" aria-controls="term" aria-selected="true">Terms & Condition</button>
+                </li>
             </ul>
             <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <div class="d-flex justify-content-end">
+                    <a href="{{ route('go-to-sheet') }}" class="btn btn-danger mr-2 mt-3">Exit</a>
+                    <a href="{{ route('quotations.edit', $quotation->id) }}" class="btn btn-warning mt-3">Quotation Edit</a>
+                </div>
                 <div class="d-flex justify-content-center">
                     <div class="page">
                         <div class="row">
@@ -116,6 +123,14 @@
                                 <td>- Initial quotation</td>
                                 <td style="text-align: center">{{ $quotation->user->name }}</td>
                             </tr>
+                            @foreach ($quotation->changeHistories as $changeHistory)
+                            <tr>
+                            <td style="text-align: center">{{ $changeHistory->date }}</td>
+                            <td style="text-align: center">{{ $changeHistory->version }}</td>
+                            <td>- {{ $changeHistory->change }}</td>
+                            <td style="text-align: center">{{ $changeHistory->user->name }}</td>
+                            </tr>
+                            @endforeach
                             </table>
                         </div>
                     
@@ -216,49 +231,115 @@
                         <tbody>
                             <tr>
                                 <td class="sl">1</td>
-                                <td class="item" contenteditable="true"></td>
-                                <td class="specification" contenteditable="true"></td>
-                                <td class="qty" contenteditable="true"></td>
-                                <td class="unit" contenteditable="true"></td>
-                                <td class="rate" contenteditable="true"></td>
-                                <td class="amount" contenteditable="true"></td>
+                                <td class="item saveData" contenteditable="true"></td>
+                                <td class="specification saveData" contenteditable="true"></td>
+                                <td class="qty saveData" contenteditable="true"></td>
+                                <td class="unit saveData" contenteditable="true"></td>
+                                <td class="rate saveData" contenteditable="true"></td>
+                                <td class="amount saveData" contenteditable="true"></td>
                             </tr>
                             <tr>
                                 <td class="sl">2</td>
-                                <td class="item" contenteditable="true"></td>
-                                <td class="specification" contenteditable="true"></td>
-                                <td class="qty" contenteditable="true"></td>
-                                <td class="unit" contenteditable="true"></td>
-                                <td class="rate" contenteditable="true"></td>
-                                <td class="amount" contenteditable="true"></td>
+                                <td class="item saveData" contenteditable="true"></td>
+                                <td class="specification saveData" contenteditable="true"></td>
+                                <td class="qty saveData" contenteditable="true"></td>
+                                <td class="unit saveData" contenteditable="true"></td>
+                                <td class="rate saveData" contenteditable="true"></td>
+                                <td class="amount saveData" contenteditable="true"></td>
                             </tr>
                             <tr>
                                 <td class="sl">3</td>
-                                <td class="item" contenteditable="true"></td>
-                                <td class="specification" contenteditable="true"></td>
-                                <td class="qty" contenteditable="true"></td>
-                                <td class="unit" contenteditable="true"></td>
-                                <td class="rate" contenteditable="true"></td>
-                                <td class="amount" contenteditable="true"></td>
+                                <td class="item saveData" contenteditable="true"></td>
+                                <td class="specification saveData" contenteditable="true"></td>
+                                <td class="qty saveData" contenteditable="true"></td>
+                                <td class="unit saveData" contenteditable="true"></td>
+                                <td class="rate saveData" contenteditable="true"></td>
+                                <td class="amount saveData" contenteditable="true"></td>
                             </tr>
                             <tr>
                                 <td class="sl">4</td>
-                                <td class="item" contenteditable="true"></td>
-                                <td class="specification" contenteditable="true"></td>
-                                <td class="qty" contenteditable="true"></td>
-                                <td class="unit" contenteditable="true"></td>
-                                <td class="rate" contenteditable="true"></td>
-                                <td class="amount" contenteditable="true"></td>
+                                <td class="item saveData" contenteditable="true"></td>
+                                <td class="specification saveData" contenteditable="true"></td>
+                                <td class="qty saveData" contenteditable="true"></td>
+                                <td class="unit saveData" contenteditable="true"></td>
+                                <td class="rate saveData" contenteditable="true"></td>
+                                <td class="amount saveData" contenteditable="true"></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <div class="d-flex justify-content-end mb-3">
+                {{-- <div class="d-flex justify-content-end mb-3">
                     <button id="" type="button" class="btn btn-success mr-2 save" style="width: 250px">Save</button>
-                </div>
+                </div> --}}
             </div>
             @endforeach
+            <div class="tab-pane fade" id="term" role="tabpanel" aria-labelledby="term-tab">
+                <div class="d-flex justify-content-end">
+                    <a href="{{ route('go-to-sheet') }}" class="btn btn-danger mr-2 mt-3">Exit</a>
+                    <a href="{{ route('quotations.edit', $quotation->id) }}" class="btn btn-warning mt-3">Quotation Edit</a>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div class="page termSection">
+                        <div class="row">
+                            <div class="column"> 
+                                <p></p>
+                            </div>
+                            <div class="column organization-details">
+                            <div class="text-dark">
+                                {!! $organization->address !!}
+                            </div>
+                            <div>
+                                <p class="text-dark">{{ $organization->phone }}</p>
+                                <p class="text-dark">{{ $organization->email }}</p>
+                                <p class="text-dark"><a href="{{ $organization->facebook }}">{{ $organization->facebook }}</a></p>
+                                <p class="text-dark"><a href="{{ $organization->website }}" target="_blank">{{ $organization->website }}</a></p>
+                            </div>
+                            </div>
+                        </div>
+                        <h5 class="text-dark"><span style=""><u>Payment Schedule</u></span></h5>
+                        @foreach ($payments as $payment)
+                           <p class="text-dark"><b style="font-weight: 900">{{ $loop->iteration }}</b>. {{ $payment->title }}</p>
+                        @endforeach
+
+                        <h5 class="text-dark mt-3"><span style=""><u>Bank Account Information</u></span></h5>
+
+                        <table class="table terTable" style="width: 70%; border: 0px solid #fff;">
+                            <tr>
+                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50%; border: 0px solid #fff;">Bank Name</td>
+                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;">: {{ $bank->bank_name }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50%; border: 0px solid #fff;">Branch Name</td>
+                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;">: {{ $bank->branch_name }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50%; border: 0px solid #fff;">Account Name</td>
+                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;">: {{ $bank->account_name }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50%; border: 0px solid #fff;">Account Number</td>
+                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;">: {{ $bank->account_number }}</td>
+                            </tr>
+                        </table>
+
+                        <h5 class="text-dark mt-3"><span style=""><u>Terms & Conditions</u></span></h5>
+
+                        @foreach ($terms as $term)
+                           <p class="text-dark"><b style="font-weight: 900">{{ $loop->iteration }}</b>. {{ $term->title }}</p>
+                        @endforeach
+
+                        <p class="mt-2 text-dark" style="font-weight: 900">Special Note: This quotation might change due to addition, reduction and/or change of design and excution, human errors which will be setteled later in concern of both parties.</p>
+
+                        <p class="mt-2 text-dark">Sincerely Yours,</p>
+
+                        <p class="mt-4 text-dark">A.B.M Shafiqul Alam</p>
+                        <p class="text-dark">Director</p>
+                        <p class="text-dark">Minimal Limited</p>
+
+                    </div>
+                </div>
+            </div>
             </div>
             @endif
             
@@ -319,6 +400,10 @@
             font-size: 15px;
             }
 
+            .terTable, td, th {
+                font-size: 13px;
+            }
+
             table {
             width: 100%;
             border-collapse: collapse;
@@ -327,6 +412,13 @@
             .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
                 color: #fff !important;
                 background-color: #198754;
+            }
+            .termSection p {
+                font-size: 13px;
+            }
+            .termSection h5 {
+                font-size: 15px;
+                font-weight: 900;
             }
         </style>
     @endpush
@@ -351,7 +443,7 @@
         <script>
             $(document).ready(function () {
                 $('#sidebarToggle').trigger('click');
-                $(document).on('click', '.save', triggerCreate);
+                $(document).on('input', '.saveData', triggerCreate);
                 $('#quotationSelect').select2();
                 $(document).on('change', '#quotationSelect', loadData);
             });
@@ -390,24 +482,34 @@
                     $(tr).find('td').each(function (tdIndex, td) {
                         let thValue = table.find('thead th').eq(tdIndex).text().trim().replace(/\s+/g, '_').toLowerCase(); // Use table.find() to search within the table
                         // Set the class based on thValue to each td
-                        $(td).attr('class', thValue);
+                        $(td).attr('class', thValue + ' saveData');
                     });
                 });
 
                 // Iterate over each row in the table body
                 table.find('tbody tr').each(function (index, tr) {
                     let item = {};
-                    let missingItem = {};
+                    let missingItem = [];
                     item['category_id'] = table.find('.categoryId').val();
                     // Loop through each td in the current row
                     $(tr).find('td').each(function (tdIndex, td) {
+                        let data = {};
                         // Get the text content of the corresponding th and clean it
                         let thText = table.find('thead th').eq(tdIndex).text().trim().replace(/\s+/g, '_').toLowerCase(); // Use table.find() to search within the table
+                        
                         // Get the value of the current cell and assign it to the corresponding property in item
                         if(thText == 'sl' || thText == 'item' || thText == 'specification' || thText == 'qty' || thText == 'unit' || thText == 'rate' || thText == 'amount') {
                             item[thText] = $(td).text().trim();
                         } else {
-                            missingItem[thText] = $(td).text().trim();
+                            // missingItem[thText] = $(td).text().trim();
+                            let input = $(td).find('input');
+                            if (input.length > 0) {
+                                data['uniqueHeader'] = input.val();
+                            } else {
+                                data[thText] = $(td).text().trim();
+                            }
+                            data[thText] = $(td).text().trim();
+                            missingItem.push(data);
                         }
                     });
                     // Push the constructed item to item_data array
@@ -435,9 +537,9 @@
                     headers: {
                         "X-CSRF-TOKEN": $(document).find('[name="_token"]').val()
                     },
-                    beforeSend  : function(){
-                        $(el).html(`Processing ...`).prop('disabled', true);  
-                    },
+                    // beforeSend  : function(){
+                    //     $(el).html(`Processing ...`).prop('disabled', true);  
+                    // },
                     success(response){
                         if (response.error !== undefined) { // Check if error is defined in the response
                             Swal.fire({
@@ -446,15 +548,7 @@
                                 showConfirmButton: false,
                                 timer: 1500
                             });
-                        } else {
-                            Swal.fire({
-                                icon: "success",
-                                title: response.message, // Show success message
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
                         }
-                        $(el).html(`Save`).prop("disabled", false);
 
                         // Swal.fire({
                         //     icon: "success",
@@ -471,8 +565,7 @@
                             title: error.responseJSON.message,
                             showConfirmButton: false,
                             timer: 1500
-                        })
-                        $(el).html(`Save`).prop("disabled", false);
+                        });
                     }
                 });
             }

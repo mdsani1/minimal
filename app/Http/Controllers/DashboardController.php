@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bank;
 use Carbon\Carbon;
 use App\Models\Land;
 use App\Models\Organization;
+use App\Models\Payment;
 use App\Models\Quotation;
 use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\QuoteItemValue;
+use App\Models\Term;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -38,7 +41,10 @@ class DashboardController extends Controller
         $organization = Organization::latest()->first();
         $quotation = Quotation::find($id);
         $quotations = Quotation::latest()->get();
-        return view('backend.quotes.editable', compact('quotation','quotations','organization'));
+        $payments = Payment::get();
+        $terms = Term::get();
+        $bank = Bank::latest()->first();
+        return view('backend.quotes.editable', compact('quotation','quotations','organization','payments','terms','bank'));
     }
 
     public function pdf($id)
@@ -90,9 +96,14 @@ class DashboardController extends Controller
     {
         $quote = Quote::find($id);
         $organization = Organization::latest()->first();
+        $quotations = Quotation::latest()->get();
         $externalMenus = QuoteItemValue::where('quote_id', $quote->id)->distinct()->pluck('header');
         $quoteItems = QuoteItem::with('quoteItemValues')->where('quote_id',$id)->get()->groupBy('category_id');
+        $payments = Payment::get();
+        $quotation = Quotation::find($quote->quotation_id);
+        $terms = Term::get();
+        $bank = Bank::latest()->first();
 
-        return view('backend.quotes.edit', compact('quote','externalMenus','organization','quoteItems'));
+        return view('backend.quotes.edit', compact('quote','quotation','quotations','externalMenus','organization','quoteItems','payments','terms','bank'));
     }
 }

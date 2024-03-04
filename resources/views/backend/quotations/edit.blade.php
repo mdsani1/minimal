@@ -30,7 +30,32 @@
                 @csrf
                 @method('patch')
                 <div class="row mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="name">Purpose</label>
+                            <select name="purpose" class="form-control mt-2" id="purposeSelect">
+                                <option value="">Please Select</option>
+                                <option value="Residential (R)" {{ $quotation->purpose == 'Residential (R)' ? 'selected' : '' }}>Residential (R)</option>
+                                <option value="Commercial (C)" {{ $quotation->purpose == 'Commercial (C)' ? 'selected' : '' }}>Commercial (C)</option>
+                                <option value="Architectural (A)" {{ $quotation->purpose == 'Architectural (A)' ? 'selected' : '' }}>Architectural (A)</option>
+                            </select>
+                            @error("purpose")
+                                <span class="sm text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="type">Type</label>
+                            <input type="hidden" id="selectedType" value="{{ $quotation->type }}">
+                            <select name="type" class="form-control mt-2" id="typeSelect">
+                                <!-- Options will be added dynamically by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="name">Name</label>
                             <input type="text" class="form-control mt-2" name="name" placeholder="Enter Name" value="{{ old('name', $quotation->name) }}" required>
@@ -40,11 +65,31 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="area">Area</label>
+                            <input type="text" class="form-control mt-2" name="area" placeholder="Enter Address" value="{{ old('area', $quotation->area) }}" required>
+                            @error("area")
+                                <span class="sm text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="address">Address</label>
                             <input type="text" class="form-control mt-2" name="address" placeholder="Enter Address" value="{{ old('address', $quotation->address) }}" required>
                             @error("address")
+                                <span class="sm text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" class="form-control mt-2" name="city" placeholder="Enter Address" value="{{ old('city', $quotation->city) }}" required>
+                            @error("city")
                                 <span class="sm text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -59,7 +104,7 @@
                                 <tr>
                                     <th>SL</th>
                                     <th class="text-center">Work Scope</th>
-                                    <th class="text-center">Amount</th>
+                                    {{-- <th class="text-center">Amount</th> --}}
                                     <th class="text-center">Action</th>
                                 </tr>
                             </thead>
@@ -68,17 +113,17 @@
                                 <tr>
                                     <input type="hidden" name="quotationItemId[]" value="{{ $quotationItem->id }}">
                                     <td class="text-center sl">1</td>
-                                    <td class="text-center" style="width: 35%">
-                                        <select data-placeholder="{{ ('please Select') }}" name="work_scope[]" value="{{ old('work_scope') }}" class="form-control mt-2" required>
+                                    <td class="text-center" style="width: 75%">
+                                        <select data-placeholder="{{ ('please Select') }}" name="work_scope[]" value="{{ old('work_scope') }}" class="form-control work_scope mt-2" required>
                                             <option value="">Please Select</option>
                                             @foreach ($categories as $category)
                                                 <option value="{{ $category->id }}" {{ $category->id == $quotationItem->work_scope ? 'selected' : '' }}>{{ $category->title }}</option>
                                             @endforeach
                                         </select>
                                     </td>
-                                    <td class="text-center" style="width: 35%">
+                                    {{-- <td class="text-center" style="width: 35%">
                                         <input type="number" class="form-control mt-2" name="amount[]" placeholder="Enter Amount" value="{{ old('amount', $quotationItem->amount) }}" required>
-                                    </td>
+                                    </td> --}}
                                     <td class="text-center" style="width: 20%">
                                         <button type="button" class="btn btn-success add-row"><i class="fas fa-plus-circle"></i></button>
                                         <button class="btn btn-danger delete" data-id="{{ $quotationItem->id }}"><i class="fas fa-trash-alt"></i></button>
@@ -117,19 +162,18 @@
             $(document).ready(function () {
                 $('select').select2();
                 loadcategory();
+                type();
                 $(document).on('change', '.work_scope', doubleCheck);
+                $(document).on('change', '#purposeSelect', loadType);
 
                 $('.add-row').click(function() {
                     $('#dynamic-table tbody').append(`<tr>
                         <input type="hidden" name="quotationItemId[]" value="{{ null }}">
                         <td class="text-center sl">1</td>
-                        <td class="text-center" style="width: 35%">
+                        <td class="text-center" style="width: 75%">
                             <select data-placeholder="{{ ('please Select') }}" name="work_scope[]" value="{{ old('work_scope') }}"  class="form-control mt-2 work_scope" required>
                                 <option value="">Please Select</option>
                             </select>
-                        </td>
-                        <td class="text-center" style="width: 35%">
-                            <input type="number" class="form-control mt-2" name="amount[]" placeholder="Enter Amount" value="{{ old('amount') }}" required>
                         </td>
                         <td class="text-center" style="width: 20%">
                             <button type="button" class="btn btn-success add-row"><i class="fas fa-plus-circle"></i></button>
@@ -239,6 +283,56 @@
                     
             }
 
+            function type() {
+                let data = $('#purposeSelect').val();
+                let selectedValue = $('#selectedType').val();
+                var typeSelect = document.getElementById('typeSelect');
+
+                // Clear previous options
+                typeSelect.innerHTML = '';
+
+                if (data === 'Residential (R)') {
+                    // Add options for Residential
+                    var types = ["Basic (B)", "Premium (P)", "Compact Luxury (C)", "Luxury (L)"];
+                    types.forEach(function(type) {
+                        var option = document.createElement('option');
+                        option.text = type;
+                        option.value = type;
+                        typeSelect.add(option);
+                    });
+                    $('#typeSelect').prop('disabled', false);
+                } else {
+                    $('#typeSelect').prop('disabled', true);
+                }
+
+                // Set selected value
+                $('#typeSelect').val(selectedValue);
+            }
+
+
+            function loadType(event) 
+            {
+                let el = event.target;
+
+                var typeSelect = document.getElementById('typeSelect');
+        
+                // Clear previous options
+                typeSelect.innerHTML = '';
+                
+                if ($(el).val() === 'Residential (R)') {
+                    // Add options for Residential
+                    var types = ["Basic (B)", "Premium (P)", "Compact Luxury (C)", "Luxury (L)"];
+                    types.forEach(function(type) {
+                        var option = document.createElement('option');
+                        option.text = type;
+                        option.value = type;
+                        typeSelect.add(option);
+                    });
+                    $('#typeSelect').prop('disabled', false);
+                } else {
+                    $('#typeSelect').prop('disabled', true);
+                }
+            }
         </script>
     @endpush
 

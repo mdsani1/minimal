@@ -108,6 +108,14 @@
           <td>- Initial quotation</td>
           <td style="text-align: center">{{ $quotation->user->name }}</td>
         </tr>
+        @foreach ($quotation->changeHistories as $changeHistory)
+        <tr>
+          <td style="text-align: center">{{ $changeHistory->date }}</td>
+          <td style="text-align: center">{{ $changeHistory->version }}</td>
+          <td>- {{ $changeHistory->change }}</td>
+          <td style="text-align: center">{{ $changeHistory->user->name }}</td>
+        </tr>
+        @endforeach
       </table>
     </div>
 

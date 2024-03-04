@@ -31,7 +31,7 @@ $(document).ready(function() {
             if (i === 0) {
                 newCell = $('<td class="sl"></td>').addClass(thValue); // Add class from th to td
             } else {
-                newCell = $('<td contenteditable="true"></td>').addClass(thValue); // Add class from th to td
+                newCell = $('<td class="saveData" contenteditable="true"></td>').addClass(thValue); // Add class from th to td
             }
             newRow.append(newCell); // Append each new cell to the row
         }
@@ -43,17 +43,24 @@ $(document).ready(function() {
 
     // Function to dynamically add a new column to the end of all rows in the editable table
     // This function iterates through each row, appending a new cell to ensure the column is added uniformly across the table.
+    let columnNo = 1;
+
     function addColumn(table) {
         // Iterate over each row in the table
         table.find('tr').each(function() {
             // For header row, add a <th> element; for other rows, add a <td> element
             if ($(this).find('th').length) {
-                $(this).append('<th style="background-color: #198754; color:#fff" contenteditable="true" class="newcloumnHeader">New Header</th>');
+                $(this).append(`<th style="background-color: #198754; color:#fff" contenteditable="true" class="newcloumnHeader saveData" id="column${columnNo}">New Header</th>`);
             } else {
-                $(this).append('<td class="NewHeader" contenteditable="true"></td>');
+                $(this).append(`<td class="NewHeader newHeader${columnNo} saveData" contenteditable="true">
+                <input type="hidden" class="quoteItemValue" value="column${columnNo}">
+                </td>`);
             }
         });
+
+        columnNo++;
     }
+
 
     // Function to update sl values
     function slHandler(table) {

@@ -1,17 +1,17 @@
 <x-backend.layouts.master>
     <x-slot name="page_title">
-        Interiors
+        Items
     </x-slot>
 
     <x-slot name="breadcrumb">
         <x-backend.layouts.elements.breadcrumb>
             <x-slot name="pageHeader">
-                Interiors
+                Items
             </x-slot>
             <x-slot name="add">
             </x-slot>
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('interiors.index') }}">Interiors</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('interiors.index') }}">Items</a></li>
                 <li class="breadcrumb-item active">Trash</li>
         </x-backend.layouts.elements.breadcrumb>
     </x-slot>
@@ -19,7 +19,7 @@
 <div class="card mb-4">
     <div class="card-header ">
         <div class="d-flex justify-content-between">
-            <span><i class="fas fa-table me-1"></i>Interiors</span>
+            <span><i class="fas fa-table me-1"></i>Items</span>
             <span>
                 <a class="btn btn-primary text-left" href="{{ route('interiors.index') }}" role="button">List</a>
             </span>

@@ -27,8 +27,12 @@
     </div>
     <div class="card-body">
         <p><b>Ref:</b> {{ $quotation->ref }}</p>
+        <p><b>Purpose:</b> {{ $quotation->purpose }}</p>
+        <p><b>Type:</b> {{ $quotation->type }}</p>
         <p><b>Name:</b> {{ $quotation->name }}</p>
+        <p><b>Area:</b> {{ $quotation->area }}</p>
         <p><b>Address:</b> {{ $quotation->address }}</p>
+        <p><b>City:</b> {{ $quotation->city }}</p>
         <p><b>Date:</b> {{ $quotation->date }}</p>
 
         <hr>

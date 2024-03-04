@@ -1,14 +1,18 @@
 <?php
 
+use App\Http\Controllers\BankController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ConditionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InteriorController;
 use App\Http\Controllers\NavItemController;
 use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RoleNavItemController;
 use App\Http\Controllers\SubCategoryController;
+use App\Http\Controllers\TermController;
 use App\Http\Controllers\UserController;
 use App\Models\Organization;
 use Illuminate\Support\Facades\Route;
@@ -92,7 +96,13 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/quotations-trash/{quotation}', [QuotationController::class, 'restore'])->name('quotations.restore');
     Route::get('/quotations-trash/{quotation}/delete', [QuotationController::class, 'delete'])->name('quotations.delete');
     Route::get('/quotations-pdf/{id}', [QuotationController::class, 'pdf'])->name('quotations.pdf');
+    Route::get('/quotations-duplicate/{id}', [QuotationController::class, 'duplicate'])->name('quotations.duplicate');
+    Route::post('/change-histories/{id}', [QuotationController::class, 'changeHistories'])->name('change-histories');
     Route::resource('quotations', QuotationController::class);
+
+    Route::resource('terms', TermController::class);
+    Route::resource('payments', PaymentController::class);
+    Route::resource('banks', BankController::class);
 });
 
 

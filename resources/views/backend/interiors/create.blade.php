@@ -1,18 +1,18 @@
 <x-backend.layouts.master>
     <x-slot name="page_title">
-        Interiors
+        Items
     </x-slot>
 
     <x-slot name="breadcrumb">
         <x-backend.layouts.elements.breadcrumb>
             <x-slot name="pageHeader">
-                Interiors
+                Items
             </x-slot>
             <x-slot name="add">
                 
             </x-slot>
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('interiors.index') }}">Interiors</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('interiors.index') }}">Items</a></li>
             <li class="breadcrumb-item active">Create</li>
         </x-backend.layouts.elements.breadcrumb>
     </x-slot>
@@ -21,7 +21,7 @@
         <div class="card-header ">
             
             <div class="d-flex justify-content-between">
-                <span><i class="fas fa-table me-1"></i>Interiors</span>
+                <span><i class="fas fa-table me-1"></i>Items</span>
                 <span>
                     <a class="btn btn-primary text-left" href="{{ Route('interiors.index') }}" role="button">List</a>
                 </span>
@@ -34,7 +34,7 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="item">Category *</label>
+                            <label for="item">Work Scope *</label>
                             <select class="form-control mt-2" name="category_id" id="category_id" required>
                                 <option value="">Please Select</option>
                                 @foreach ($categories as $category)
@@ -49,7 +49,7 @@
 
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="sub_category_id">Sub Category</label>
+                            <label for="sub_category_id">Zone</label>
                             <select data-placeholder="{{ ('please Select') }}" name="sub_category_id" value="{{ old('sub_category_id') }}"  id="sub_category_id" class="form-control mt-2">
                                 <option value="">Please Select</option>
                             </select>
@@ -110,22 +110,58 @@
                     </div>
 
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="height">Height</label>
-                            <input type="text" class="form-control mt-2" name="height" placeholder="Enter Height" value="{{ old('height') }}">
-                            @error("height")
-                                <span class="sm text-danger">{{ $message }}</span>
-                            @enderror
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="feet">Height</label>
+                                    <input type="text" class="form-control mt-2" name="feet" placeholder="Enter Feet" value="{{ old('feet') }}">
+                                    @error("feet")
+                                        <span class="sm text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="inche"></label>
+                                    <input type="text" class="form-control mt-2" name="inche" placeholder="Enter Inches" value="{{ old('inche') }}">
+                                    @error("inche")
+                                        <span class="sm text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="description">Detail *</label>
-                            <textarea class="form-control mt-2" name="default_detail" id="" cols="30" rows="10"></textarea>
-                            @error("description")
-                                <span class="sm text-danger">{{ $message }}</span>
-                            @enderror
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="description">Specification 1 *</label>
+                                    <textarea class="form-control mt-2" name="specification1" id="" cols="30" rows="5"></textarea>
+                                    @error("description")
+                                        <span class="sm text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+        
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="description">Specification 2 *</label>
+                                    <textarea class="form-control mt-2" name="specification2" id="" cols="30" rows="5"></textarea>
+                                    @error("description")
+                                        <span class="sm text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+        
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="description">Specification 3 *</label>
+                                    <textarea class="form-control mt-2" name="specification3" id="" cols="30" rows="5"></textarea>
+                                    @error("description")
+                                        <span class="sm text-danger">{{ $message }}</span>
+                                    @enderror
+                            </div>
                         </div>
                     </div>
                 </div>

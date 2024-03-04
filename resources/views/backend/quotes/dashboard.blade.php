@@ -125,6 +125,7 @@
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item" target="_blank" href="/sheet-pdf/${elementValue.id}">Pdf</a>
                                         <a class="dropdown-item" href="/go-to-sheet/edit/${elementValue.id}">Edit</a>
+                                        <button type="button" class="dropdown-item copyLink" target="_blank" href="/sheet-pdf/${elementValue.id}">Copy</button>
                                         <form style="display: inline;" action="/sheet-delete/${elementValue.id}" method="POST">
                                             @csrf
                                             @method('delete')
@@ -141,6 +142,37 @@
                     }
                 });
             }
+        </script>
+        <script>
+            $(document).ready(function() {
+                // Function to handle click event on PDF button
+                $(document).on('click', '.copyLink', function() {
+                    // Retrieve the base URL
+                    let baseUrl = window.location.origin;
+                    let pdfUrl = $(this).attr('href');
+                    
+                    // Concatenate base URL and PDF URL
+                    let fullUrl = baseUrl + pdfUrl;
+                    
+                    // Notify the user that the full URL has been copied
+                    navigator.clipboard.writeText(fullUrl)
+                        .then(function() {
+                            // Notify the user that the URL has been copied
+                            Swal.fire({
+                                icon: "success",
+                                title: 'Copy Link', // Show error message
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        })
+                        .catch(function(error) {
+                            console.error('Failed to copy full URL: ', error);
+                        });
+                    
+                    // Prevent default link behavior
+                    return false;
+                });
+            });
         </script>
     @endpush
 </x-backend.layouts.master>

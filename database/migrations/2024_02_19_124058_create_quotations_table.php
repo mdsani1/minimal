@@ -15,7 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('ref')->nullable();
             $table->string('name')->nullable();
+            $table->string('area')->nullable();
             $table->string('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('purpose')->nullable();
+            $table->string('type')->nullable();
             $table->date('date')->nullable();
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();

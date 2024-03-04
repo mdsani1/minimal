@@ -1,18 +1,18 @@
 <x-backend.layouts.master>
     <x-slot name="page_title">
-        Categories
+        Work Scope 
     </x-slot>
 
     <x-slot name="breadcrumb">
         <x-backend.layouts.elements.breadcrumb>
             <x-slot name="pageHeader">
-                Categories
+                Work Scope 
             </x-slot>
             <x-slot name="add">
                 
             </x-slot>
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('categories.index') }}">Categories</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('categories.index') }}">Work Scope </a></li>
             <li class="breadcrumb-item active">Create</li>
         </x-backend.layouts.elements.breadcrumb>
     </x-slot>
@@ -21,7 +21,7 @@
         <div class="card-header ">
             
             <div class="d-flex justify-content-between">
-                <span><i class="fas fa-table me-1"></i>Categories</span>
+                <span><i class="fas fa-table me-1"></i>Work Scope </span>
                 <span>
                     <a class="btn btn-primary text-left" href="{{ Route('categories.index') }}" role="button">List</a>
                 </span>

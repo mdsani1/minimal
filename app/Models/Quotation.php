@@ -22,4 +22,9 @@ class Quotation extends Model
     {
         return $this->hasMany(QuotationItem::class, 'quotation_id');
     }
+
+    public function changeHistories()
+    {
+        return $this->hasMany(ChangeHistories::class, 'quotation_id');
+    }
 }

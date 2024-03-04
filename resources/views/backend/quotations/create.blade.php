@@ -32,7 +32,31 @@
             <form action="{{ route('quotations.store') }}" method="POST">
                 @csrf
                 <div class="row mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="name">Purpose</label>
+                            <select name="purpose" class="form-control mt-2" id="purposeSelect">
+                                <option value="">Please Select</option>
+                                <option value="Residential (R)">Residential (R)</option>
+                                <option value="Commercial (C)">Commercial (C)</option>
+                                <option value="Architectural (A)">Architectural (A)</option>
+                            </select>
+                            @error("purpose")
+                                <span class="sm text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="type">Type</label>
+                            <select name="type" class="form-control mt-2" id="typeSelect">
+                                <!-- Options will be added dynamically by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="name">Name</label>
                             <input type="text" class="form-control mt-2" name="name" placeholder="Enter Name" value="{{ old('name') }}" required>
@@ -42,11 +66,31 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="area">Area</label>
+                            <input type="text" class="form-control mt-2" name="area" placeholder="Enter Address" value="{{ old('area') }}" required>
+                            @error("area")
+                                <span class="sm text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="address">Address</label>
                             <input type="text" class="form-control mt-2" name="address" placeholder="Enter Address" value="{{ old('address') }}" required>
                             @error("address")
+                                <span class="sm text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" class="form-control mt-2" name="city" placeholder="Enter Address" value="{{ old('city') }}" required>
+                            @error("city")
                                 <span class="sm text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -61,25 +105,24 @@
                                 <tr>
                                     <th>SL</th>
                                     <th class="text-center">Work Scope</th>
-                                    <th class="text-center">Amount</th>
                                     <th class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                @foreach ($categories as $category)
                                 <tr>
                                     <td class="text-center sl">1</td>
-                                    <td class="text-center" style="width: 35%">
-                                        <select data-placeholder="{{ ('please Select') }}" name="work_scope[]" value="{{ old('work_scope') }}" class="form-control work_scope mt-2" required>
-                                            <option value="">Please Select</option>
+                                    <td class="text-center" style="width: 75%">
+                                        <select data-placeholder="{{ ('please Select') }}" name="work_scope[]" value="{{ old('work_scope') }}" class="form-control mt-2 work_scope" required readonly>
+                                            <option value="{{ $category->id }}">{{ $category->title }}</option>
                                         </select>
-                                    </td>
-                                    <td class="text-center" style="width: 35%">
-                                        <input type="number" class="form-control mt-2" name="amount[]" placeholder="Enter Amount" value="{{ old('amount') }}" required>
                                     </td>
                                     <td class="text-center" style="width: 20%">
                                         <button type="button" class="btn btn-success add-row"><i class="fas fa-plus-circle"></i></button>
+                                        <button class="btn btn-danger delete-row"><i class="fas fa-trash-alt"></i></button>
                                     </td>
                                 </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -107,23 +150,23 @@
         </style>
     @endpush
 
-    @push('js')
+    @push('js')        
+
         <script>
             $(document).ready(function () {
                 $('select').select2();
                 loadcategory();
+                $('#typeSelect').prop('disabled', true);
                 $(document).on('change', '.work_scope', doubleCheck);
+                $(document).on('change', '#purposeSelect', loadType);
 
                 $('.add-row').click(function() {
                     $('#dynamic-table tbody').append(`<tr>
                         <td class="text-center sl">1</td>
-                        <td class="text-center" style="width: 35%">
+                        <td class="text-center" style="width: 75%">
                             <select data-placeholder="{{ ('please Select') }}" name="work_scope[]" value="{{ old('work_scope') }}"  class="form-control mt-2 work_scope" required>
                                 <option value="">Please Select</option>
                             </select>
-                        </td>
-                        <td class="text-center" style="width: 35%">
-                            <input type="number" class="form-control mt-2" name="amount[]" placeholder="Enter Amount" value="{{ old('amount') }}" required>
                         </td>
                         <td class="text-center" style="width: 20%">
                             <button type="button" class="btn btn-success add-row"><i class="fas fa-plus-circle"></i></button>
@@ -197,6 +240,30 @@
                     $(el).val(null).change();
                 }
                     
+            }
+
+            function loadType(event) 
+            {
+                let el = event.target;
+
+                var typeSelect = document.getElementById('typeSelect');
+        
+                // Clear previous options
+                typeSelect.innerHTML = '';
+                
+                if ($(el).val() === 'Residential (R)') {
+                    // Add options for Residential
+                    var types = ["Basic (B)", "Premium (P)", "Compact Luxury (C)", "Luxury (L)"];
+                    types.forEach(function(type) {
+                        var option = document.createElement('option');
+                        option.text = type;
+                        option.value = type;
+                        typeSelect.add(option);
+                    });
+                    $('#typeSelect').prop('disabled', false);
+                } else {
+                    $('#typeSelect').prop('disabled', true);
+                }
             }
 
         </script>

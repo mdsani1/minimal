@@ -1,16 +1,16 @@
 <x-backend.layouts.master>
     <x-slot name="page_title">
-        Interiors
+        Items
     </x-slot>
     <x-slot name="breadcrumb">
         <x-backend.layouts.elements.breadcrumb>
             <x-slot name="pageHeader">
-                Interiors
+                Items
             </x-slot>
             <x-slot name="add">  
             </x-slot>
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('interiors.index') }}">Interiors</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('interiors.index') }}">Items</a></li>
             <li class="breadcrumb-item active">Edit</li>
         </x-backend.layouts.elements.breadcrumb>
     </x-slot>
@@ -18,7 +18,7 @@
     <div class="card mb-4">
         <div class="card-header ">
             <div class="d-flex justify-content-between">
-                <span><i class="fas fa-table me-1"></i>Interiors</span>
+                <span><i class="fas fa-table me-1"></i>Items</span>
                 <span>
                     <a class="btn btn-primary text-left" href="{{ Route('interiors.index') }}" role="button">List</a>
                 </span>
@@ -109,22 +109,58 @@
                     </div>
 
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="height">Height</label>
-                            <input type="text" class="form-control mt-2" name="height" placeholder="Enter Height" value="{{ old('height', $interior->height) }}">
-                            @error("height")
-                                <span class="sm text-danger">{{ $message }}</span>
-                            @enderror
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="feet">Height</label>
+                                    <input type="text" class="form-control mt-2" name="feet" placeholder="Enter Feet" value="{{ old('feet', $interior->feet) }}">
+                                    @error("feet")
+                                        <span class="sm text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="inche"></label>
+                                    <input type="text" class="form-control mt-2" name="inche" placeholder="Enter Inches" value="{{ old('inche', $interior->inche) }}">
+                                    @error("inche")
+                                        <span class="sm text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="description">Detail *</label>
-                            <textarea class="form-control mt-2" name="default_detail" id="" cols="30" rows="10">{{ $interior->default_detail }}</textarea>
-                            @error("description")
-                                <span class="sm text-danger">{{ $message }}</span>
-                            @enderror
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="description">Specification 1 *</label>
+                                    <textarea class="form-control mt-2" name="specification1" id="" cols="30" rows="5">{{ $interior->specification1 }}</textarea>
+                                    @error("description")
+                                        <span class="sm text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+        
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="description">Specification 2 *</label>
+                                    <textarea class="form-control mt-2" name="specification2" id="" cols="30" rows="5">{{ $interior->specification2 }}</textarea>
+                                    @error("description")
+                                        <span class="sm text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+        
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="description">Specification 3 *</label>
+                                    <textarea class="form-control mt-2" name="specification3" id="" cols="30" rows="5">{{ $interior->specification3 }}</textarea>
+                                    @error("description")
+                                        <span class="sm text-danger">{{ $message }}</span>
+                                    @enderror
+                            </div>
                         </div>
                     </div>
                 </div>
