@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Quotation extends Model
+class Template extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -18,18 +18,8 @@ class Quotation extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function quotationItems()
+    public function quote()
     {
-        return $this->hasMany(QuotationItem::class, 'quotation_id');
-    }
-
-    public function sheets()
-    {
-        return $this->hasMany(Quote::class, 'quotation_id');
-    }
-
-    public function changeHistories()
-    {
-        return $this->hasMany(ChangeHistories::class, 'quotation_id');
+        return $this->belongsTo(Quote::class);
     }
 }

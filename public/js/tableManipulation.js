@@ -8,7 +8,19 @@ $(document).ready(function() {
 
     $('.addColumnBtn').click(function() {
         let editableTable = $(this).closest('.tab-pane').find('.editableTable');
-        addColumn(editableTable);
+        var lastThId = editableTable.find('.saveData.extracolumn:last').attr('id');
+
+        let columnNo;
+        if(lastThId == null || lastThId == undefined) {
+            console.log('in');
+            columnNo = 1;
+        } else {
+            var modifiedString = lastThId.replace(/^column/, '');
+            console.log(parseInt(modifiedString) + 1);
+            columnNo = parseInt(modifiedString) + 1;
+        }
+
+        addColumn(editableTable, columnNo);
     });
 
     // Function to dynamically add a new row to the editable table
@@ -25,13 +37,21 @@ $(document).ready(function() {
         for (let i = 0; i < columnCount; i++) {
             // Declare and initialize thValue inside the loop
             let thValue = table.find('thead th').eq(i).text(); // Get the class value of the corresponding th
+            let thValueId = table.find('thead th').eq(i).attr('id');
             thValue = thValue.replace(/\s+/g, '_').toLowerCase(); // Should now log the correct class values
 
             let newCell;
             if (i === 0) {
                 newCell = $('<td class="sl"></td>').addClass(thValue); // Add class from th to td
             } else {
-                newCell = $('<td class="saveData" contenteditable="true"></td>').addClass(thValue); // Add class from th to td
+                console.log(thValue);
+                if(i > 6) {
+                    newCell = $(`<td class="saveData" contenteditable="true">
+                    <input type="hidden" class="quoteItemValue" value="${thValueId}">
+                    </td>`).addClass(thValue); // Add class from th to td
+                } else {
+                    newCell = $('<td class="saveData" contenteditable="true"></td>').addClass(thValue); // Add class from th to td
+                }
             }
             newRow.append(newCell); // Append each new cell to the row
         }
@@ -43,14 +63,13 @@ $(document).ready(function() {
 
     // Function to dynamically add a new column to the end of all rows in the editable table
     // This function iterates through each row, appending a new cell to ensure the column is added uniformly across the table.
-    let columnNo = 1;
 
-    function addColumn(table) {
+    function addColumn(table, columnNo) {
         // Iterate over each row in the table
         table.find('tr').each(function() {
             // For header row, add a <th> element; for other rows, add a <td> element
             if ($(this).find('th').length) {
-                $(this).append(`<th style="background-color: #198754; color:#fff" contenteditable="true" class="newcloumnHeader saveData" id="column${columnNo}">New Header</th>`);
+                $(this).append(`<th style="background-color: #198754; color:#fff" contenteditable="true" class="newcloumnHeader saveData extracolumn" id="column${columnNo}">New Header</th>`);
             } else {
                 $(this).append(`<td class="NewHeader newHeader${columnNo} saveData" contenteditable="true">
                 <input type="hidden" class="quoteItemValue" value="column${columnNo}">

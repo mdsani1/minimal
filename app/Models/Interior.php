@@ -27,4 +27,9 @@ class Interior extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function interiorSpecifications()
+    {
+        return $this->hasMany(InteriorSpecification::class, 'interior_id');
+    }
 }

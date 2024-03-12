@@ -15,10 +15,10 @@
         
 
         <div class="mt-4">
-            <p style="font-size: 18px">Start a new sheet</p>
+            <p style="font-size: 18px">Sheet</p>
 
             <div class="row">
-                <div class="col-md-2">
+                {{-- <div class="col-md-2">
                     <a href="{{ route('editableTable') }}">
                         <div class="card" style="height: 150px">
                             <div class="card-body d-flex justify-content-center align-items-center">
@@ -27,7 +27,7 @@
                         </div>
                         <p class="text-center" style="font-size: 18px">Blank sheet</p>
                     </a>
-                </div>
+                </div> --}}
 
                 @foreach ($quotes as $item)
                 <div class="col-md-2">
@@ -45,12 +45,12 @@
         </div>
     </div>
 
-    <div style="background-color: #fff; height:60vh">
-        <div class="container">
+    <div class="table-responsive" style="background-color: #fff; height:60vh">
+        <div class="container table-responsive">
             <div class="pt-3">
                 <x-backend.layouts.elements.message :message="session('message')"/>
             </div>
-            <div class="pt-2">
+            <div class="pt-2 ">
                 <table class="table" id="quotesTableData">
                     <thead>
                         <tr>
@@ -115,7 +115,7 @@
                              data += `
                              <tr>
                                 <td>${elementValue.title}</td>
-                                <td class="text-center">${elementValue.quotation.ref}</td>
+                                <td class="text-center">${elementValue.quotation != null ? elementValue.quotation.ref : ''}</td>
                                 <td class="text-center">${elementValue.date}</td>
                                 <td style="text-align: right">
                                     <div class="dropdown">

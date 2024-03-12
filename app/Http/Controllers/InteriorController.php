@@ -10,6 +10,7 @@ use App\Exports\InteriorsExport;
 use Illuminate\Database\QueryException;
 use App\Http\Requests\StoreInteriorRequest;
 use App\Http\Requests\UpdateInteriorRequest;
+use App\Models\InteriorSpecification;
 
 class InteriorController extends Controller
 {
@@ -52,12 +53,20 @@ class InteriorController extends Controller
                 $file->move('backend/images/interior', $filename);
             }
 
-            $interiorData = $request->except('image');
+            $interiorData = $request->except('image','specification');
             if ($filename) {
                 $interiorData['image'] = $filename;
             }
 
             $interior = Interior::create(['created_by' => auth()->user()->id] + $interiorData);
+
+            foreach ($request->specification as $key => $value) {
+                $interiorSpecification = InteriorSpecification::create([
+                    'interior_id'   => $interior->id,
+                    'specification' => $value,
+                    'created_by'    => auth()->user()->id,
+                ]);
+            }
 
             return redirect()->route('interiors.index')->withMessage('Successful create :)');
         }catch(QueryException $e){
@@ -102,6 +111,7 @@ class InteriorController extends Controller
     {
         try{
             $interior = Interior::find($id);
+
             
             $filename = null;
             
@@ -110,12 +120,30 @@ class InteriorController extends Controller
                 $filename = time().'.'.$file->getClientOriginalExtension();
                 $file->move('backend/images/interior', $filename);
             }
-            $interiorData = $request->except('image');
+            $interiorData = $request->except('image','interiorSpecificationId', 'specification');
             if ($filename) {
                 $interiorData['image'] = $filename;
             }
 
             $interior->update(['updated_by' => auth()->user()->id] + $interiorData);
+
+
+            foreach ($request->specification as $key => $value) {
+
+                if($request->interiorSpecificationId[$key] != null) {
+                    $interiorSpecification = InteriorSpecification::find($request->interiorSpecificationId[$key]);
+                    $interiorSpecification->update([
+                        'specification' => $value,
+                        'updated_by'    => auth()->user()->id,
+                    ]);
+                } else {
+                    $interiorSpecification = InteriorSpecification::create([
+                        'interior_id'   => $interior->id,
+                        'specification' => $value,
+                        'created_by'    => auth()->user()->id,
+                    ]);
+                }
+            }
 
             return redirect()->route('interiors.index')->withMessage('Successful update :)');
         }catch(QueryException $e){
@@ -137,6 +165,19 @@ class InteriorController extends Controller
             $interior->delete();
 
             return redirect()->route('interiors.index')->withMessage('Successful delete :)');
+        }catch(QueryException $e){
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
+
+    public function interiorspecificationDelete($id)
+    {
+        try{
+            $interiorSpecification = InteriorSpecification::find($id);
+            $interiorSpecification->update(['deleted_by' => auth()->user()->id]);
+            $interiorSpecification->delete();
+
+            return redirect()->back()->withMessage('Successful Delete :)');
         }catch(QueryException $e){
             return redirect()->back()->withInput()->withErrors($e->getMessage());
         }

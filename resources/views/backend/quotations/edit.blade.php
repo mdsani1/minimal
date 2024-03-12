@@ -32,6 +32,16 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <div class="form-group">
+                            <label for="ref">Ref</label>
+                            <input type="text" class="form-control mt-2" name="ref" placeholder="" value="{{ old('ref', $quotation->ref) }}" required>
+                            @error("ref")
+                                <span class="sm text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
                             <label for="name">Purpose</label>
                             <select name="purpose" class="form-control mt-2" id="purposeSelect">
                                 <option value="">Please Select</option>

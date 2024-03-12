@@ -48,7 +48,7 @@
 
     table, td, th {
       border: 1px solid;
-      font-size: 15px;
+      font-size: 12px;
     }
 
     table {
@@ -58,7 +58,7 @@
   </style>
 </head>
 <body>
-  <div>
+  <div style="page-break-after: always;">
     <div class="row">
       <div class="column">
         <img src="{{ public_path('backend/images/organization/'.$organization->image ?? '') }}" alt="" style="width: 70%">
@@ -102,19 +102,22 @@
           <th style="text-align: center">Changes</th>
           <th style="text-align: center">Created By</th>
         </tr>
-        <tr>
-          <td style="text-align: center">{{ $quotation->date }}</td>
-          <td style="text-align: center">V1.0</td>
-          <td>- Initial quotation</td>
-          <td style="text-align: center">{{ $quotation->user->name }}</td>
-        </tr>
-        @foreach ($quotation->changeHistories as $changeHistory)
-        <tr>
-          <td style="text-align: center">{{ $changeHistory->date }}</td>
-          <td style="text-align: center">{{ $changeHistory->version }}</td>
-          <td>- {{ $changeHistory->change }}</td>
-          <td style="text-align: center">{{ $changeHistory->user->name }}</td>
-        </tr>
+        @foreach ($quotation->sheets as $sheet)
+            @if ($loop->first)
+              <tr>
+                <td style="text-align: center">{{ $quotation->date }}</td>
+                <td style="text-align: center">{{ $sheet->version }}</td>
+                <td>- Initial quotation</td>
+                <td style="text-align: center">{{ $quotation->user->name }}</td>
+              </tr>
+              @else
+              <tr>
+                <td style="text-align: center">{{ $sheet->date }}</td>
+                <td style="text-align: center">{{ $sheet->version }}</td>
+                <td>- Change Update </td>
+                <td style="text-align: center">{{ $sheet->user->name }}</td>
+              </tr>
+            @endif
         @endforeach
       </table>
     </div>
@@ -179,8 +182,67 @@
         </div>
       </div>
     </div>
+  </div>
 
+  <div>
+    <div class="page termSection">
+      <div class="row">
+          <div class="column"> 
+              <p></p>
+          </div>
+          <div class="column organization-details">
+          <div class="text-dark">
+              {!! $organization->address !!}
+          </div>
+          <div>
+              <p class="text-dark">{{ $organization->phone }}</p>
+              <p class="text-dark">{{ $organization->email }}</p>
+              <p class="text-dark"><a href="{{ $organization->facebook }}">{{ $organization->facebook }}</a></p>
+              <p class="text-dark"><a href="{{ $organization->website }}" target="_blank">{{ $organization->website }}</a></p>
+          </div>
+          </div>
+      </div>
+      <h5 class="text-dark"><span style=""><u>Payment Schedule</u></span></h5>
+      @foreach ($payments as $payment)
+         <p class="text-dark"><b style="font-weight: 900">{{ $loop->iteration }}</b>. {{ $payment->title }}</p>
+      @endforeach
 
+      <h5 class="text-dark mt-3"><span style=""><u>Bank Account Information</u></span></h5>
+
+      <table class="table terTable" style="width: 70%; border: 0px solid #fff;">
+          <tr>
+              <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50%; border: 0px solid #fff;">Bank Name</td>
+              <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;">: {{ $bank->bank_name }}</td>
+          </tr>
+          <tr>
+              <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50%; border: 0px solid #fff;">Branch Name</td>
+              <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;">: {{ $bank->branch_name }}</td>
+          </tr>
+          <tr>
+              <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50%; border: 0px solid #fff;">Account Name</td>
+              <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;">: {{ $bank->account_name }}</td>
+          </tr>
+          <tr>
+              <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50%; border: 0px solid #fff;">Account Number</td>
+              <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;">: {{ $bank->account_number }}</td>
+          </tr>
+      </table>
+
+      <h5 class="text-dark mt-3"><span style=""><u>Terms & Conditions</u></span></h5>
+
+      @foreach ($terms as $term)
+         <p class="text-dark"><b style="font-weight: 900">{{ $loop->iteration }}</b>. {{ $term->title }}</p>
+      @endforeach
+
+      <p class="mt-2 text-dark" style="font-weight: 900">Special Note: This quotation might change due to addition, reduction and/or change of design and excution, human errors which will be setteled later in concern of both parties.</p>
+
+      <p class="mt-2 text-dark" style="margin-top: 10px">Sincerely Yours,</p>
+
+      <p class="mt-4 text-dark" style="margin-top: 10px">A.B.M Shafiqul Alam</p>
+      <p class="text-dark">Director</p>
+      <p class="text-dark">Minimal Limited</p>
+
+  </div>
   </div>
 </body>
 </html>

@@ -36,7 +36,7 @@
                     <th>SL#</th>
                     <th class="text-center">Category</th>
                     <th class="text-center">Sub Category</th>
-                    <th class="text-center">Item</th>
+                    <th class="text-center" style="width: 30%">Item</th>
                     <th class="text-center">Unit</th>
                     <th class="text-center">Rate</th>
                     <th class="text-center">Created By</th>

@@ -39,6 +39,16 @@
         <p><b>Specification 2 :</b> {{ $interior->specification2 ?? '' }}</p>
         <p><b>Specification 3 :</b> {{ $interior->specification3 ?? '' }}</p>
 
+        @php
+            $index = 4;
+        @endphp
+        @foreach ($interior->interiorSpecifications as $interiorSpecification)
+            <p><b>Specification {{ $index }} :</b> {{ $interiorSpecification->specification ?? '' }}</p>
+            @php
+                $index += 1;
+            @endphp
+        @endforeach
+
     </div>
 </div>
 

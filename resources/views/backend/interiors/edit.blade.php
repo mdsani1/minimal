@@ -21,11 +21,14 @@
                 <span><i class="fas fa-table me-1"></i>Items</span>
                 <span>
                     <a class="btn btn-primary text-left" href="{{ Route('interiors.index') }}" role="button">List</a>
+                    <button type="button" class="btn btn-info text-left text-white" id="addSpecification">Add Specification</button>
                 </span>
             </div>
         </div>
         <div class="card-body">
             <x-backend.layouts.elements.errors :errors="$errors"/>
+            <x-backend.layouts.elements.message :message="session('message')"/>
+
             <form action="{{ route('interiors.update', ['interior' => $interior->id]) }}" method="POST">
                 @csrf
                 @method('patch')
@@ -132,10 +135,10 @@
                     </div>
 
                     <div class="col-md-12">
-                        <div class="row">
+                        <div class="row" id="specificationSection">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="description">Specification 1 *</label>
+                                    <label for="description">Specification <span class="sl">1</span></label>
                                     <textarea class="form-control mt-2" name="specification1" id="" cols="30" rows="5">{{ $interior->specification1 }}</textarea>
                                     @error("description")
                                         <span class="sm text-danger">{{ $message }}</span>
@@ -145,7 +148,7 @@
         
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="description">Specification 2 *</label>
+                                    <label for="description">Specification <span class="sl">2</span></label>
                                     <textarea class="form-control mt-2" name="specification2" id="" cols="30" rows="5">{{ $interior->specification2 }}</textarea>
                                     @error("description")
                                         <span class="sm text-danger">{{ $message }}</span>
@@ -155,13 +158,35 @@
         
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="description">Specification 3 *</label>
+                                    <label for="description">Specification <span class="sl">3</span></label>
                                     <textarea class="form-control mt-2" name="specification3" id="" cols="30" rows="5">{{ $interior->specification3 }}</textarea>
                                     @error("description")
                                         <span class="sm text-danger">{{ $message }}</span>
                                     @enderror
+                                </div>
                             </div>
-                        </div>
+
+                            @php
+                                $index = 4;
+                            @endphp
+                            @foreach ($interior->interiorSpecifications as $interiorSpecification)
+                                <div class="col-md-4">
+                                    <input type="hidden" name="interiorSpecificationId[]" value="{{ $interiorSpecification->id }}">
+                                    <div class="form-group">
+                                        <div class="d-flex justify-content-between">
+                                            <label for="description">Specification <span class="sl">{{ $index }}</span></label>
+                                            <a href="{{ route('interiorspecification.delete', $interiorSpecification->id) }}" class="btn removeSpecification"><i class="fas fa-times-circle text-danger"></i></a>
+                                        </div>                                        
+                                        <textarea class="form-control mt-2" name="specification[]" id="" cols="30" rows="5">{{ $interiorSpecification->specification }}</textarea>
+                                        @error("description")
+                                            <span class="sm text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                @php
+                                    $index += 1;
+                                @endphp
+                            @endforeach
                     </div>
                 </div>
 
@@ -192,7 +217,12 @@
                 $('select').select2();
                 loadSubCategory();
                 $(document).on('change', '#category_id', loadSubCategory);
+                $(document).on('click', '#addSpecification', addSpecification);
                 $("#sub_category_id").prop('disabled', true);
+                $(document).on('click', '.removeSpecification', function() {
+                    $(this).closest('.col-md-4').remove();
+                    slHandler();
+                });
             });
 
             function loadSubCategory()
@@ -226,6 +256,35 @@
                         }
                     }); 
                 }
+            }
+
+            function addSpecification()
+            {
+                let data = ``;
+                data = `
+                <div class="col-md-4">
+                    <input type="hidden" name="interiorSpecificationId[]" value="{{ null }}">
+                    <div class="form-group">
+                        <div class="d-flex justify-content-between">
+                            <label for="description">Specification <span class="sl"></span></label>
+                            <button type="button" class="btn removeSpecification"><i class="fas fa-times-circle text-danger"></i></button>
+                        </div>
+                        <textarea class="form-control mt-2" name="specification[]" id="" cols="30" rows="5"></textarea>
+                        @error("specification")
+                            <span class="sm text-danger">{{ $message }}</span>
+                        @enderror
+                </div>`;
+                $('#specificationSection').append(data);
+                slHandler();
+            }
+
+            function slHandler()
+            {
+                let sls = $('.sl');
+
+                $.each(sls, function(index,val){
+                    $(val).html(index +1);
+                });
             }
         </script>
     @endpush

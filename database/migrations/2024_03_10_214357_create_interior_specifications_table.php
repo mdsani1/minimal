@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('quotes', function (Blueprint $table) {
+        Schema::create('interior_specifications', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('quotation_id')->nullable();
-            $table->string('title');
-            $table->string('version');
-            $table->date('date');
+            $table->unsignedBigInteger('interior_id')->nullable();
+            $table->string('specification')->nullable();
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->string('deleted_by')->nullable();
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('quotes');
+        Schema::dropIfExists('interior_specifications');
     }
 };

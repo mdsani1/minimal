@@ -10,8 +10,15 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\QueryException;
 use App\Http\Requests\StoreQuotationRequest;
 use App\Http\Requests\UpdateQuotationRequest;
+use App\Models\Bank;
 use App\Models\ChangeHistories;
 use App\Models\Organization;
+use App\Models\Payment;
+use App\Models\Quote;
+use App\Models\QuoteItem;
+use App\Models\QuoteItemValue;
+use App\Models\Term;
+use Illuminate\Support\Facades\DB;
 
 class QuotationController extends Controller
 {
@@ -46,6 +53,8 @@ class QuotationController extends Controller
     public function store(StoreQuotationRequest $request)
     {
         try{
+            DB::beginTransaction();
+
             $quotationData = $request->except(['work_scope', 'amount']);
 
             $workScopes = $request->input('work_scope', []);
@@ -91,6 +100,28 @@ class QuotationController extends Controller
                 ];
                 QuotationItem::create(['created_by' => auth()->user()->id] + $quotationItemData);
             }
+
+            $quote = Quote::create([
+                'title'         => $request->input('name') . ' New Sheet',
+                'quotation_id'  => $quotation->id,
+                'version'       => 'V1.0',
+                'date'          => now(),
+                'created_by'    => auth()->user()->id
+            ]);
+
+            
+            foreach ($quotation->quotationItems as $key => $quotationItem) {
+
+                $quoteItem = QuoteItem::create([
+                    'quote_id'      => $quote->id,
+                    'category_id'   => $quotationItem->work_scope,
+                    'sl'            => '1',
+                    'created_by'    => auth()->user()->id
+                ] );
+        
+            }
+
+            DB::commit();
             
             return redirect()->route('quotations.index')->withMessage('Successful create :)');
         }catch(QueryException $e){
@@ -119,62 +150,200 @@ class QuotationController extends Controller
     public function duplicate(StoreQuotationRequest $request, $id)
     {
         try{
-            $quotation = Quotation::find($id);
+            // DB::transaction();
+            DB::transaction(function () use ($id) {
+                $sheet = Quote::find($id);
+                $quotation = Quotation::find($sheet->quotation_id);
 
-            $purpose = $quotation->purpose;
-            $type = $quotation->type;
-            $name = $quotation->name;
+                $purpose = $quotation->purpose;
+                $type = $quotation->type;
+                $name = $quotation->name;
 
-            if($purpose == 'Residential (R)' && $type != null) {
-                if($type == 'Basic (B)') {
-                    $refPurpose = 'RB';
-                } else if ($type == 'Premium (P)') {
-                    $refPurpose = 'RP';
-                } else if ($type == 'Compact Luxury (C)') {
-                    $refPurpose = 'RC';
-                } else if ($type == 'Luxury (L)') {
-                    $refPurpose = 'RL';
+                if($purpose == 'Residential (R)' && $type != null) {
+                    if($type == 'Basic (B)') {
+                        $refPurpose = 'RB';
+                    } else if ($type == 'Premium (P)') {
+                        $refPurpose = 'RP';
+                    } else if ($type == 'Compact Luxury (C)') {
+                        $refPurpose = 'RC';
+                    } else if ($type == 'Luxury (L)') {
+                        $refPurpose = 'RL';
+                    }
+                } else if($purpose == 'Residential (R)') {
+                    $refPurpose = 'R';
+                } else if($purpose == 'Commercial (C)') {
+                    $refPurpose = 'C';
+                } else if($purpose == 'Architectural (A)') {
+                    $refPurpose = 'A';
                 }
-            } else if($purpose == 'Residential (R)') {
-                $refPurpose = 'R';
-            } else if($purpose == 'Commercial (C)') {
-                $refPurpose = 'C';
-            } else if($purpose == 'Architectural (A)') {
-                $refPurpose = 'A';
-            }
 
 
-            $currentYear = Carbon::now()->format('Y');
-            $currentYearLastTwoDigits = substr(date('Y'), -2);
-            $nextReferenceNumber = Quotation::whereYear('created_at', $currentYear)->count() + 1;
-            $referenceNumber = str_pad($nextReferenceNumber, 3, '0', STR_PAD_LEFT); // Pad with leading zeros
-            
-            $referenceCode = 'MNML/' . $name . '/' . $currentYearLastTwoDigits . '-' . $referenceNumber . '-' . $refPurpose;
+                $currentYear = Carbon::now()->format('Y');
+                $currentYearLastTwoDigits = substr(date('Y'), -2);
+                $nextReferenceNumber = Quotation::whereYear('created_at', $currentYear)->count() + 1;
+                $referenceNumber = str_pad($nextReferenceNumber, 3, '0', STR_PAD_LEFT); // Pad with leading zeros
+                
+                $referenceCode = 'MNML/' . $name . '/' . $currentYearLastTwoDigits . '-' . $referenceNumber . '-' . $refPurpose. ' Copy ';
 
-            $data = Quotation::create([
-                'ref'       => $referenceCode,
-                'name'      => $quotation->name,
-                'area'      => $quotation->area,
-                'address'   => $quotation->address,
-                'city'      => $quotation->city,
-                'purpose'   => $quotation->purpose,
-                'type'      => $quotation->type,
-                'date'      => now(),
-                'created_by' => auth()->user()->id
-            ]);
+                $data = Quotation::create([
+                    'ref'       => $referenceCode,
+                    'name'      => $quotation->name,
+                    'area'      => $quotation->area,
+                    'address'   => $quotation->address,
+                    'city'      => $quotation->city,
+                    'purpose'   => $quotation->purpose,
+                    'type'      => $quotation->type,
+                    'date'      => now(),
+                    'created_by' => auth()->user()->id
+                ]);
 
-            foreach ($quotation->quotationItems as $key => $value) {
-                QuotationItem::create([
+                foreach ($quotation->quotationItems as $key => $value) {
+                    QuotationItem::create([
+                        'quotation_id'  => $data->id,
+                        'work_scope'    => $value->work_scope,
+                        'created_by'    => auth()->user()->id
+                    ]);
+                }
+
+                $lastQuote = Quote::where('quotation_id', $data->id)->orderBy('id', 'desc')->first();
+                if($lastQuote){
+                    $version = $lastQuote->version;
+                    // Split the version string into major and minor parts
+                    list($major, $minor) = explode('.', $version);
+
+                    // Increment the minor version
+                    $minor++;
+
+                    // Format the new version string
+                    $newVersion = $major . '.' . $minor;
+                } else {
+                    $newVersion = 'V1.0';
+                }
+
+                
+
+                $quoteCount = 1;
+                $newTitle = $sheet->title. ' Copy';
+
+                // Check if a title with the current suffix exists, if so, increment the suffix
+                while (Quote::where('quotation_id', $data->id)->where('title', $newTitle)->exists()) {
+                    $newTitle = $sheet->title . ' Copy ' . $quoteCount;
+                    $quoteCount++;
+                }
+
+                $quote = Quote::create([
+                    'title'         => $newTitle,
                     'quotation_id'  => $data->id,
-                    'work_scope'    => $value->work_scope,
+                    'version'       => $newVersion,
+                    'date'          => now(),
                     'created_by'    => auth()->user()->id
                 ]);
-            }
+
+
+                foreach ($sheet->quoteItems as $key => $quoteItem) {
+                    $newquoteItem = QuoteItem::create([
+                        'quote_id'          => $quote->id,
+                        'category_id'       => $quoteItem->category_id,
+                        'sl'                => $quoteItem->sl,
+                        'item'              => $quoteItem->item,
+                        'specification'     => $quoteItem->specification,
+                        'qty'               => $quoteItem->qty,
+                        'unit'              => $quoteItem->unit,
+                        'rate'              => $quoteItem->rate,
+                        'amount'            => $quoteItem->amount,
+                        'created_by'        => auth()->user()->id
+                    ]);
+
+                    foreach ($quoteItem->quoteItemValues as $key => $quoteItemValue) {
+                        $quoteItemValue = QuoteItemValue::create([
+                            'quote_id'          => $quote->id,
+                            'category_id'       => $quoteItemValue->category_id,
+                            'quote_item_id'     => $newquoteItem->id,
+                            'unique_header'     => $quoteItemValue->unique_header,
+                            'header'            => $quoteItemValue->header,
+                            'value'             => $quoteItemValue->value,
+                            'created_by'        => auth()->user()->id
+                        ]);
+                    }
+                }
+
+            });
             
             return redirect()->route('quotations.index')->withMessage('Successful Duplicate :)');
         }catch(QueryException $e){
             return redirect()->back()->withInput()->withErrors($e->getMessage());
         }
+    }
+
+    public function versionCopy($id)
+    {
+        try{
+            DB::beginTransaction();
+            $sheet = Quote::find($id);
+            $lastQuote = Quote::where('quotation_id', $sheet->quotation_id)->orderBy('id', 'desc')->first();
+            $version = $lastQuote->version;
+
+            // Split the version string into major and minor parts
+            list($major, $minor) = explode('.', $version);
+
+            // Increment the minor version
+            $minor++;
+
+            // Format the new version string
+            $newVersion = $major . '.' . $minor;
+
+            $quoteCount = 1;
+            $newTitle = $sheet->title. ' Copy';
+
+            // Check if a title with the current suffix exists, if so, increment the suffix
+            while (Quote::where('quotation_id', $sheet->quotation_id)->where('title', $newTitle)->exists()) {
+                $newTitle = $sheet->title . ' Copy ' . $quoteCount;
+                $quoteCount++;
+            }
+
+            $quote = Quote::create([
+                'title'         => $newTitle,
+                'quotation_id'  => $sheet->quotation_id,
+                'version'       => $newVersion,
+                'date'          => now(),
+                'created_by'    => auth()->user()->id
+            ]);
+
+
+            foreach ($sheet->quoteItems as $key => $quoteItem) {
+                $newquoteItem = QuoteItem::create([
+                    'quote_id'          => $quote->id,
+                    'category_id'       => $quoteItem->category_id,
+                    'sl'                => $quoteItem->sl,
+                    'item'              => $quoteItem->item,
+                    'specification'     => $quoteItem->specification,
+                    'qty'               => $quoteItem->qty,
+                    'unit'              => $quoteItem->unit,
+                    'rate'              => $quoteItem->rate,
+                    'amount'            => $quoteItem->amount,
+                    'created_by'        => auth()->user()->id
+                ]);
+
+                foreach ($quoteItem->quoteItemValues as $key => $quoteItemValue) {
+                    $quoteItemValue = QuoteItemValue::create([
+                        'quote_id'          => $quote->id,
+                        'category_id'       => $quoteItemValue->category_id,
+                        'quote_item_id'     => $newquoteItem->id,
+                        'unique_header'     => $quoteItemValue->unique_header,
+                        'header'            => $quoteItemValue->header,
+                        'value'             => $quoteItemValue->value,
+                        'created_by'        => auth()->user()->id
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('quotations.index')->withMessage('Successful Duplicate :)');
+        }catch(QueryException $e){
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+
     }
 
     /**
@@ -307,8 +476,11 @@ class QuotationController extends Controller
     {
         $quotation = Quotation::find($id);
         $organization = Organization::latest()->first();
+        $payments = Payment::get();
+        $terms = Term::get();
+        $bank = Bank::latest()->first();
 
-        $view = view('backend.quotations.pdf', compact('quotation','organization'))->render();
+        $view = view('backend.quotations.pdf', compact('quotation','organization','payments','terms','bank'))->render();
 
         $mpdf = new \Mpdf\Mpdf([
             'default_font_size' => 9,
@@ -321,5 +493,13 @@ class QuotationController extends Controller
         $mpdf->SetTitle('Quotation');
         $mpdf->WriteHTML($view);
         $mpdf->Output(time() . '-quotation' . ".pdf", "I");
+    }
+
+    public function quotationToSheet($id)
+    {
+        $sheet = Quote::where('quotation_id', $id)->orderBy('id', 'desc')->first();
+        if($sheet != null) {
+            return redirect()->route('go-to-sheet-edit', $sheet->id);
+        }
     }
 }

@@ -464,8 +464,8 @@
                 }
             }
 
-            function reqData(event) {
-                let table = $(event.target).closest('.tab-pane').find('.editableTable'); // Use event.target to refer to the element that triggered the event
+            function reqData() {
+                let table = $('#myTabContent .tab-pane.fade.active.show').find('.editableTable'); // Use event.target to refer to the element that triggered the event
 
                 const data = {
                     quote_title: $('.quote_title').val(),
@@ -499,7 +499,14 @@
                         
                         // Get the value of the current cell and assign it to the corresponding property in item
                         if(thText == 'sl' || thText == 'item' || thText == 'specification' || thText == 'qty' || thText == 'unit' || thText == 'rate' || thText == 'amount') {
-                            item[thText] = $(td).text().trim();
+                            var tdText = $(td).clone()           // Clone the td element
+                                            .children()          // Select the children elements
+                                            .remove()            // Remove them
+                                            .end()               // Go back to the cloned td element
+                                            .text()              // Get the text
+                                            .trim();             // Trim any leading/trailing whitespace
+
+                            item[thText] = tdText;
                         } else {
                             // missingItem[thText] = $(td).text().trim();
                             let input = $(td).find('input');

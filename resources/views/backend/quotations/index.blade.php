@@ -27,18 +27,21 @@
     </div>
     <div class="card-body">
         <x-backend.layouts.elements.message :message="session('message')"/>
+        <x-backend.layouts.elements.errors :errors="$errors"/>
+
 
         <table id="myTable" class="display table  table-bordered" style="padding-top:20px">
             <thead>
                 <tr class="bg-success text-white">
                     <th>SL#</th>
-                    <th class="text-center">Ref</th>
+                    <th class="text-center" style="width: 25%">Ref</th>
                     <th class="text-center">Name</th>
                     <th class="text-center">Address</th>
                     <th class="text-center">Date</th>
                     <th class="text-center">Created By</th>
                     <th class="text-center">Sheet</th>
-                    <th class="text-center">Action</th>
+                    <th class="text-center">To</th>
+                    <th class="text-center" style="width: 10%">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,9 +53,13 @@
                         <td>{{ ++$sl }}</td>
                         <td class="text-center">
                             {{ $quotation->ref ?? '' }} <br>
-                            ( V1.0 
-                            @foreach ($quotation->changeHistories as $item)
-                                , {{ $item->version }}
+                            (
+                            @foreach ($quotation->sheets as $sheet)
+                                
+                                <a href="{{ route('go-to-sheet-edit', $sheet->id) }}">{{ $sheet->version }} </a>
+                                @if (!$loop->last)
+                                    ,
+                                @endif
                             @endforeach
                             )
                         </td>
@@ -60,58 +67,60 @@
                         <td class="text-center">{{ $quotation->address ?? '' }}</td>
                         <td class="text-center">{{ $quotation->date ?? '' }}</td>
                         <td class="text-center">{{ $quotation->user->name ?? '' }}</td>
-                        <td class="text-center">
-                            <a class="btn btn-sm btn-info text-white m-1" href="{{ route('editableTable',['id' => $quotation->id]) }}" role="button">Quotaion To Sheet</a>
-                            <!-- Button trigger modal -->
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#staticBackdrop{{ $quotation->id }}">
-                                Change Histories
-                            </button>
+                        <td class="text-center d-flex justify-content-center pt-3 pb-3">
+                            <ul class="navbar-nav mr-auto">
+                                <li class="nav-item dropdown">
+                                  <a class="nav-link dropdown-toggle bg-success text-white p-2" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                                    All Sheet
+                                  </a>
+                                  @if (!empty($quotation->sheets))
+                                  <div class="dropdown-menu">
+                                    @foreach ($quotation->sheets as $sheet)
+                                        <a class="dropdown-item" href="{{ route('go-to-sheet-edit', $sheet->id) }}">{{ $sheet->title }}</a>
+                                    @endforeach
+                                  </div>
+                                  @endif
+                                </li>
+                              </ul>
 
-                            <!-- Modal -->
-                            <div class="modal fade" id="staticBackdrop{{ $quotation->id }}" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                    <h5 class="modal-title" id="staticBackdropLabel">Change Histories</h5>
-                                    <button class="btn" type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
+                              <ul class="navbar-nav mr-auto" style="margin-left:5px">
+                                <li class="nav-item dropdown ">
+                                    <a class="nav-link dropdown-toggle bg-primary text-white p-2" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                                    V <i class="fas fa-copy"></i>
+                                    </a>
+                                    @if (!empty($quotation->sheets))
+                                    <div class="dropdown-menu">
+                                    @foreach ($quotation->sheets as $sheet)
+                                        <a class="dropdown-item" href="{{ route('version-copy', $sheet->id) }}">{{ $sheet->version }}</a>
+                                    @endforeach
                                     </div>
-                                    <div class="modal-body">
-                                        <form action="{{ route('change-histories', $quotation->id) }}" method="post">
-                                            @csrf
-                                            <table class="table table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="text-center" style="width: 50%">Version</th>
-                                                        <th class="text-center" style="width: 50%">Change</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <input type="text" name="version" class="form-control">
-                                                        </td>
-                                                        <td>
-                                                            <input type="text" name="change" class="form-control">
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <div class="d-flex justify-content-end">
-                                                <button class="btn btn-success">Save</button>
-                                            </div>
-                                        </form>
+                                    @endif
+                                </li>
+                            </ul>
+
+                            <ul class="navbar-nav mr-auto" style="margin-left:5px">
+                                <li class="nav-item dropdown ">
+                                    <a class="nav-link dropdown-toggle bg-warning text-white p-2" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                                    Q <i class="fas fa-copy"></i>
+                                    </a>
+                                    @if (!empty($quotation->sheets))
+                                    <div class="dropdown-menu">
+                                    @foreach ($quotation->sheets as $sheet)
+                                        <a class="dropdown-item" href="{{ route('quotations.duplicate',['id' => $sheet->id]) }}">{{ $sheet->quotation->ref }} ({{ $sheet->version }})</a>
+                                    @endforeach
                                     </div>
-                                </div>
-                                </div>
-                            </div>
+                                    @endif
+                                </li>
+                            </ul>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-sm btn-info text-white m-1" href="{{ route('quotation-to-sheet',['id' => $quotation->id]) }}" role="button">Quotaion To Sheet</a>
                         </td>
                         <td class="text-center">
                             <a class="btn btn-sm btn-primary" href="{{ route('quotations.show', ['quotation'=>$quotation->id]) }}" role="button" style="border-radius: 50%"><i class="far fa-eye text-white"></i></a>
                             <a class="btn btn-sm btn-warning" href="{{ route('quotations.edit',['quotation' => $quotation->id]) }}" role="button" style="border-radius: 50%"><i class="fas fa-pen-nib text-white"></i></a>
                             <a class="btn btn-sm btn-info text-white" href="{{ route('quotations.pdf',['id' => $quotation->id]) }}" role="button" style="border-radius: 50%"><i class="fas fa-file-pdf"></i></a>
-                            <a class="btn btn-sm btn-success text-white" title="Duplicate" href="{{ route('quotations.duplicate',['id' => $quotation->id]) }}" role="button" style="border-radius: 50%"><i class="fas fa-copy"></i></a>
+                            {{-- <a class="btn btn-sm btn-success text-white" title="Duplicate" href="{{ route('quotations.duplicate',['id' => $quotation->id]) }}" role="button" style="border-radius: 50%"><i class="fas fa-copy"></i></a> --}}
 
                             <form style="display: inline;" action="{{ route('quotations.destroy', ['quotation'=>$quotation->id]) }}" method="POST">
                                 @csrf

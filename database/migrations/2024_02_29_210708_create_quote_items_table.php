@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('quote_id')->nullable();
             $table->unsignedBigInteger('category_id')->nullable();
             $table->string('sl')->nullable();
-            $table->string('item')->nullable();
+            $table->text('item')->nullable();
             $table->text('specification')->nullable();
             $table->string('qty')->nullable();
             $table->string('unit')->nullable();

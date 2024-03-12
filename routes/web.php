@@ -45,11 +45,12 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth','web'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/go-to-sheet', [DashboardController::class, 'goToSheet'])->name('go-to-sheet');
+    Route::get('/template', [DashboardController::class, 'template'])->name('template');
+
     Route::get('/editable-table/{id?}', [DashboardController::class, 'editableTable'])->name('editableTable');
     Route::get('/sheet-pdf/{id}', [DashboardController::class, 'pdf'])->name('sheet.pdf');
     Route::delete('/sheet-delete/{id}', [DashboardController::class, 'destroy'])->name('sheet.delete');
     Route::get('/go-to-sheet/edit/{id}', [DashboardController::class, 'edit'])->name('go-to-sheet-edit');
-
 
 
     Route::resource('roles', RoleController::class);
@@ -86,6 +87,8 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/interiors-trash/{interior}/delete', [InteriorController::class, 'delete'])->name('interiors.delete');
     Route::get('/interiors-excel', [InteriorController::class, 'excel'])->name('interiors.excel');
     Route::get('/interiors-pdf', [InteriorController::class, 'pdf'])->name('interiors.pdf');
+    Route::get('/interiorspecification/delete/{id}', [InteriorController::class, 'interiorspecificationDelete'])->name('interiorspecification.delete');
+
     Route::resource('interiors', InteriorController::class);
 
     //organization
@@ -96,7 +99,10 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/quotations-trash/{quotation}', [QuotationController::class, 'restore'])->name('quotations.restore');
     Route::get('/quotations-trash/{quotation}/delete', [QuotationController::class, 'delete'])->name('quotations.delete');
     Route::get('/quotations-pdf/{id}', [QuotationController::class, 'pdf'])->name('quotations.pdf');
+    Route::get('/quotation-to-sheet/{id}', [QuotationController::class, 'quotationToSheet'])->name('quotation-to-sheet');
     Route::get('/quotations-duplicate/{id}', [QuotationController::class, 'duplicate'])->name('quotations.duplicate');
+    Route::get('/version-copy/{id}', [QuotationController::class, 'versionCopy'])->name('version-copy');
+
     Route::post('/change-histories/{id}', [QuotationController::class, 'changeHistories'])->name('change-histories');
     Route::resource('quotations', QuotationController::class);
 

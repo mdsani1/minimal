@@ -11,6 +11,7 @@ use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\QuoteItemMenu;
 use App\Models\QuoteItemValue;
+use App\Models\Template;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -33,6 +34,23 @@ class BackendApiController extends Controller
         }
     }
 
+    public function addTemplate($id)
+    {
+        $checkTemplate = Template::where('quote_id', $id)->first();
+
+        if($checkTemplate == null) {
+            $template = Template::create([
+                'quote_id'      => $id,
+                'created_by'    => auth()->user()->id
+            ]);
+            return response()->json($template, 200);
+        } else {
+            return response()->json([
+                "message" => "This Template Allready Add."
+            ], 400);
+        }
+    }
+
     public function quotesStore(Request $request)
     {
         try{
@@ -43,12 +61,14 @@ class BackendApiController extends Controller
                 $quote->update([
                     'title'         => $request->quote_title,
                     'quotation_id'  => $request->quotationId,
+                    'version'       => 'V1.0',
                     'date'          => now(),
                 ]);
             } else {
                 $quote = Quote::create([
                     'title'         => $request->quote_title,
                     'quotation_id'  => $request->quotationId,
+                    'version'       => 'V1.0',
                     'date'          => now(),
                     'created_by'    => auth()->user()->id
                 ]);
@@ -148,7 +168,8 @@ class BackendApiController extends Controller
     public function list()
     {
         try{
-            $quoteCollection = Quote::with('quotation')->latest();
+            $quoteIds = Template::pluck('quote_id');
+            $quoteCollection = Quote::whereIn('id', $quoteIds)->with('quotation')->latest();
             if(request('search')){
                 $quotes = $quoteCollection->where('title','like', '%'.request('search').'%');
             }
@@ -164,72 +185,88 @@ class BackendApiController extends Controller
     public function quotesUpdate(Request $request, $id)
     {
         try{
-            // dd($request->all());
+
+            
+            DB::beginTransaction();
             $quote = Quote::find($id);
             $quote->update([
                 'title'         => $request->quote_title,
                 'date'          => now(),
                 'updated_by'    => auth()->user()->id
             ]);
+
             
             foreach ($request->item_data as $key => $value) {
 
-                $interiorCheck = Interior::where('item', $value['item'])->first();
-                
+                $interiorCheck = Interior::where('item',$value['item'])->first();
+
                 if($interiorCheck == null) {
-                    $interior = Interior::create([
-                        'item'              => $value['item'],
-                        'default_detail'    => $value['specification'],
-                        'unit'              => $value['unit'],
-                        'created_by'        => auth()->user()->id
-                    ]);
+                    if($value['item'] != null) {
+                        $interior = Interior::create([
+                            'item'              => $value['item'],
+                            'specification1'    => $value['specification'],
+                            'unit'              => $value['unit'],
+                            'created_by'        => auth()->user()->id
+                        ]);
+                    }
                 }
 
-                if(isset($value['quote_id'])){
-                    $quoteItem = QuotationItem::find($value['quote_id']);
-                    $quoteItem->update([
+                $quoteItem = QuoteItem::where('quote_id', $quote->id)->where('category_id', $request->category_id)->where('sl', $value['sl'])->latest()->first();
+                if($quoteItem == null) {
+                    $quoteItem = QuoteItem::create([
                         'quote_id'      => $quote->id,
-                        'updated_by'    => auth()->user()->id
+                        'created_by'    => auth()->user()->id
                     ] + $value);
                 } else {
-                    $quoteItem = QuotationItem::create([
+                    $quoteItem->update([
                         'quote_id'      => $quote->id,
-                        'updated_by'    => auth()->user()->id
+                        'created_by'    => auth()->user()->id
                     ] + $value);
                 }
-
             
                 if ($request->missing_data && $request->missing_data[$key] !== null) { 
                     foreach ($request->missing_data[$key] as $menu => $menudata) {
-                        if(isset($menudata['quoteItemValue']))
+
+                        if(isset($menudata['uniqueHeader']))
                         {
-                            $quoteItemvalue = QuoteItemValue::find($menudata['quoteItemValue']); 
-                            foreach ($menudata as $key => $item) {
-                                if($key != 'quoteItemValue'){
-                                    $quoteItemvalue->update([
-                                        'quote_id'              => $quote->id,
-                                        'quote_item_id'         => $quoteItem->id,
-                                        'header'                => $key,
-                                        'value'                 => $item,
-                                        'updated_by'            => auth()->user()->id
-                                    ]);
+                            $quoteItemvalue = QuoteItemValue::where('quote_id', $quote->id)->where('quote_item_id', $quoteItem->id)->where('unique_header', $menudata['uniqueHeader'])->latest()->first(); 
+
+                            if($quoteItemvalue != null) {
+                                foreach ($menudata as $key => $item) {
+                                    if($key != 'uniqueHeader'){
+                                        $quoteItemvalue->update([
+                                            'quote_id'              => $quote->id,
+                                            'quote_item_id'         => $quoteItem->id,
+                                            'category_id'           => $request->category_id,
+                                            'header'                => $key,
+                                            'value'                 => $item,
+                                        ]);
+                                    }
+                                }
+                            } else {
+                                foreach ($menudata as $key => $item) {
+                                    if($key != 'uniqueHeader'){
+                                        $quoteItemvalue = QuoteItemValue::create([
+                                            'quote_id'              => $quote->id,
+                                            'quote_item_id'         => $quoteItem->id,
+                                            'category_id'           => $request->category_id,
+                                            'unique_header'         => $menudata['uniqueHeader'],
+                                            'header'                => $key,
+                                            'value'                 => $item,
+                                            'created_by'            => auth()->user()->id
+                                        ]);
+                                    }
                                 }
                             }
-                        } else {
-                            foreach ($menudata as $key => $item) {
-                                $quoteItemvalue = QuoteItemValue::create([
-                                    'quote_id'              => $quote->id,
-                                    'quote_item_id'         => $quoteItem->id,
-                                    'header'                => $key,
-                                    'value'                 => $item,
-                                    'created_by'            => auth()->user()->id
-                                ]);
-                            }
+
+                            
                         }
                     }
                 }
             
             }
+
+            DB::commit();
             
             return response()->json([
                 "message" => "Successfull Update :)",

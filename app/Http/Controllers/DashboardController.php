@@ -11,6 +11,7 @@ use App\Models\Quotation;
 use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\QuoteItemValue;
+use App\Models\Template;
 use App\Models\Term;
 use App\Models\User;
 use Illuminate\Database\QueryException;
@@ -32,7 +33,14 @@ class DashboardController extends Controller
 
     public function goToSheet()
     {
-        $quotes = Quote::latest()->limit(5)->get();
+        $quotes = Quote::latest()->limit(6)->get();
+        return view('backend.quotes.dashboard', compact('quotes'));
+    }
+
+    public function template()
+    {
+        $quoteIds = Template::pluck('quote_id');
+        $quotes = Quote::whereIn('id', $quoteIds)->latest()->limit(6)->get();
         return view('backend.quotes.dashboard', compact('quotes'));
     }
 

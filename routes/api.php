@@ -29,6 +29,7 @@ Route::group(['middleware' => ['api', 'auth', 'web'], 'as' => 'api.'], function 
     Route::get('/suggestions', [BackendApiController::class, 'suggestions']);
     Route::post('/quotes/store', [BackendApiController::class, 'quotesStore']);
     Route::put('/quotes/update/{id}', [BackendApiController::class, 'quotesUpdate']);
+    Route::get('/add-template/{id}', [BackendApiController::class, 'addTemplate']);
     Route::get('/sheet/list', [BackendApiController::class, 'list']);
 });
 

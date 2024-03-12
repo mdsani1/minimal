@@ -32,10 +32,11 @@
 
         <div class="">
             <input type="hidden" class="quotationId" value="{{ $quote->quotation_id }}">
-            <h3 class="mt-5 border text-center">{{ $quote->quotation->ref }}</h3>
+            <h3 class="mt-5 border text-center">{{ $quote->quotation->ref }} ({{ $quote->version }})</h3>
 
             <h1 class="mt-5">
                 <input type="text" class="form-control quote_title" name="quote_title" style="background: none; border:none; font-size:30px" value="{{ $quote->title }}">
+                <input type="hidden" id="quoteId" value="{{ $quote->id }}">
             </h1>
 
             @if ($quote->quotation != null)
@@ -43,11 +44,6 @@
                 <li class="nav-item" role="presentation">
                   <button class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Top Sheet</button>
                 </li>
-                {{-- @foreach ($quoteItems as $quoteItem)
-                    <li class="nav-item" role="presentation">
-                      <button class="nav-link" id="{{ str_replace(' ', '-', $quoteItem[0]->category->title) }}-tab" data-toggle="tab" data-target="#{{ str_replace(' ', '-', $quoteItem[0]->category->title) }}" type="button" role="tab" aria-controls="{{ str_replace(' ', '-', $quoteItem[0]->category->title) }}" aria-selected="false">{{ $quoteItem[0]->category->title }}</button>
-                    </li>
-                @endforeach --}}
                 @foreach ($quotation->quotationItems as $quotationItem)
                 <li class="nav-item" role="presentation">
                   <button class="nav-link" id="{{ str_replace(' ', '-', $quotationItem->category->title) }}-tab" data-toggle="tab" data-target="#{{ str_replace(' ', '-', $quotationItem->category->title) }}" type="button" role="tab" aria-controls="{{ str_replace(' ', '-', $quotationItem->category->title) }}" aria-selected="false">{{ $quotationItem->category->title }}</button>
@@ -60,9 +56,18 @@
             <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                 <div class="d-flex justify-content-end">
-                    <a href="{{ route('go-to-sheet') }}" class="btn btn-danger mr-2 mt-3">Exit</a>
-                    <a href="{{ route('quotations.edit', $quotation->id) }}" class="btn btn-warning mt-3">Quotation Edit</a>
+                    <a href="{{ route('quotations.index') }}" class="btn btn-primary mr-2 mt-3">Exit</a>
+                    <a href="{{ route('quotations.edit', $quotation->id) }}" class="btn btn-warning mr-2 mt-3">Quotation Edit</a>
+                    <a href="/sheet-pdf/{{ $quote->id }}" class="btn btn-info mr-2 mt-3">Pdf</a>
+                    <a href="/sheet-pdf/{{ $quote->id }}" class="btn btn-primary mr-2 mt-3 copyLink">Copy</a>
+                    <button type="button" class="btn btn-success mr-2 mt-3 template" value="{{ $quote->id }}"><i class="fa-solid fa-bookmark"></i> Template</button>
+                    <form style="display: inline;" action="/sheet-delete/{{ $quote->id }}" method="POST">
+                        @csrf
+                        @method('delete')
+                        <button onclick="return confirm('Are you sure want to delete ?')" class="btn btn-danger mt-3" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Remove</button>
+                    </form>                
                 </div>
+
                 <div class="d-flex justify-content-center">
                     <div class="page">
                         <div class="row">
@@ -109,19 +114,22 @@
                                 <th style="text-align: center">Changes</th>
                                 <th style="text-align: center">Created By</th>
                             </tr>
-                            <tr>
-                                <td style="text-align: center">{{ $quote->quotation->date }}</td>
-                                <td style="text-align: center">V1.0</td>
-                                <td>- Initial quotation</td>
-                                <td style="text-align: center">{{ $quote->quotation->user->name }}</td>
-                            </tr>
-                            @foreach ($quotation->changeHistories as $changeHistory)
-                            <tr>
-                            <td style="text-align: center">{{ $changeHistory->date }}</td>
-                            <td style="text-align: center">{{ $changeHistory->version }}</td>
-                            <td>- {{ $changeHistory->change }}</td>
-                            <td style="text-align: center">{{ $changeHistory->user->name }}</td>
-                            </tr>
+                            @foreach ($quotation->sheets as $sheet)
+                                @if ($loop->first)
+                                <tr>
+                                    <td style="text-align: center">{{ $quotation->date }}</td>
+                                    <td style="text-align: center">{{ $sheet->version }}</td>
+                                    <td>- Initial quotation</td>
+                                    <td style="text-align: center">{{ $quotation->user->name }}</td>
+                                </tr>
+                                @else
+                                <tr>
+                                    <td style="text-align: center">{{ $sheet->date }}</td>
+                                    <td style="text-align: center">{{ $sheet->version }}</td>
+                                    <td>- Change Update </td>
+                                    <td style="text-align: center">{{ $sheet->user->name }}</td>
+                                </tr>
+                                @endif
                             @endforeach
                             </table>
                         </div>
@@ -189,63 +197,7 @@
                     </div>
                 </div>
             </div>
-            {{-- @foreach ($quoteItems as $quoteItem)
-                <div class="tab-pane fade" id="{{ str_replace(' ', '-', $quoteItem[0]->category->title) }}" role="tabpanel" aria-labelledby="{{ str_replace(' ', '-', $quoteItem[0]->category->title) }}-tab">
-                    <div class="mt-4 mb-4 d-flex justify-content-between">
-                        <div>
-                            <button class="btn btn-success addRowBtn" id="">Add Row</button>
-                            <button class="btn btn-info addColumnBtn" id="">Add Column</button>
-                            <!-- Button to trigger PDF preview -->
-                            <button class="btn btn-warning pdfPreviewButton" id="">Preview PDF</button>
-    
-                            <!-- Button to download the PDF directly -->
-                            <button class="btn btn-primary downloadPdfButton" id="">Download PDF</button>
-                        </div>
-                        <div>
-                            <a href="{{ route('go-to-sheet') }}" class="btn btn-danger">Exit</a>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table editableTable" id="" style="background: #fff">
-                            <thead>
-                                <input type="hidden" class="categoryId" value="{{ $quoteItem[0]->category_id }}">
-                                <tr>
-                                    <th style="background-color: #198754; color:#fff">SL</th>
-                                    <th style="background-color: #198754; color:#fff">ITEM</th>
-                                    <th style="background-color: #198754; color:#fff">SPECIFICATION</th>
-                                    <th style="background-color: #198754; color:#fff">QTY</th>
-                                    <th style="background-color: #198754; color:#fff">UNIT</th>
-                                    <th style="background-color: #198754; color:#fff">RATE</th>
-                                    <th style="background-color: #198754; color:#fff">AMOUNT</th>
-                                    @foreach ($quoteItem[0]->quoteItemValues as $data)
-                                        <th style="background-color: #198754; color:#fff">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($quoteItem as $item)  
-                                <tr>
-                                    <td class="sl">{{ $item->sl }}</td>
-                                    <td class="item" contenteditable="true">{{ $item->item }}</td>
-                                    <td class="specification" contenteditable="true">{{ $item->specification }}</td>
-                                    <td class="qty" contenteditable="true">{{ $item->qty }}</td>
-                                    <td class="unit" contenteditable="true">{{ $item->unit }}</td>
-                                    <td class="rate" contenteditable="true">{{ $item->rate }}</td>
-                                    <td class="amount" contenteditable="true">{{ $item->amount }}</td>
-                                    @foreach ($item->quoteItemValues as $quoteItemValue)
-                                        <td class="" contenteditable="true">{{ $quoteItemValue->value }}</td>
-                                    @endforeach
-                                </tr>
-                                @endforeach
-                            </tbody>
-                          </table>
-                    </div>
-    
-                    <div class="d-flex justify-content-end mb-3">
-                        <button id="" type="button" class="btn btn-success mr-2 save" style="width: 250px">Save</button>
-                    </div>
-                </div>
-            @endforeach --}}
+
             @foreach ($quotation->quotationItems as $quotationItem)
             <div class="tab-pane fade" id="{{ str_replace(' ', '-', $quotationItem->category->title) }}" role="tabpanel" aria-labelledby="{{ str_replace(' ', '-', $quotationItem->category->title) }}-tab">
 
@@ -259,8 +211,15 @@
                         <!-- Button to download the PDF directly -->
                         <button class="btn btn-primary downloadPdfButton" id="">Download PDF</button>
                     </div>
-                    <div>
-                        <a href="{{ route('go-to-sheet') }}" class="btn btn-danger">Exit</a>
+                    <div class="d-flex">
+                        <a href="{{ route('quotations.index') }}" class="btn btn-primary mr-2">Exit</a>
+                        <a href="/sheet-pdf/{{ $quote->id }}" class="btn btn-info mr-2">Pdf</a>
+                        <a href="/sheet-pdf/{{ $quote->id }}" class="btn btn-primary mr-2 copyLink">Copy</a>
+                        <form style="display: inline;" action="/sheet-delete/{{ $quote->id }}" method="POST">
+                            @csrf
+                            @method('delete')
+                            <button onclick="return confirm('Are you sure want to delete ?')" class="btn btn-danger" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Remove</button>
+                        </form>     
                     </div>
                 </div>
                 @php
@@ -284,7 +243,7 @@
                                     <th style="background-color: #198754; color:#fff">RATE</th>
                                     <th style="background-color: #198754; color:#fff">AMOUNT</th>
                                     @foreach ($quoteItem[0]->quoteItemValues as $data)
-                                        <th class="saveData" style="background-color: #198754; color:#fff">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
+                                        <th id="{{ $data->unique_header }}" class="saveData extracolumn" style="background-color: #198754; color:#fff">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
                                     @endforeach
                                 </tr>
                             </thead>
@@ -299,7 +258,10 @@
                                     <td class="rate saveData" contenteditable="true">{{ $item->rate }}</td>
                                     <td class="amount saveData" contenteditable="true">{{ $item->amount }}</td>
                                     @foreach ($item->quoteItemValues as $quoteItemValue)
-                                        <td class=" saveData" contenteditable="true">{{ $quoteItemValue->value }}</td>
+                                        <td class=" saveData" contenteditable="true">
+                                            <input type="hidden" class="quoteItemValue" value="{{ $quoteItemValue->unique_header }}">
+                                            {{ $quoteItemValue->value }}
+                                        </td>
                                     @endforeach
                                 </tr>
                                 @endforeach
@@ -366,14 +328,11 @@
                 </div>
                 @endif
 
-                {{-- <div class="d-flex justify-content-end mb-3">
-                    <button id="" type="button" class="btn btn-success mr-2 save" style="width: 250px">Save</button>
-                </div> --}}
             </div>
             @endforeach
             <div class="tab-pane fade" id="term" role="tabpanel" aria-labelledby="term-tab">
                 <div class="d-flex justify-content-end">
-                    <a href="{{ route('go-to-sheet') }}" class="btn btn-danger mr-2 mt-3">Exit</a>
+                    <a href="{{ route('quotations.index') }}" class="btn btn-danger mr-2 mt-3">Exit</a>
                     <a href="{{ route('quotations.edit', $quotation->id) }}" class="btn btn-warning mt-3">Quotation Edit</a>
                 </div>
                 <div class="d-flex justify-content-center">
@@ -440,57 +399,7 @@
             @endif
             
         </div>
-        
 
-        {{-- <div class="">
-            <h1 class="mt-5">
-                <input type="text" class="form-control quote_title" name="quote_title" style="background: none; border:none; font-size:30px" value="{{ $quote->title }}">
-
-                <input type="hidden" id="quoteId" value="{{ $quote->id }}">
-            </h1>
-            <div class="table-responsive">
-                <table class="table" id="editableTable" style="background: #fff">
-                    <thead>
-                        <tr>
-                            <th style="background-color: #198754; color:#fff">SL</th>
-                            <th style="background-color: #198754; color:#fff">ITEM</th>
-                            <th style="background-color: #198754; color:#fff">SPECIFICATION</th>
-                            <th style="background-color: #198754; color:#fff">QTY</th>
-                            <th style="background-color: #198754; color:#fff">UNIT</th>
-                            <th style="background-color: #198754; color:#fff">RATE</th>
-                            <th style="background-color: #198754; color:#fff">AMOUNT</th>
-                            @foreach ($externalMenus as $header)
-                                <th style="background-color: #198754; color:#fff" contenteditable="true">{{ ucwords(str_replace('_', ' ', $header)) }}</th>
-                            @endforeach
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($quote->quoteItems as $quoteItem)
-                            <tr>
-                                <input type="hidden" class="quoteItem" value="{{ $quoteItem->id }}">
-                                <td class="sl">{{ $quoteItem->sl }}</td>
-                                <td class="item">{{ $quoteItem->item }}</td>
-                                <td class="specification">{{ $quoteItem->specification }}</td>
-                                <td class="qty" contenteditable="true">{{ $quoteItem->qty }}</td>
-                                <td class="unit">{{ $quoteItem->unit }}</td>
-                                <td class="rate" contenteditable="true">{{ $quoteItem->rate }}</td>
-                                <td class="amount" contenteditable="true">{{ $quoteItem->amount }}</td>
-                                @foreach ($quoteItem->quoteItemValues as $quoteItemValue)
-                                    <td contenteditable="true">
-                                        <input type="hidden" class="quoteItemValue" value="{{ $quoteItemValue->id }}">
-                                        {{ $quoteItemValue->value }}
-                                    </td>
-                                @endforeach
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            <div class="d-flex justify-content-end mb-3">
-                <button id="save" type="button" class="btn btn-success mr-2" style="width: 250px">Save New</button>
-                <button id="update" type="button" class="btn btn-warning" style="width: 250px">Update</button>
-            </div>
-        </div> --}}
     </div>
 
     @push('css')
@@ -501,7 +410,7 @@
         <style>
             .page {
                 width: 21cm;
-                height: 29.7cm;
+                height: 33.7cm;
                 margin: 0;
                 background-color: #fff;
                 padding: 20px;
@@ -510,46 +419,46 @@
             }
             /* Create two equal columns that float next to each other */
             .column {
-            float: left;
-            width: 50%;
-            padding: 10px;
+                float: left;
+                width: 50%;
+                padding: 10px;
             }
             
             /* Clear floats after the columns */
             .row:after {
-            content: "";
-            display: table;
-            clear: both;
+                content: "";
+                display: table;
+                clear: both;
             }
             
             p {
-            padding: 0px;
-            margin: 2px;
+                padding: 0px;
+                margin: 2px;
             }
             
             /* Apply text alignment to the organization details */
             .organization-details {
-            text-align: right;
+                text-align: right;
             }
 
             h4 {
-            padding: 0px;
-            margin: 4px;
+                padding: 0px;
+                margin: 4px;
             }
 
             h3 {
-            padding: 0px;
-            margin: 4px;
+                padding: 0px;
+                margin: 4px;
             }
 
             table, td, th {
-            border: 1px solid;
-            font-size: 15px;
+                border: 1px solid;
+                font-size: 15px;
             }
 
             table {
-            width: 100%;
-            border-collapse: collapse;
+                width: 100%;
+                border-collapse: collapse;
             }
 
             .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
@@ -578,122 +487,77 @@
         <script>
             $(document).ready(function () {
                 $('#sidebarToggle').trigger('click');
-                // $(document).on('click', '.save', triggerCreate);
-                $(document).on('input', '.saveData', triggerCreate);
+                $(document).on('click', '.template', templateCreate);
+                // $(document).on('input', '.saveData', triggerCreate);
+                // $(document).on('change || keyup', '.saveData', triggerCreate);
+                $(document).on('click', '.autosuggestion-dropdown li', function(event) {
+                    triggerCreate(event);
+                });
+
+                $(document).on('input change keyup', '.saveData', function(event) {
+                    triggerCreate(event);
+                });
+
                 // $(document).on('click', '#update', triggerUpdate);
+
+                $(document).on('click', '.copyLink', function() {
+                    // Retrieve the base URL
+                    let baseUrl = window.location.origin;
+                    let pdfUrl = $(this).attr('href');
+                    
+                    // Concatenate base URL and PDF URL
+                    let fullUrl = baseUrl + pdfUrl;
+                    
+                    // Notify the user that the full URL has been copied
+                    navigator.clipboard.writeText(fullUrl)
+                        .then(function() {
+                            // Notify the user that the URL has been copied
+                            Swal.fire({
+                                icon: "success",
+                                title: 'Copy Link', // Show error message
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        })
+                        .catch(function(error) {
+                            console.error('Failed to copy full URL: ', error);
+                        });
+                    
+                    // Prevent default link behavior
+                    return false;
+                });
             });
         </script>
         <script>
-            // function reqData(event) {
-            //     let table = $(event.target).closest('.tab-pane').find('.editableTable'); // Use event.target to refer to the element that triggered the event
 
-            //     const data = {
-            //         quote_title: $('.quote_title').val(),
-            //         quotationId: $('.quotationId').val(),
-            //         category_id: table.find('.categoryId').val(),
-            //         item_data: [],
-            //         missing_data: [],
-            //     };
+            function templateCreate(event) {
+                var quoteId = $(this).val();
 
-            //     const columnCount = table.find('tr:first th').length || table.find('tr:first td').length;
-            //     table.find('tbody tr').each(function (index, tr) {
-            //         let  item = {};
-            //         // Loop through each td in the current tr
-            //         $(tr).find('td').each(function (tdIndex, td) {
-            //             let thValue = table.find('thead th').eq(tdIndex).text().trim().replace(/\s+/g, '_').toLowerCase(); // Use table.find() to search within the table
-            //             // Set the class based on thValue to each td
-            //             $(td).attr('class', thValue);
-            //         });
-            //     });
+                $.ajax({
+                    method: "GET",
+                    url: "/api/add-template/" + quoteId,
+                    dataType: "json",
+                    success: function (response) {
+                        Swal.fire({
+                            icon: "success",
+                            title: 'Template Add Successfully.', // Show error message
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    },
+                    error(error){
+                        Swal.fire({
+                            icon: "error",
+                            title: error.responseJSON.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                });
+            }
 
-            //     // Iterate over each row in the table body
-            //     table.find('tbody tr').each(function (index, tr) {
-            //         let item = {};
-            //         let missingItem = {};
-            //         item['category_id'] = table.find('.categoryId').val();
-            //         // Loop through each td in the current row
-            //         $(tr).find('td').each(function (tdIndex, td) {
-            //             // Get the text content of the corresponding th and clean it
-            //             let thText = table.find('thead th').eq(tdIndex).text().trim().replace(/\s+/g, '_').toLowerCase(); // Use table.find() to search within the table
-            //             // Get the value of the current cell and assign it to the corresponding property in item
-            //             if(thText == 'sl' || thText == 'item' || thText == 'specification' || thText == 'qty' || thText == 'unit' || thText == 'rate' || thText == 'amount') {
-            //                 item[thText] = $(td).text().trim();
-            //             } else {
-            //                 missingItem[thText] = $(td).text().trim();
-            //             }
-            //         });
-            //         // Push the constructed item to item_data array
-            //         data.item_data.push(item);
-            //         data.missing_data.push(missingItem);
-            //     });
-
-            //     return data;
-            // }
-
-
-            // const triggerCreate = (event)=>{
-
-            //     let 
-            //         el      = event.target,
-            //         payload = reqData(event);
-            //         console.log(payload);
-                
-            //     $.ajax({
-            //         url         : `/api/quotes/store`,
-            //         method      : "POST",
-            //         dataType    : "JSON",
-            //         data        : payload,
-            //         enctype     : 'multipart/form-data',
-            //         headers: {
-            //             "X-CSRF-TOKEN": $(document).find('[name="_token"]').val()
-            //         },
-            //         beforeSend  : function(){
-            //             $(el).html(`Processing ...`).prop('disabled', true);  
-            //         },
-            //         success(response){
-            //             if (response.error !== undefined) { // Check if error is defined in the response
-            //                 Swal.fire({
-            //                     icon: "error",
-            //                     title: response.error, // Show error message
-            //                     showConfirmButton: false,
-            //                     timer: 1500
-            //                 });
-            //             } else {
-            //                 Swal.fire({
-            //                     icon: "success",
-            //                     title: response.message, // Show success message
-            //                     showConfirmButton: false,
-            //                     timer: 1500
-            //                 });
-            //             }
-
-            //             $(el).html(`Save`).prop("disabled", false);
-
-
-            //             // Swal.fire({
-            //             //     icon: "success",
-            //             //     title: response.message,
-            //             //     showConfirmButton: false,
-            //             //     timer: 1500
-            //             // }).then(() => {
-            //             //     window.location.href = '/go-to-sheet';
-            //             // });
-            //         },
-            //         error(error){
-            //             Swal.fire({
-            //                 icon: "error",
-            //                 title: error.responseJSON.message,
-            //                 showConfirmButton: false,
-            //                 timer: 1500
-            //             })
-            //             $(el).html(`Save`).prop("disabled", false);
-            //         }
-            //     });
-            // }
-
-            function reqData(event) {
-                let table = $(event.target).closest('.tab-pane').find('.editableTable'); // Use event.target to refer to the element that triggered the event
-
+            function reqData() {
+                let table = $('#myTabContent .tab-pane.fade.active.show').find('.editableTable'); // Use event.target to refer to the element that triggered the event
                 const data = {
                     quote_title: $('.quote_title').val(),
                     quotationId: $('.quotationId').val(),
@@ -726,10 +590,18 @@
                         
                         // Get the value of the current cell and assign it to the corresponding property in item
                         if(thText == 'sl' || thText == 'item' || thText == 'specification' || thText == 'qty' || thText == 'unit' || thText == 'rate' || thText == 'amount') {
-                            item[thText] = $(td).text().trim();
+                            var tdText = $(td).clone()           // Clone the td element
+                                            .children()          // Select the children elements
+                                            .remove()            // Remove them
+                                            .end()               // Go back to the cloned td element
+                                            .text()              // Get the text
+                                            .trim();             // Trim any leading/trailing whitespace
+
+                            item[thText] = tdText;
                         } else {
                             // missingItem[thText] = $(td).text().trim();
                             let input = $(td).find('input');
+                            console.log(input);
                             if (input.length > 0) {
                                 data['uniqueHeader'] = input.val();
                             } else {
@@ -748,118 +620,11 @@
             }
 
 
-            const triggerCreate = (event)=>{
+            const triggerCreate = ()=>{
 
                 let 
-                    el      = event.target,
-                    payload = reqData(event);
+                    payload = reqData();
                     console.log(payload);
-                
-                $.ajax({
-                    url         : `/api/quotes/store`,
-                    method      : "POST",
-                    dataType    : "JSON",
-                    data        : payload,
-                    enctype     : 'multipart/form-data',
-                    headers: {
-                        "X-CSRF-TOKEN": $(document).find('[name="_token"]').val()
-                    },
-                    // beforeSend  : function(){
-                    //     $(el).html(`Processing ...`).prop('disabled', true);  
-                    // },
-                    success(response){
-                        if (response.error !== undefined) { // Check if error is defined in the response
-                            Swal.fire({
-                                icon: "error",
-                                title: response.error, // Show error message
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-                        }
-
-                        // Swal.fire({
-                        //     icon: "success",
-                        //     title: response.message,
-                        //     showConfirmButton: false,
-                        //     timer: 1500
-                        // }).then(() => {
-                        //     window.location.href = '/go-to-sheet';
-                        // });
-                    },
-                    error(error){
-                        Swal.fire({
-                            icon: "error",
-                            title: error.responseJSON.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                    }
-                });
-            }
-
-            function updateReqData() {
-                const data = {
-                    quote_id    : $('#quoteId').val(),
-                    quote_title : $('.quote_title').val(),
-                    item_data   : [],
-                    missing_data: [],
-                };
-
-                const columnCount = $('#editableTable tr:first th').length || $('#editableTable tr:first td').length;
-
-                $('#editableTable tbody tr').each(function (index, tr) {
-                    let  item = {};
-                    // Loop through each td in the current tr
-                    $(tr).find('td').each(function (tdIndex, td) {
-                        let thValue = $('#editableTable thead th').eq(tdIndex).text().trim().replace(/\s+/g, '_').toLowerCase();
-                        // Set the class based on thValue to each td
-                        $(td).attr('class', thValue);
-                    });
-                });
-
-                // Iterate over each row in the table body
-                $('#editableTable tbody tr').each(function (index, tr) {
-                    let item = {};
-                    let missingItem = [];
-
-                    // Assign the quote ID to the item
-                    item['quote_id'] = $(tr).find('.quoteItem').val();
-
-                    // Loop through each cell in the current row
-                    $(tr).find('td').each(function (tdIndex, td) {
-                        let data = {};
-                        let thText = $('#editableTable thead th').eq(tdIndex).text().trim().replace(/\s+/g, '_').toLowerCase();
-
-                        // For standard fields, directly assign the cell content to the item
-                        if (thText == 'sl' || thText == 'item' || thText == 'specification' || thText == 'qty' || thText == 'unit' || thText == 'rate' || thText == 'amount') {
-                            item[thText] = $(td).text().trim();
-                        } else {
-                            // For quoteItemValue, collect input values if exists
-                            let input = $(td).find('input');
-                            if (input.length > 0) {
-                                data['quoteItemValue'] = input.val();
-                            } else {
-                                data[thText] = $(td).text().trim();
-                            }
-                            data[thText] = $(td).text().trim();
-                            missingItem.push(data);
-                        }
-                    });
-
-                    // Push the constructed item and missing data to respective arrays
-                    data.item_data.push(item);
-                    data.missing_data.push(missingItem);
-                });
-
-
-                return data;
-            }
-
-            const triggerUpdate = (event)=>{
-
-                let 
-                    el      = event.target,
-                    payload = updateReqData();
                 
                 $.ajax({
                     url         : `/api/quotes/update/${$('#quoteId').val()}`,
@@ -870,18 +635,15 @@
                     headers: {
                         "X-CSRF-TOKEN": $(document).find('[name="_token"]').val()
                     },
-                    beforeSend  : function(){
-                        $(el).html(`Processing ...`).prop('disabled', true);  
-                    },
                     success(response){
-                        Swal.fire({
-                            icon: "success",
-                            title: response.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then(() => {
-                            window.location.href = '/go-to-sheet';
-                        });
+                        if (response.error !== undefined) { // Check if error is defined in the response
+                            Swal.fire({
+                                icon: "error",
+                                title: response.error, // Show error message
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
                     },
                     error(error){
                         Swal.fire({
@@ -889,8 +651,7 @@
                             title: error.responseJSON.message,
                             showConfirmButton: false,
                             timer: 1500
-                        })
-                        $(el).html(`Update`).prop("disabled", false);
+                        });
                     }
                 });
             }
