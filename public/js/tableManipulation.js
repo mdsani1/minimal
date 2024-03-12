@@ -2,12 +2,26 @@ $(document).ready(function() {
     // Attach the event listener for the "Add Row" button click
     $('.addRowBtn').click(function() {
         // Find the closest .tab-pane and then find the .editableTable inside it
-        let editableTable = $(this).closest('.tab-pane').find('.editableTable');
+        let table = $(this).closest('.category').find('.tab-pane.zone.fade.show.active .editableTable');
+        let editableTable;
+        if(table.length > 0) {
+            editableTable = table;
+        } else {
+            editableTable = $(this).closest('.tab-pane').find('.editableTable');
+        }
         addRow(editableTable);
     });
 
     $('.addColumnBtn').click(function() {
-        let editableTable = $(this).closest('.tab-pane').find('.editableTable');
+        // let editableTable = $(this).closest('.tab-pane').find('.editableTable');
+        let table = $(this).closest('.category').find('.tab-pane.zone.fade.show.active .editableTable');
+        let editableTable;
+        if(table.length > 0) {
+            editableTable = table;
+        } else {
+            editableTable = $(this).closest('.tab-pane').find('.editableTable');
+        }
+        
         var lastThId = editableTable.find('.saveData.extracolumn:last').attr('id');
 
         let columnNo;

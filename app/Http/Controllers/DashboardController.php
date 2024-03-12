@@ -58,7 +58,11 @@ class DashboardController extends Controller
     public function pdf($id)
     {
         $quote = Quote::find($id);
-        $quoteItems = QuoteItem::with('quoteItemValues')->where('quote_id',$id)->get()->groupBy('category_id');
+        // $quoteItems = QuoteItem::with('quoteItemValues')->where('quote_id',$id)->get()->groupBy('category_id');
+        $quoteItems = QuoteItem::with('quoteItemValues')
+                ->where('quote_id', $id)
+                ->get()
+                ->groupBy(['category_id', 'sub_category_id']);
         $externalMenus = QuoteItemValue::where('quote_id', $quote->id)->distinct()->pluck('header');
         $organization = Organization::latest()->first();
 

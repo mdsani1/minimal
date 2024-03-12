@@ -194,7 +194,6 @@ class BackendApiController extends Controller
                 'date'          => now(),
                 'updated_by'    => auth()->user()->id
             ]);
-
             
             foreach ($request->item_data as $key => $value) {
 
@@ -211,16 +210,18 @@ class BackendApiController extends Controller
                     }
                 }
 
-                $quoteItem = QuoteItem::where('quote_id', $quote->id)->where('category_id', $request->category_id)->where('sl', $value['sl'])->latest()->first();
+                $quoteItem = QuoteItem::where('quote_id', $quote->id)->where('category_id', $request->category_id)->where('sub_category_id', $request->sub_category_id)->where('sl', $value['sl'])->latest()->first();
                 if($quoteItem == null) {
                     $quoteItem = QuoteItem::create([
-                        'quote_id'      => $quote->id,
-                        'created_by'    => auth()->user()->id
+                        'quote_id'          => $quote->id,
+                        'sub_category_id'   => $request->sub_category_id,
+                        'created_by'        => auth()->user()->id
                     ] + $value);
                 } else {
                     $quoteItem->update([
-                        'quote_id'      => $quote->id,
-                        'created_by'    => auth()->user()->id
+                        'quote_id'          => $quote->id,
+                        'sub_category_id'   => $request->sub_category_id,
+                        'created_by'        => auth()->user()->id
                     ] + $value);
                 }
             
@@ -238,6 +239,7 @@ class BackendApiController extends Controller
                                             'quote_id'              => $quote->id,
                                             'quote_item_id'         => $quoteItem->id,
                                             'category_id'           => $request->category_id,
+                                            'sub_category_id'       => $request->sub_category_id,
                                             'header'                => $key,
                                             'value'                 => $item,
                                         ]);
@@ -250,6 +252,7 @@ class BackendApiController extends Controller
                                             'quote_id'              => $quote->id,
                                             'quote_item_id'         => $quoteItem->id,
                                             'category_id'           => $request->category_id,
+                                            'sub_category_id'       => $request->sub_category_id,
                                             'unique_header'         => $menudata['uniqueHeader'],
                                             'header'                => $key,
                                             'value'                 => $item,

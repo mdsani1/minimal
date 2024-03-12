@@ -84,38 +84,45 @@
             <p style="text-align: center; font-size:20px">{{ $quote->title }}</p>
 
             <div style="width:95%; margin-left:10px; margin-top:8px">
-              @foreach ($quoteItems as $quoteItem)
-                <p style="font-size: 18px">{{ $quoteItem[0]->category->title }}</p>
-                <table style="margin-bottom: 30px">
-                  
-                    <tr style="background-color:#bbb;">
-                        <th style="text-align: center">SL </th>
-                        <th style="text-align: center">ITEM</th>
-                        <th style="text-align: center">SPECIFICATION</th>
-                        <th style="text-align: center">QTY</th>
-                        <th style="text-align: center">UNIT</th>
-                        <th style="text-align: center">RATE</th>
-                        <th style="text-align: center">AMOUNT</th>
-                        @foreach ($quoteItem[0]->quoteItemValues as $data)
-                            <th style="text-align: center">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
-                        @endforeach
-                    </tr>
-                    @foreach ($quoteItem as $item)  
-                    <tr>
-                        <td style="text-align: center">{{ $item->sl }}</td>
-                        <td style="text-align: center; width:30%">{{ $item->item }}</td>
-                        <td style="text-align: center">{{ $item->specification }}</td>
-                        <td style="text-align: center">{{ $item->qty }}</td>
-                        <td style="text-align: center">{{ $item->unit }}</td>
-                        <td style="text-align: center">{{ $item->rate }}</td>
-                        <td style="text-align: center">{{ $item->amount }}</td>
-                        @foreach ($item->quoteItemValues as $quoteItemValue)
-                            <td style="text-align: center">{{ $quoteItemValue->value }}</td>
-                        @endforeach
-                    </tr>
-                    @endforeach
+              @foreach ($quoteItems as $categoryId => $subCategories)
+              @foreach ($subCategories as $subCategoryId => $quoteItem)
+                  <p style="font-size: 18px">
+                    {{ $quoteItem->first()->category->title }} 
+                    @if ($quoteItem->first()->subCategory != null)
+                        ({{ $quoteItem->first()->subCategory  ->title }})
+                    @endif
+                  </p>
+                  <table style="margin-bottom: 30px">
+                      <tr style="background-color:#bbb;">
+                          <th style="text-align: center">SL </th>
+                          <th style="text-align: center">ITEM</th>
+                          <th style="text-align: center">SPECIFICATION</th>
+                          <th style="text-align: center">QTY</th>
+                          <th style="text-align: center">UNIT</th>
+                          <th style="text-align: center">RATE</th>
+                          <th style="text-align: center">AMOUNT</th>
+                          @foreach ($quoteItem->first()->quoteItemValues as $data)
+                              <th style="text-align: center">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
+                          @endforeach
+                      </tr>
+                      @foreach ($quoteItem as $item)
+                          <tr>
+                              <td style="text-align: center">{{ $item->sl }}</td>
+                              <td style="text-align: center; width:30%">{{ $item->item }}</td>
+                              <td style="text-align: center">{{ $item->specification }}</td>
+                              <td style="text-align: center">{{ $item->qty }}</td>
+                              <td style="text-align: center">{{ $item->unit }}</td>
+                              <td style="text-align: center">{{ $item->rate }}</td>
+                              <td style="text-align: center">{{ $item->amount }}</td>
+                              @foreach ($item->quoteItemValues as $quoteItemValue)
+                                  <td style="text-align: center">{{ $quoteItemValue->value }}</td>
+                              @endforeach
+                          </tr>
+                      @endforeach
                   </table>
-                  @endforeach
+              @endforeach
+          @endforeach
+
               </div>
           </div>
     </div>

@@ -199,7 +199,7 @@
             </div>
 
             @foreach ($quotation->quotationItems as $quotationItem)
-            <div class="tab-pane fade" id="{{ str_replace(' ', '-', $quotationItem->category->title) }}" role="tabpanel" aria-labelledby="{{ str_replace(' ', '-', $quotationItem->category->title) }}-tab">
+            <div class="tab-pane category fade" id="{{ str_replace(' ', '-', $quotationItem->category->title) }}" role="tabpanel" aria-labelledby="{{ str_replace(' ', '-', $quotationItem->category->title) }}-tab">
 
                 <div class="mt-4 mb-4 d-flex justify-content-between">
                     <div>
@@ -230,107 +230,109 @@
                     @php
                         $check = true;
                     @endphp
-                    <div class="table-responsive">
-                        <table class="table editableTable" id="" style="background: #fff">
-                            <thead>
-                                <input type="hidden" class="categoryId" value="{{ $quoteItem[0]->category_id }}">
-                                <tr>
-                                    <th style="background-color: #198754; color:#fff">SL</th>
-                                    <th style="background-color: #198754; color:#fff">ITEM</th>
-                                    <th style="background-color: #198754; color:#fff">SPECIFICATION</th>
-                                    <th style="background-color: #198754; color:#fff">QTY</th>
-                                    <th style="background-color: #198754; color:#fff">UNIT</th>
-                                    <th style="background-color: #198754; color:#fff">RATE</th>
-                                    <th style="background-color: #198754; color:#fff">AMOUNT</th>
-                                    @foreach ($quoteItem[0]->quoteItemValues as $data)
-                                        <th id="{{ $data->unique_header }}" class="saveData extracolumn" style="background-color: #198754; color:#fff">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
+                    @if (count($quotationItem->category->subcategory) > 0)
+                        <ul class="nav nav-tabs border-info" id="myTab" role="tablist">
+                            @foreach ($quotationItem->category->subcategory as $subcategory)
+                                <li class="nav-item" role="presentation">
+                                <button class="nav-link {{ $loop->first ? 'active' : '' }}" id="home-tab-{{ $subcategory->id }}" data-toggle="tab" data-target="#home{{ $subcategory->id }}" type="button" role="tab" aria-controls="home{{ $subcategory->id }}" aria-selected="true">{{ $subcategory->title }}</button>
+                                </li>
+                            @endforeach
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            @foreach ($quotationItem->category->subcategory as $subcategory)
+                                <div class="tab-pane zone fade {{ $loop->first ? 'show active' : '' }}" id="home{{ $subcategory->id }}" role="tabpanel" aria-labelledby="home-tab-{{ $subcategory->id }}">
+                                    <div class="table-responsive mt-4">
+                                        <table class="table editableTable" id="" style="background: #fff">
+                                            <thead>
+                                                <input type="hidden" class="categoryId" value="{{ $quoteItem[0]->category_id }}">
+                                                <input type="hidden" class="subCategoryId" value="{{ $subcategory->id }}">
+                                                <tr>
+                                                    <th style="background-color: #198754; color:#fff">SL</th>
+                                                    <th style="background-color: #198754; color:#fff">ITEM</th>
+                                                    <th style="background-color: #198754; color:#fff">SPECIFICATION</th>
+                                                    <th style="background-color: #198754; color:#fff">QTY</th>
+                                                    <th style="background-color: #198754; color:#fff">UNIT</th>
+                                                    <th style="background-color: #198754; color:#fff">RATE</th>
+                                                    <th style="background-color: #198754; color:#fff">AMOUNT</th>
+                                                    @foreach ($quoteItem[0]->quoteItemValues as $data)
+                                                        <th id="{{ $data->unique_header }}" class="saveData extracolumn" style="background-color: #198754; color:#fff">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
+                                                    @endforeach
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($quoteItem as $item)  
+                                                @if ($item->sub_category_id == $subcategory->id)
+                                                <tr>
+                                                    <td class="sl">{{ $item->sl }}</td>
+                                                    <td class="item saveData" contenteditable="true">{{ $item->item }}</td>
+                                                    <td class="specification saveData" contenteditable="true">{{ $item->specification }}</td>
+                                                    <td class="qty saveData" contenteditable="true">{{ $item->qty }}</td>
+                                                    <td class="unit saveData" contenteditable="true">{{ $item->unit }}</td>
+                                                    <td class="rate saveData" contenteditable="true">{{ $item->rate }}</td>
+                                                    <td class="amount saveData" contenteditable="true">{{ $item->amount }}</td>
+                                                    @foreach ($item->quoteItemValues as $quoteItemValue)
+                                                        <td class=" saveData" contenteditable="true">
+                                                            <input type="hidden" class="quoteItemValue" value="{{ $quoteItemValue->unique_header }}">
+                                                            {{ $quoteItemValue->value }}
+                                                        </td>
+                                                    @endforeach
+                                                </tr>
+                                                @endif
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                       @else 
+                       <div class="table-responsive mt-4">
+                            <table class="table editableTable" id="" style="background: #fff">
+                                <thead>
+                                    <input type="hidden" class="categoryId" value="{{ $quoteItem[0]->category_id }}">
+                                    <input type="hidden" class="subCategoryId" value="{{ null }}">
+                                    <tr>
+                                        <th style="background-color: #198754; color:#fff">SL</th>
+                                        <th style="background-color: #198754; color:#fff">ITEM</th>
+                                        <th style="background-color: #198754; color:#fff">SPECIFICATION</th>
+                                        <th style="background-color: #198754; color:#fff">QTY</th>
+                                        <th style="background-color: #198754; color:#fff">UNIT</th>
+                                        <th style="background-color: #198754; color:#fff">RATE</th>
+                                        <th style="background-color: #198754; color:#fff">AMOUNT</th>
+                                        @foreach ($quoteItem[0]->quoteItemValues as $data)
+                                            <th id="{{ $data->unique_header }}" class="saveData extracolumn" style="background-color: #198754; color:#fff">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
+                                        @endforeach
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($quoteItem as $item)  
+                                    <tr>
+                                        <td class="sl">{{ $item->sl }}</td>
+                                        <td class="item saveData" contenteditable="true">{{ $item->item }}</td>
+                                        <td class="specification saveData" contenteditable="true">{{ $item->specification }}</td>
+                                        <td class="qty saveData" contenteditable="true">{{ $item->qty }}</td>
+                                        <td class="unit saveData" contenteditable="true">{{ $item->unit }}</td>
+                                        <td class="rate saveData" contenteditable="true">{{ $item->rate }}</td>
+                                        <td class="amount saveData" contenteditable="true">{{ $item->amount }}</td>
+                                        @foreach ($item->quoteItemValues as $quoteItemValue)
+                                            <td class=" saveData" contenteditable="true">
+                                                <input type="hidden" class="quoteItemValue" value="{{ $quoteItemValue->unique_header }}">
+                                                {{ $quoteItemValue->value }}
+                                            </td>
+                                        @endforeach
+                                    </tr>
                                     @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($quoteItem as $item)  
-                                <tr>
-                                    <td class="sl">{{ $item->sl }}</td>
-                                    <td class="item saveData" contenteditable="true">{{ $item->item }}</td>
-                                    <td class="specification saveData" contenteditable="true">{{ $item->specification }}</td>
-                                    <td class="qty saveData" contenteditable="true">{{ $item->qty }}</td>
-                                    <td class="unit saveData" contenteditable="true">{{ $item->unit }}</td>
-                                    <td class="rate saveData" contenteditable="true">{{ $item->rate }}</td>
-                                    <td class="amount saveData" contenteditable="true">{{ $item->amount }}</td>
-                                    @foreach ($item->quoteItemValues as $quoteItemValue)
-                                        <td class=" saveData" contenteditable="true">
-                                            <input type="hidden" class="quoteItemValue" value="{{ $quoteItemValue->unique_header }}">
-                                            {{ $quoteItemValue->value }}
-                                        </td>
-                                    @endforeach
-                                </tr>
-                                @endforeach
-                            </tbody>
-                          </table>
-                    </div>
+                                </tbody>
+                            </table>
+                        </div> 
+                    @endif
+
                 @endif
                 @endforeach
 
-                @if ( $check == false)
-                <div class="table-responsive">
-                    <table class="table editableTable" id="" style="background: #fff">
-                        <input type="hidden" class="categoryId" value="{{ $quotationItem->work_scope }}">
-                        <thead>
-                            <tr>
-                                <th style="background-color: #198754; color:#fff">SL</th>
-                                <th style="background-color: #198754; color:#fff">ITEM</th>
-                                <th style="background-color: #198754; color:#fff">SPECIFICATION</th>
-                                <th style="background-color: #198754; color:#fff">QTY</th>
-                                <th style="background-color: #198754; color:#fff">UNIT</th>
-                                <th style="background-color: #198754; color:#fff">RATE</th>
-                                <th style="background-color: #198754; color:#fff">AMOUNT</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="sl">1</td>
-                                <td class="item saveData" contenteditable="true"></td>
-                                <td class="specification saveData" contenteditable="true"></td>
-                                <td class="qty saveData" contenteditable="true"></td>
-                                <td class="unit saveData" contenteditable="true"></td>
-                                <td class="rate saveData" contenteditable="true"></td>
-                                <td class="amount saveData" contenteditable="true"></td>
-                            </tr>
-                            <tr>
-                                <td class="sl">2</td>
-                                <td class="item saveData" contenteditable="true"></td>
-                                <td class="specification saveData" contenteditable="true"></td>
-                                <td class="qty saveData" contenteditable="true"></td>
-                                <td class="unit saveData" contenteditable="true"></td>
-                                <td class="rate saveData" contenteditable="true"></td>
-                                <td class="amount saveData" contenteditable="true"></td>
-                            </tr>
-                            <tr>
-                                <td class="sl">3</td>
-                                <td class="item saveData" contenteditable="true"></td>
-                                <td class="specification saveData" contenteditable="true"></td>
-                                <td class="qty saveData" contenteditable="true"></td>
-                                <td class="unit saveData" contenteditable="true"></td>
-                                <td class="rate saveData" contenteditable="true"></td>
-                                <td class="amount saveData" contenteditable="true"></td>
-                            </tr>
-                            <tr>
-                                <td class="sl">4</td>
-                                <td class="item saveData" contenteditable="true"></td>
-                                <td class="specification saveData" contenteditable="true"></td>
-                                <td class="qty saveData" contenteditable="true"></td>
-                                <td class="unit saveData" contenteditable="true"></td>
-                                <td class="rate saveData" contenteditable="true"></td>
-                                <td class="amount saveData" contenteditable="true"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                @endif
-
             </div>
             @endforeach
-            <div class="tab-pane fade" id="term" role="tabpanel" aria-labelledby="term-tab">
+            <div class="tab-pane  fade" id="term" role="tabpanel" aria-labelledby="term-tab">
                 <div class="d-flex justify-content-end">
                     <a href="{{ route('quotations.index') }}" class="btn btn-danger mr-2 mt-3">Exit</a>
                     <a href="{{ route('quotations.edit', $quotation->id) }}" class="btn btn-warning mt-3">Quotation Edit</a>
@@ -557,11 +559,21 @@
             }
 
             function reqData() {
-                let table = $('#myTabContent .tab-pane.fade.active.show').find('.editableTable'); // Use event.target to refer to the element that triggered the event
+
+                
+                let table
+
+                if($('#myTabContent .category.active.show .zone.active.show').find('.editableTable').length > 0) {
+                    table = $('#myTabContent .category.active.show .zone.active.show').find('.editableTable');
+                } else {
+                    table = $('#myTabContent .category.active.show').find('.editableTable');
+                }
+
                 const data = {
                     quote_title: $('.quote_title').val(),
                     quotationId: $('.quotationId').val(),
                     category_id: table.find('.categoryId').val(),
+                    sub_category_id: table.find('.subCategoryId').val(),
                     item_data: [],
                     missing_data: [],
                 };

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('quote_id')->nullable();
             $table->unsignedBigInteger('quote_item_id')->nullable();
             $table->unsignedBigInteger('category_id')->nullable();
+            $table->unsignedBigInteger('sub_category_id')->nullable();
             $table->string('unique_header');
             $table->string('header')->nullable();
             $table->string('value')->nullable();
