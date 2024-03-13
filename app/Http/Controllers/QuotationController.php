@@ -244,6 +244,7 @@ class QuotationController extends Controller
                     $newquoteItem = QuoteItem::create([
                         'quote_id'          => $quote->id,
                         'category_id'       => $quoteItem->category_id,
+                        'sub_category_id'   => $quoteItem->sub_category_id,
                         'sl'                => $quoteItem->sl,
                         'item'              => $quoteItem->item,
                         'specification'     => $quoteItem->specification,
@@ -258,6 +259,7 @@ class QuotationController extends Controller
                         $quoteItemValue = QuoteItemValue::create([
                             'quote_id'          => $quote->id,
                             'category_id'       => $quoteItemValue->category_id,
+                            'sub_category_id'   => $quoteItemValue->sub_category_id,
                             'quote_item_id'     => $newquoteItem->id,
                             'unique_header'     => $quoteItemValue->unique_header,
                             'header'            => $quoteItemValue->header,
@@ -314,6 +316,7 @@ class QuotationController extends Controller
                 $newquoteItem = QuoteItem::create([
                     'quote_id'          => $quote->id,
                     'category_id'       => $quoteItem->category_id,
+                    'sub_category_id'   => $quoteItem->sub_category_id,
                     'sl'                => $quoteItem->sl,
                     'item'              => $quoteItem->item,
                     'specification'     => $quoteItem->specification,
@@ -328,6 +331,7 @@ class QuotationController extends Controller
                     $quoteItemValue = QuoteItemValue::create([
                         'quote_id'          => $quote->id,
                         'category_id'       => $quoteItemValue->category_id,
+                        'sub_category_id'   => $quoteItemValue->sub_category_id,
                         'quote_item_id'     => $newquoteItem->id,
                         'unique_header'     => $quoteItemValue->unique_header,
                         'header'            => $quoteItemValue->header,

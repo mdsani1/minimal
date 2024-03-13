@@ -98,7 +98,7 @@ class DashboardController extends Controller
                 }
             }
 
-            return redirect()->route('go-to-sheet')->withMessage('Successful delete :)');
+            return redirect()->route('quotations.index')->withMessage('Successful delete :)');
         }catch(QueryException $e){
             return redirect()->back()->withInput()->withErrors($e->getMessage());
         }

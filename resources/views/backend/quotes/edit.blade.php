@@ -500,6 +500,14 @@
                     triggerCreate(event);
                 });
 
+                $(document).on('input change keyup', '.rate', function(event) {
+                    subTotal(event);
+                });
+
+                $(document).on('input change keyup', '.qty', function(event) {
+                    subTotal(event);
+                });
+
                 // $(document).on('click', '#update', triggerUpdate);
 
                 $(document).on('click', '.copyLink', function() {
@@ -531,6 +539,19 @@
             });
         </script>
         <script>
+
+            const subTotal = event => {
+
+                let 
+                    el = event.target,
+                    tr = $(el).closest('tr'),
+                    rate = parseFloat($(tr).find('.rate').text()), // Parsing as float for decimal values
+                    qty = parseInt($(tr).find('.qty').text()); // Parsing as integer
+
+                    console.log('in', rate, qty);
+
+                $(tr).find('.amount').text(rate*qty);
+            }
 
             function templateCreate(event) {
                 var quoteId = $(this).val();
@@ -613,7 +634,6 @@
                         } else {
                             // missingItem[thText] = $(td).text().trim();
                             let input = $(td).find('input');
-                            console.log(input);
                             if (input.length > 0) {
                                 data['uniqueHeader'] = input.val();
                             } else {
