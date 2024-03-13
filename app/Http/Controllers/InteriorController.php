@@ -60,12 +60,14 @@ class InteriorController extends Controller
 
             $interior = Interior::create(['created_by' => auth()->user()->id] + $interiorData);
 
-            foreach ($request->specification as $key => $value) {
-                $interiorSpecification = InteriorSpecification::create([
-                    'interior_id'   => $interior->id,
-                    'specification' => $value,
-                    'created_by'    => auth()->user()->id,
-                ]);
+            if(isset($request->specification)){
+                foreach ($request->specification as $key => $value) {
+                    $interiorSpecification = InteriorSpecification::create([
+                        'interior_id'   => $interior->id,
+                        'specification' => $value,
+                        'created_by'    => auth()->user()->id,
+                    ]);
+                }
             }
 
             return redirect()->route('interiors.index')->withMessage('Successful create :)');
@@ -127,21 +129,22 @@ class InteriorController extends Controller
 
             $interior->update(['updated_by' => auth()->user()->id] + $interiorData);
 
-
-            foreach ($request->specification as $key => $value) {
-
-                if($request->interiorSpecificationId[$key] != null) {
-                    $interiorSpecification = InteriorSpecification::find($request->interiorSpecificationId[$key]);
-                    $interiorSpecification->update([
-                        'specification' => $value,
-                        'updated_by'    => auth()->user()->id,
-                    ]);
-                } else {
-                    $interiorSpecification = InteriorSpecification::create([
-                        'interior_id'   => $interior->id,
-                        'specification' => $value,
-                        'created_by'    => auth()->user()->id,
-                    ]);
+            if(isset($request->specification)){
+                foreach ($request->specification as $key => $value) {
+    
+                    if($request->interiorSpecificationId[$key] != null) {
+                        $interiorSpecification = InteriorSpecification::find($request->interiorSpecificationId[$key]);
+                        $interiorSpecification->update([
+                            'specification' => $value,
+                            'updated_by'    => auth()->user()->id,
+                        ]);
+                    } else {
+                        $interiorSpecification = InteriorSpecification::create([
+                            'interior_id'   => $interior->id,
+                            'specification' => $value,
+                            'created_by'    => auth()->user()->id,
+                        ]);
+                    }
                 }
             }
 
