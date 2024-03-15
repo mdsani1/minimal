@@ -117,6 +117,31 @@ class BankController extends Controller
         }
     }
 
+    public function bankUpdate(UpdateBankRequest $request, $id)
+    {
+        try{
+            $bank = Bank::find($id);
+            
+            $filename = null;
+            
+            if($request->file('image')){
+                $file = $request->file('image');
+                $filename = time().'.'.$file->getClientOriginalExtension();
+                $file->move('backend/images/bank', $filename);
+            }
+            $bankData = $request->except('image');
+            if ($filename) {
+                $bankData['image'] = $filename;
+            }
+
+            $bank->update(['updated_by' => auth()->user()->id] + $bankData);
+
+            return redirect()->back()->withMessage('Successful update :)');
+        }catch(QueryException $e){
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
+
     /**
      * Remove the specified resource from storage.
      *

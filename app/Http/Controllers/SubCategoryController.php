@@ -71,6 +71,31 @@ class SubCategoryController extends Controller
         }
     }
 
+    public function zoneStore(StoreSubCategoryRequest $request)
+    {
+        try{
+
+            $filename = null;
+
+            if($request->file('image')){
+                $file = $request->file('image');
+                $filename = time().'.'.$file->getClientOriginalExtension();
+                $file->move('backend/images/subcategory', $filename);
+            }
+
+            $subcategoryData = $request->except('image');
+            if ($filename) {
+                $subcategoryData['image'] = $filename;
+            }
+
+            $subcategory = SubCategory::create(['created_by' => auth()->user()->id] + $subcategoryData);
+
+            return redirect()->back()->withMessage('Successful create :)');
+        }catch(QueryException $e){
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
+
     /**
      * Display the specified resource.
      *

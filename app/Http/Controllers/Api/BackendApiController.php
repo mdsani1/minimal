@@ -12,6 +12,8 @@ use App\Models\QuoteItem;
 use App\Models\QuoteItemMenu;
 use App\Models\QuoteItemValue;
 use App\Models\Template;
+use App\Models\TemplateItem;
+use App\Models\TemplateItemValue;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -34,20 +36,164 @@ class BackendApiController extends Controller
         }
     }
 
-    public function addTemplate($id)
+    public function addTemplate(Request $request, $id)
     {
-        $checkTemplate = Template::where('quote_id', $id)->first();
 
-        if($checkTemplate == null) {
+        try {
+            $checkTemplate = Template::where('quote_id', $id)->first();
+
+            if($checkTemplate != null) {
+
+                return response()->json([
+                    "message" => "This Template Allready Add."
+                ], 400);
+                
+            }
+
+            // DB::beginTransaction();
+            $sheet = Quote::find($id);
+
             $template = Template::create([
+                'quotation_id'  => $sheet->quotation_id,
                 'quote_id'      => $id,
+                'title'         => $request->title,
+                'version'       => $sheet->version,
+                'date'          => now(),
                 'created_by'    => auth()->user()->id
             ]);
+
+            foreach ($sheet->quoteItems as $key => $quoteItem) {
+                $templateItem = TemplateItem::create([
+                    'template_id'       => $template->id,
+                    'quote_id'          => $id,
+                    'category_id'       => $quoteItem->category_id,
+                    'sub_category_id'   => $quoteItem->sub_category_id,
+                    'sl'                => $quoteItem->sl,
+                    'item'              => $quoteItem->item,
+                    'specification'     => $quoteItem->specification,
+                    'qty'               => $quoteItem->qty,
+                    'unit'              => $quoteItem->unit,
+                    'rate'              => $quoteItem->rate,
+                    'amount'            => $quoteItem->amount,
+                    'created_by'        => auth()->user()->id
+                ]);
+
+                foreach ($quoteItem->quoteItemValues as $key => $quoteItemValue) {
+                    $templateItemValue = TemplateItemValue::create([
+                        'template_id'           => $template->id,
+                        'quote_id'              => $id,
+                        'category_id'           => $quoteItemValue->category_id,
+                        'sub_category_id'       => $quoteItemValue->sub_category_id,
+                        'quote_item_id'         => $quoteItemValue->quote_item_id,
+                        'template_item_id'      => $templateItem->id,
+                        'quote_item_value_id'   => $templateItem->id,
+                        'unique_header'         => $quoteItemValue->unique_header,
+                        'header'                => $quoteItemValue->header,
+                        'value'                 => $quoteItemValue->value,
+                        'created_by'            => auth()->user()->id
+                    ]);
+                }
+            }
+
             return response()->json($template, 200);
-        } else {
+
+            // DB::commit();
+        } catch(QueryException $e){
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
+
+    public function templateUpdate(Request $request, $id)
+    {
+        try{
+
+            
+            DB::beginTransaction();
+            $template = Template::find($id);
+            $template->update([
+                'title'         => $request->template_title,
+                'date'          => now(),
+                'updated_by'    => auth()->user()->id
+            ]);
+            
+            foreach ($request->item_data as $key => $value) {
+
+                $templateItem = TemplateItem::where('template_id', $template->id)
+                                            ->where('category_id', $request->category_id)
+                                            ->where('sub_category_id', $request->sub_category_id)
+                                            ->where('sl', $value['sl'])
+                                            ->latest()
+                                            ->first();
+
+                if($templateItem == null) {
+                    $templateItem = TemplateItem::create([
+                        'template_id'       => $template->id,
+                        'sub_category_id'   => $request->sub_category_id,
+                        'created_by'        => auth()->user()->id
+                    ] + $value);
+                } else {
+                    $templateItem->update([
+                        'template_id'       => $template->id,
+                        'sub_category_id'   => $request->sub_category_id,
+                        'created_by'        => auth()->user()->id
+                    ] + $value);
+                }
+            
+                if ($request->missing_data && $request->missing_data[$key] !== null) { 
+                    foreach ($request->missing_data[$key] as $menu => $menudata) {
+
+                        if(isset($menudata['uniqueHeader']))
+                        {
+                            $templateItemvalue = TemplateItemValue::where('template_id', $template->id)
+                                                                ->where('template_item_id', $templateItem->id)
+                                                                ->where('unique_header', $menudata['uniqueHeader'])
+                                                                ->latest()
+                                                                ->first(); 
+
+                            if($templateItemvalue != null) {
+                                foreach ($menudata as $key => $item) {
+                                    if($key != 'uniqueHeader'){
+                                        $templateItemvalue->update([
+                                            'template_id'           => $template->id,
+                                            'template_item_id'      => $templateItem->id,
+                                            'category_id'           => $request->category_id,
+                                            'sub_category_id'       => $request->sub_category_id,
+                                            'header'                => $key,
+                                            'value'                 => $item,
+                                        ]);
+                                    }
+                                }
+                            } else {
+                                foreach ($menudata as $key => $item) {
+                                    if($key != 'uniqueHeader'){
+                                        $templateItemvalue = TemplateItemValue::create([
+                                            'template_id'           => $template->id,
+                                            'template_item_id'      => $templateItem->id,
+                                            'category_id'           => $request->category_id,
+                                            'sub_category_id'       => $request->sub_category_id,
+                                            'unique_header'         => $menudata['uniqueHeader'],
+                                            'header'                => $key,
+                                            'value'                 => $item,
+                                            'created_by'            => auth()->user()->id
+                                        ]);
+                                    }
+                                }
+                            }
+
+                            
+                        }
+                    }
+                }
+            
+            }
+
+            DB::commit();
+            
             return response()->json([
-                "message" => "This Template Allready Add."
-            ], 400);
+                "message" => "Successfull Update :)",
+            ]);
+        }catch(QueryException $e){
+            return response()->json(['error' => $e->getMessage()]);
         }
     }
 
@@ -168,14 +314,13 @@ class BackendApiController extends Controller
     public function list()
     {
         try{
-            $quoteIds = Template::pluck('quote_id');
-            $quoteCollection = Quote::whereIn('id', $quoteIds)->with('quotation')->latest();
+            $templateCollection = Template::latest();
             if(request('search')){
-                $quotes = $quoteCollection->where('title','like', '%'.request('search').'%');
+                $templates = $templateCollection->where('title','like', '%'.request('search').'%');
             }
 
-            $quotes = $quoteCollection->get();
-            return response()->json($quotes);
+            $templates = $templateCollection->get();
+            return response()->json($templates);
 
         }catch(QueryException $e){
             return response()->json(['error' => $e->getMessage()]);

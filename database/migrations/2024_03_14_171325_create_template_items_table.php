@@ -11,13 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('templates', function (Blueprint $table) {
+        Schema::create('template_items', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('quotation_id')->nullable();
+            $table->unsignedBigInteger('template_id')->nullable();
             $table->unsignedBigInteger('quote_id')->nullable();
-            $table->string('title');
-            $table->string('version');
-            $table->date('date');
+            $table->unsignedBigInteger('category_id')->nullable();
+            $table->unsignedBigInteger('sub_category_id')->nullable();
+            $table->string('sl')->nullable();
+            $table->text('item')->nullable();
+            $table->text('specification')->nullable();
+            $table->string('qty')->nullable();
+            $table->string('unit')->nullable();
+            $table->string('rate')->nullable();
+            $table->string('amount')->nullable();
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->string('deleted_by')->nullable();
@@ -31,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('templates');
+        Schema::dropIfExists('template_items');
     }
 };

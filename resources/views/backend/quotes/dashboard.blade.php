@@ -18,26 +18,16 @@
             <p style="font-size: 18px">Sheet</p>
 
             <div class="row">
-                {{-- <div class="col-md-2">
-                    <a href="{{ route('editableTable') }}">
-                        <div class="card" style="height: 150px">
-                            <div class="card-body d-flex justify-content-center align-items-center">
-                                <i class="fas fa-plus" style="font-size: 40px"></i>
-                            </div>
-                        </div>
-                        <p class="text-center" style="font-size: 18px">Blank sheet</p>
-                    </a>
-                </div> --}}
 
-                @foreach ($quotes as $item)
+                @foreach ($templates as $template)
                 <div class="col-md-2">
-                    <a href="{{ route('go-to-sheet-edit', $item->id) }}">
+                    <a href="{{ route('template-edit', $template->id) }}">
                         <div class="card" style="height: 150px">
                             <div class="card-body d-flex justify-content-center align-items-center">
                                 <i class="fas fa-database" style="font-size: 40px"></i>
                             </div>
                         </div>
-                        <p class="text-center" style="font-size: 18px">{{ $item->title }}</p>
+                        <p class="text-center" style="font-size: 18px">{{ $template->title }}</p>
                     </a>
                 </div>
                 @endforeach
@@ -55,7 +45,6 @@
                     <thead>
                         <tr>
                             <th>Title</th>
-                            <th class="text-center">Ref</th>
                             <th class="text-center">Date</th>
                             <th style="text-align: right">Action</th>
                         </tr>
@@ -115,7 +104,6 @@
                              data += `
                              <tr>
                                 <td>${elementValue.title}</td>
-                                <td class="text-center">${elementValue.quotation != null ? elementValue.quotation.ref : ''}</td>
                                 <td class="text-center">${elementValue.date}</td>
                                 <td style="text-align: right">
                                     <div class="dropdown">
@@ -124,7 +112,7 @@
                                     </button>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item" target="_blank" href="/sheet-pdf/${elementValue.id}">Pdf</a>
-                                        <a class="dropdown-item" href="/go-to-sheet/edit/${elementValue.id}">Edit</a>
+                                        <a class="dropdown-item" href="/template/edit/${elementValue.id}">Edit</a>
                                         <button type="button" class="dropdown-item copyLink" target="_blank" href="/sheet-pdf/${elementValue.id}">Copy</button>
                                         <form style="display: inline;" action="/sheet-delete/${elementValue.id}" method="POST">
                                             @csrf

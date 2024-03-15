@@ -51,6 +51,9 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/sheet-pdf/{id}', [DashboardController::class, 'pdf'])->name('sheet.pdf');
     Route::delete('/sheet-delete/{id}', [DashboardController::class, 'destroy'])->name('sheet.delete');
     Route::get('/go-to-sheet/edit/{id}', [DashboardController::class, 'edit'])->name('go-to-sheet-edit');
+    Route::get('/template/edit/{id}', [DashboardController::class, 'templateEdit'])->name('template-edit');
+    Route::get('/template-pdf/{id}', [DashboardController::class, 'templatePdf'])->name('template.pdf');
+    Route::delete('/template-delete/{id}', [DashboardController::class, 'templateDestroy'])->name('template.delete');
 
 
     Route::resource('roles', RoleController::class);
@@ -79,6 +82,7 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/sub-categories-trash/{sub_category}/delete', [SubCategoryController::class, 'delete'])->name('sub-categories.delete');
     Route::get('/sub-categories-excel', [SubCategoryController::class, 'excel'])->name('sub-categories.excel');
     Route::get('/sub-categories-pdf', [SubCategoryController::class, 'pdf'])->name('sub-categories.pdf');
+    Route::post('/zone/store', [SubCategoryController::class, 'zoneStore'])->name('zone.store');
     Route::resource('sub-categories', SubCategoryController::class);
 
     //interior crud
@@ -109,7 +113,10 @@ Route::middleware(['auth','web'])->group(function () {
     Route::resource('terms', TermController::class);
     Route::resource('payments', PaymentController::class);
     Route::resource('banks', BankController::class);
+    Route::patch('/bank/update/{bank}', [BankController::class, 'bankUpdate'])->name('bank.update');
+    Route::post('/term/update', [TermController::class, 'termUpdate'])->name('term.update');
+    Route::post('/payment/update', [PaymentController::class, 'paymentUpdate'])->name('payment.update');
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__.'/auth.php';    

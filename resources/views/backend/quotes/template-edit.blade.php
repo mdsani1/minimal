@@ -8,38 +8,23 @@
     <x-slot name="breadcrumb">
         <x-backend.layouts.elements.breadcrumb>
             <x-slot name="pageHeader">
-                Sheet Edit
+                Template Edit
             </x-slot>
         </x-backend.layouts.elements.breadcrumb>
     </x-slot>
 
     <div>
 
-        <!-- Button for scroll-to-top -->
-        {{-- <button id="scrollToTopButton" aria-label="Scroll to top" title="Scroll to top" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 100;">
-            <i class="fas fa-chevron-up"></i>
-        </button> --}}
-
-
-
-        <!-- The Modal for PDF preview -->
-        {{-- <div id="pdfPreviewModal" class="modal">
-            <div class="modal-content">
-            <span class="close">&times;</span> <!-- Close button -->
-            <iframe id="pdfPreviewIframe" style="width:100%;height:100%;"></iframe>
-            </div>
-        </div> --}}
-
         <div class="">
-            <input type="hidden" class="quotationId" value="{{ $quote->quotation_id }}">
-            <h3 class="mt-5 border text-center">{{ $quote->quotation->ref }} ({{ $quote->version }})</h3>
+            <input type="hidden" class="quotationId" value="{{ $template->quotation_id }}">
+            <h3 class="mt-5 border text-center ">{{ $template->quotation->ref }} ({{ $template->version }})</h3>
 
             <h1 class="mt-5">
-                <input type="text" class="form-control quote_title" name="quote_title" style="background: none; border:none; font-size:30px" value="{{ $quote->title }}">
-                <input type="hidden" id="quoteId" value="{{ $quote->id }}">
+                <input type="text" class="form-control template_title" name="template_title" style="background: none; border:none; font-size:30px" value="{{ $template->title }}">
+                <input type="hidden" id="templateId" value="{{ $template->id }}">
             </h1>
 
-            @if ($quote->quotation != null)
+            @if ($template->quotation != null)
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                   <button class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Top Sheet</button>
@@ -56,82 +41,12 @@
             <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                 <div class="d-flex justify-content-end">
-                    <a href="{{ route('quotations.index') }}" class="btn btn-primary mr-2 mt-3">Exit</a>
-                    <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-success mr-2 mt-3" data-toggle="modal" data-target="#addzone">
-                        Add Zone
-                    </button>
+                    <a href="{{ route('template') }}" class="btn btn-primary mr-2 mt-3">Exit</a>
+                    {{-- <a href="{{ route('quotations.edit', $quotation->id) }}" class="btn btn-warning mr-2 mt-3">Quotation Edit</a> --}}
+                    <a href="/template-pdf/{{ $template->id }}" class="btn btn-info mr-2 mt-3">Pdf</a>
+                    <a href="/template-pdf/{{ $template->id }}" class="btn btn-primary mr-2 mt-3 copyLink">Copy</a>
 
-                    <!-- Modal -->
-                    <div class="modal fade" id="addzone" tabindex="-1" aria-labelledby="addzoneLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" style="min-width: 80%;">
-                        <form action="{{ route('zone.store') }}" method="POST" style="min-width: 100%">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 class="modal-title" id="addzoneLabel">Add Zone</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                </div>
-                                <div class="modal-body">
-                                    @csrf
-                                    <div class="row mb-3">
-                                        <div class="col-md-6 mb-2">
-                                            <x-backend.form.select name="category_id" label="Category" :option="$categories"/>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="title">Title</label>
-                                                <input type="text" class="form-control" name="title" placeholder="Enter Title" value="{{ old('title') }}" required>
-                                                @error("title")
-                                                    <span class="sm text-danger">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary closeBtn" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                                </div>
-                            </div>
-                        </form>
-                        </div>
-                    </div>
-
-                    <a href="{{ route('quotations.edit', $quotation->id) }}" class="btn btn-warning mr-2 mt-3">Quotation Edit</a>
-                    <a href="/sheet-pdf/{{ $quote->id }}" class="btn btn-info mr-2 mt-3">Pdf</a>
-                    <a href="/sheet-pdf/{{ $quote->id }}" class="btn btn-primary mr-2 mt-3 copyLink">Copy</a>
-                    {{-- <button type="button" class="btn btn-success mr-2 mt-3 template" value="{{ $quote->id }}"><i class="fa-solid fa-bookmark"></i> Template</button> --}}
-                    <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-success mr-2 mt-3" data-toggle="modal" data-target="#exampleModal2">
-                        <i class="fa-solid fa-bookmark"></i> Template
-                    </button>
-
-                    <!-- Modal -->
-                    <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModal2Label" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModal2Label">Template</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                            </div>
-                            <div class="modal-body">
-                                <label for="">Name</label>
-                                <input type="text" class="form-control" name="title" id="templateTitle" value="{{ $quote->title }}">
-                                <input type="hidden" id="quoteId" value="{{ $quote->id }}">
-                            </div>
-                            <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary closeBtn" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary template">Submit</button>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-
-                    <form style="display: inline;" action="/sheet-delete/{{ $quote->id }}" method="POST">
+                    <form style="display: inline;" action="/template-delete/{{ $template->id }}" method="POST">
                         @csrf
                         @method('delete')
                         <button onclick="return confirm('Are you sure want to delete ?')" class="btn btn-danger mt-3" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Remove</button>
@@ -143,10 +58,10 @@
                         <div class="row">
                             <div class="column">
                             <img src="{{ asset('backend/images/organization/'.$organization->image ?? '') }}" alt="" style="width: 70%">
-                            <h4>Ref: {{ $quote->quotation->ref }}</h4>
+                            <h4>Ref: {{ $template->quotation->ref }}</h4>
                             <h4>To</h4>
-                            <h4>{{ $quote->quotation->name }}</h4>
-                            <h4>{{ $quote->quotation->address }}</h4>
+                            <h4>{{ $template->quotation->name }}</h4>
+                            <h4>{{ $template->quotation->address }}</h4>
                             </div>
                             <div class="column organization-details">
                             <div>
@@ -158,7 +73,7 @@
                                 <p><a href="{{ $organization->facebook }}">{{ $organization->facebook }}</a></p>
                                 <p><a href="{{ $organization->website }}" target="_blank">{{ $organization->website }}</a></p>
                                 @php
-                                    $dateString = $quote->quotation->date;
+                                    $dateString = $template->quotation->date;
                                     $formattedDate = date("F j, Y", strtotime($dateString));
                                 @endphp 
                                 <p style="margin-top: 20px">{{ $formattedDate }}</p>
@@ -169,7 +84,7 @@
                         <div style="background-color:#bbb; text-align:center; border:3px solid #09e240; width:100%;">
                             <h4>Financial Proposal For Residence Interior & Electrical Works</h4>
                             <h4>Of</h4>
-                            <h3>{{ $quote->quotation->name }} | {{ $quote->quotation->address }}</h3>
+                            <h3>{{ $template->quotation->name }} | {{ $template->quotation->address }}</h3>
                         </div>
                     
                         <div class="d-flex justify-content-center" style="margin-top: 20px;">
@@ -219,7 +134,7 @@
                             @php
                                 $total = 0;
                             @endphp
-                            @foreach ($quote->quotation->quotationItems as $quotationItem)
+                            @foreach ($template->quotation->quotationItems as $quotationItem)
                             <tr>
                                 <td style="text-align: center">{{ $loop->iteration }}</td>
                                 <td>{{ $quotationItem->category->title }}</td>
@@ -282,10 +197,10 @@
                         <button class="btn btn-primary downloadPdfButton" id="">Download PDF</button>
                     </div>
                     <div class="d-flex">
-                        <a href="{{ route('quotations.index') }}" class="btn btn-primary mr-2">Exit</a>
-                        <a href="/sheet-pdf/{{ $quote->id }}" class="btn btn-info mr-2">Pdf</a>
-                        <a href="/sheet-pdf/{{ $quote->id }}" class="btn btn-primary mr-2 copyLink">Copy</a>
-                        <form style="display: inline;" action="/sheet-delete/{{ $quote->id }}" method="POST">
+                        <a href="{{ route('template') }}" class="btn btn-primary mr-2">Exit</a>
+                        <a href="/template-pdf/{{ $template->id }}" class="btn btn-info mr-2">Pdf</a>
+                        <a href="/template-pdf/{{ $template->id }}" class="btn btn-primary mr-2 copyLink">Copy</a>
+                        <form style="display: inline;" action="/template-delete/{{ $template->id }}" method="POST">
                             @csrf
                             @method('delete')
                             <button onclick="return confirm('Are you sure want to delete ?')" class="btn btn-danger" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Remove</button>
@@ -295,8 +210,8 @@
                 @php
                     $check = false;
                 @endphp
-                @foreach ($quoteItems as $quoteItem)
-                @if ($quoteItem[0]->category->title == $quotationItem->category->title)
+                @foreach ($templateItems as $templateItem)
+                @if ($templateItem[0]->category->title == $quotationItem->category->title)
                     @php
                         $check = true;
                     @endphp
@@ -314,7 +229,7 @@
                                     <div class="table-responsive mt-4">
                                         <table class="table editableTable" id="" style="background: #fff">
                                             <thead>
-                                                <input type="hidden" class="categoryId" value="{{ $quoteItem[0]->category_id }}">
+                                                <input type="hidden" class="categoryId" value="{{ $templateItem[0]->category_id }}">
                                                 <input type="hidden" class="subCategoryId" value="{{ $subcategory->id }}">
                                                 <tr>
                                                     <th style="background-color: #198754; color:#fff">SL</th>
@@ -324,13 +239,13 @@
                                                     <th style="background-color: #198754; color:#fff">UNIT</th>
                                                     <th style="background-color: #198754; color:#fff">RATE</th>
                                                     <th style="background-color: #198754; color:#fff">AMOUNT</th>
-                                                    @foreach ($quoteItem[0]->quoteItemValues as $data)
+                                                    @foreach ($templateItem[0]->templateItemValues as $data)
                                                         <th id="{{ $data->unique_header }}" class="saveData extracolumn" style="background-color: #198754; color:#fff">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
                                                     @endforeach
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($quoteItem as $item)  
+                                                @foreach ($templateItem as $item)  
                                                 @if ($item->sub_category_id == $subcategory->id)
                                                 <tr>
                                                     <td class="sl">{{ $item->sl }}</td>
@@ -340,10 +255,10 @@
                                                     <td class="unit saveData" contenteditable="true">{{ $item->unit }}</td>
                                                     <td class="rate saveData" contenteditable="true">{{ $item->rate }}</td>
                                                     <td class="amount saveData" contenteditable="true">{{ $item->amount }}</td>
-                                                    @foreach ($item->quoteItemValues as $quoteItemValue)
+                                                    @foreach ($item->templateItemValues as $templateItemValue)
                                                         <td class=" saveData" contenteditable="true">
-                                                            <input type="hidden" class="quoteItemValue" value="{{ $quoteItemValue->unique_header }}">
-                                                            {{ $quoteItemValue->value }}
+                                                            <input type="hidden" class="templateItemValue" value="{{ $templateItemValue->unique_header }}">
+                                                            {{ $templateItemValue->value }}
                                                         </td>
                                                     @endforeach
                                                 </tr>
@@ -359,7 +274,7 @@
                        <div class="table-responsive mt-4">
                             <table class="table editableTable" id="" style="background: #fff">
                                 <thead>
-                                    <input type="hidden" class="categoryId" value="{{ $quoteItem[0]->category_id }}">
+                                    <input type="hidden" class="categoryId" value="{{ $templateItem[0]->category_id }}">
                                     <input type="hidden" class="subCategoryId" value="{{ null }}">
                                     <tr>
                                         <th style="background-color: #198754; color:#fff">SL</th>
@@ -369,13 +284,13 @@
                                         <th style="background-color: #198754; color:#fff">UNIT</th>
                                         <th style="background-color: #198754; color:#fff">RATE</th>
                                         <th style="background-color: #198754; color:#fff">AMOUNT</th>
-                                        @foreach ($quoteItem[0]->quoteItemValues as $data)
+                                        @foreach ($templateItem[0]->templateItemValues as $data)
                                             <th id="{{ $data->unique_header }}" class="saveData extracolumn" style="background-color: #198754; color:#fff">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
                                         @endforeach
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($quoteItem as $item)  
+                                    @foreach ($templateItem as $item)  
                                     <tr>
                                         <td class="sl">{{ $item->sl }}</td>
                                         <td class="item saveData" contenteditable="true">{{ $item->item }}</td>
@@ -384,10 +299,10 @@
                                         <td class="unit saveData" contenteditable="true">{{ $item->unit }}</td>
                                         <td class="rate saveData" contenteditable="true">{{ $item->rate }}</td>
                                         <td class="amount saveData" contenteditable="true">{{ $item->amount }}</td>
-                                        @foreach ($item->quoteItemValues as $quoteItemValue)
+                                        @foreach ($item->templateItemValues as $templateItemValue)
                                             <td class=" saveData" contenteditable="true">
-                                                <input type="hidden" class="quoteItemValue" value="{{ $quoteItemValue->unique_header }}">
-                                                {{ $quoteItemValue->value }}
+                                                <input type="hidden" class="templateItemValue" value="{{ $templateItemValue->unique_header }}">
+                                                {{ $templateItemValue->value }}
                                             </td>
                                         @endforeach
                                     </tr>
@@ -404,8 +319,8 @@
             @endforeach
             <div class="tab-pane  fade" id="term" role="tabpanel" aria-labelledby="term-tab">
                 <div class="d-flex justify-content-end">
-                    <a href="{{ route('quotations.index') }}" class="btn btn-danger mr-2 mt-3">Exit</a>
-                    <a href="{{ route('quotations.edit', $quotation->id) }}" class="btn btn-warning mt-3">Quotation Edit</a>
+                    <a href="{{ route('template') }}" class="btn btn-danger mr-2 mt-3">Exit</a>
+                    {{-- <a href="{{ route('quotations.edit', $quotation->id) }}" class="btn btn-warning mt-3">Quotation Edit</a> --}}
                 </div>
                 <div class="d-flex justify-content-center">
                     <div class="page termSection">
@@ -427,191 +342,35 @@
                         </div>
                         <h5 class="text-dark"><span style=""><u>Payment Schedule</u></span></h5>
                         @foreach ($payments as $payment)
-                           <p class="text-dark" data-toggle="modal" data-target="#paymentEdittModal"><b style="font-weight: 900">{{ $loop->iteration }}</b>. {{ $payment->title }}</p>
+                           <p class="text-dark"><b style="font-weight: 900">{{ $loop->iteration }}</b>. {{ $payment->title }}</p>
                         @endforeach
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="paymentEdittModal" tabindex="-1" aria-labelledby="paymentEdittModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" style="min-width: 60%">
-                            <form action="{{ route('payment.update') }}" method="POST" style="min-width: 100%">
-                                @csrf
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                    <h5 class="modal-title" id="paymentEdittModalLabel">Payment Schedule</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>SL</th>
-                                                    <th class="text-center">Title</th>
-                                                    <th class="text-center">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="paymentTbody">
-                                                @foreach ($payments as $payment)
-                                                    <tr>
-                                                        <td class="paymentSl">{{ $loop->iteration }}</td>
-                                                        <td class="text-center">
-                                                            <input type="hidden" name="paymentId[]" id="paymentId" value="{{ $payment->id }}">
-                                                            <input type="text" class="form-control" name="title[]" value="{{ $payment->title }}">
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <button type="button" class="btn btn-success addPaymentRow"><i class="fas fa-plus-circle"></i></button>
-                                                            <button type="button" class="btn btn-danger deletePaymentRow" value="{{ $payment->id }}"><i class="fas fa-times-circle"></i></button>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Save changes</button>
-                                    </div>
-                                </div>
-                            </form>
-                            </div>
-                        </div>
 
                         <h5 class="text-dark mt-3"><span style=""><u>Bank Account Information</u></span></h5>
 
                         <table class="table terTable" style="width: 70%; border: 0px solid #fff;">
                             <tr>
                                 <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50%; border: 0px solid #fff;">Bank Name</td>
-                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;" data-toggle="modal" data-target="#bankeditModal">: {{ $bank->bank_name }}</td>
+                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;">: {{ $bank->bank_name }}</td>
                             </tr>
                             <tr>
                                 <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50%; border: 0px solid #fff;">Branch Name</td>
-                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;" data-toggle="modal" data-target="#bankeditModal">: {{ $bank->branch_name }}</td>
+                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;">: {{ $bank->branch_name }}</td>
                             </tr>
                             <tr>
                                 <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50%; border: 0px solid #fff;">Account Name</td>
-                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;" data-toggle="modal" data-target="#bankeditModal">: {{ $bank->account_name }}</td>
+                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;">: {{ $bank->account_name }}</td>
                             </tr>
                             <tr>
                                 <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50%; border: 0px solid #fff;">Account Number</td>
-                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;" data-toggle="modal" data-target="#bankeditModal">: {{ $bank->account_number }}</td>
+                                <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;">: {{ $bank->account_number }}</td>
                             </tr>
                         </table>
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="bankeditModal" tabindex="-1" aria-labelledby="bankeditModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" style="min-width: 80%">
-                            <form action="{{ route('bank.update', ['bank' => $bank->id]) }}" method="POST" style="min-width: 100%">
-                                @csrf
-                                @method('patch')
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                    <h5 class="modal-title" id="bankeditModalLabel">Bank Account Information</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row mb-3">
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="bank_name">Bank Name</label>
-                                                    <input type="text" class="form-control mt-2" name="bank_name" placeholder="Enter Bank Name" value="{{ old('bank_name', $bank->bank_name) }}" required>
-                                                    @error("bank_name")
-                                                        <span class="sm text-danger">{{ $message }}</span>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="branch_name">Branch Name</label>
-                                                    <input type="text" class="form-control mt-2" name="branch_name" placeholder="Enter Branch Name" value="{{ old('branch_name', $bank->branch_name) }}" required>
-                                                    @error("branch_name")
-                                                        <span class="sm text-danger">{{ $message }}</span>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="account_name">Account Name</label>
-                                                    <input type="text" class="form-control mt-2" name="account_name" placeholder="Enter Account Name" value="{{ old('account_name', $bank->account_name) }}" required>
-                                                    @error("account_name")
-                                                        <span class="sm text-danger">{{ $message }}</span>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="account_number">Account Number</label>
-                                                    <input type="text" class="form-control mt-2" name="account_number" placeholder="Enter Account Number" value="{{ old('account_number', $bank->account_number) }}" required>
-                                                    @error("account_number")
-                                                        <span class="sm text-danger">{{ $message }}</span>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Save changes</button>
-                                    </div>
-                                </div>
-                            </form>
-                            </div>
-                        </div>
 
                         <h5 class="text-dark mt-3"><span style=""><u>Terms & Conditions</u></span></h5>
 
                         @foreach ($terms as $term)
-                           <p class="text-dark" data-toggle="modal" data-target="#termEdittModal"><b style="font-weight: 900">{{ $loop->iteration }}</b>. {{ $term->title }}</p>
+                           <p class="text-dark"><b style="font-weight: 900">{{ $loop->iteration }}</b>. {{ $term->title }}</p>
                         @endforeach
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="termEdittModal" tabindex="-1" aria-labelledby="termEdittModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" style="min-width: 60%">
-                            <form action="{{ route('term.update') }}" method="POST" style="min-width: 100%">
-                                @csrf
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                    <h5 class="modal-title" id="termEdittModalLabel">Payment Schedule</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>SL</th>
-                                                    <th class="text-center">Title</th>
-                                                    <th class="text-center">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="termTbody">
-                                                @foreach ($terms as $term)
-                                                    <tr>
-                                                        <td class="termSl">{{ $loop->iteration }}</td>
-                                                        <td class="text-center">
-                                                            <input type="hidden" name="termId[]" id="termId" value="{{ $term->id }}">
-                                                            <input type="text" class="form-control" name="title[]" value="{{ $term->title }}">
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <button type="button" class="btn btn-success addTermRow"><i class="fas fa-plus-circle"></i></button>
-                                                            <button type="button" class="btn btn-danger deleteTermRow" value="{{ $term->id }}"><i class="fas fa-times-circle"></i></button>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Save changes</button>
-                                    </div>
-                                </div>
-                            </form>
-                            </div>
-                        </div>
 
                         <p class="mt-2 text-dark" style="font-weight: 900">Special Note: This quotation might change due to addition, reduction and/or change of design and excution, human errors which will be setteled later in concern of both parties.</p>
 
@@ -714,9 +473,7 @@
         <script src="{{ asset('js/keyBoardShortcut.js') }}"></script>
         <script>
             $(document).ready(function () {
-                // $('select').select2();
                 $('#sidebarToggle').trigger('click');
-                $(document).on('click', '.template', templateCreate);
                 // $(document).on('input', '.saveData', triggerCreate);
                 // $(document).on('change || keyup', '.saveData', triggerCreate);
                 $(document).on('click', '.autosuggestion-dropdown li', function(event) {
@@ -763,69 +520,6 @@
                     // Prevent default link behavior
                     return false;
                 });
-
-                function updatePayementSerialNumbers() {
-                    $('#paymentTbody tr').each(function(index) {
-                        $(this).find('.paymentSl').text(index + 1);
-                    });
-                }
-
-                // Add new row
-                $('.addPaymentRow').click(function() {
-                    var newRow = '<tr>' +
-                        '<td class="paymentSl"></td>' +
-                        '<td class="text-center">' +
-                        '<input type="hidden" name="paymentId[]" class="paymentId">' +
-                        '<input type="text" class="form-control title" name="title[]">' +
-                        '</td>' +
-                        '<td class="text-center">' +
-                        // '<button type="button" class="btn btn-success addPaymentRow"><i class="fas fa-plus-circle"></i></button>' +
-                        '<button type="button" class="btn btn-danger deletePaymentRow ml-1"><i class="fas fa-times-circle"></i></button>' +
-                        '</td>' +
-                        '</tr>';
-                    $('#paymentTbody').append(newRow);
-                    updatePayementSerialNumbers(); // Update SL numbers
-                });
-
-                // Delete row
-                $(document).on('click', '.deletePaymentRow', function() {
-                    $(this).closest('tr').remove();
-                    updatePayementSerialNumbers(); // Update SL numbers
-                });
-
-                // Initial SL number update
-                updatePayementSerialNumbers();
-
-                function updateTermSerialNumbers() {
-                    $('#termTbody tr').each(function(index) {
-                        $(this).find('.termSl').text(index + 1);
-                    });
-                }
-
-                // Add new row
-                $('.addTermRow').click(function() {
-                    var newRow = '<tr>' +
-                        '<td class="termSl"></td>' +
-                        '<td class="text-center">' +
-                        '<input type="hidden" name="termId[]" class="termId">' +
-                        '<input type="text" class="form-control title" name="title[]">' +
-                        '</td>' +
-                        '<td class="text-center">' +
-                        '<button type="button" class="btn btn-danger deleteTermRow ml-1"><i class="fas fa-times-circle"></i></button>' +
-                        '</td>' +
-                        '</tr>';
-                    $('#termTbody').append(newRow);
-                    updateTermSerialNumbers(); // Update SL numbers
-                });
-
-                // Delete row
-                $(document).on('click', '.deleteTermRow', function() {
-                    $(this).closest('tr').remove();
-                    updateTermSerialNumbers(); // Update SL numbers
-                });
-
-                // Initial SL number update
-                updateTermSerialNumbers();
             });
         </script>
         <script>
@@ -843,39 +537,6 @@
                 $(tr).find('.amount').text(rate*qty);
             }
 
-            function templateCreate(event) {
-
-                $.ajax({
-                    method: "POST",
-                    url: "/api/add-template/" + $('#quoteId').val(),
-                    data: {
-                        'title': $('#templateTitle').val()
-                    },
-                    headers: {
-                        "X-CSRF-TOKEN": $(document).find('[name="_token"]').val()
-                    },
-                    dataType: "json",
-                    success: function (response) {
-                        Swal.fire({
-                            icon: "success",
-                            title: 'Template Add Successfully.', // Show error message
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                        
-                        $('.closeBtn').click();
-                    },
-                    error(error){
-                        Swal.fire({
-                            icon: "error",
-                            title: error.responseJSON.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                    }
-                });
-            }
-
             function reqData() {
 
                 
@@ -888,7 +549,7 @@
                 }
 
                 const data = {
-                    quote_title: $('.quote_title').val(),
+                    template_title: $('.template_title').val(),
                     quotationId: $('.quotationId').val(),
                     category_id: table.find('.categoryId').val(),
                     sub_category_id: table.find('.subCategoryId').val(),
@@ -956,7 +617,7 @@
                     console.log(payload);
                 
                 $.ajax({
-                    url         : `/api/quotes/update/${$('#quoteId').val()}`,
+                    url         : `/api/template/update/${$('#templateId').val()}`,
                     method      : "PUT",
                     dataType    : "JSON",
                     data        : payload,

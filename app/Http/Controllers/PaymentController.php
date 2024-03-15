@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Http\Requests\StorePaymentRequest;
 use App\Http\Requests\UpdatePaymentRequest;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Request;
 
 class PaymentController extends Controller
 {
@@ -115,6 +117,42 @@ class PaymentController extends Controller
             return redirect()->back()->withInput()->withErrors($e->getMessage());
         }
     }
+
+    public function paymentUpdate(UpdatePaymentRequest $request)
+    {
+        try{
+            // Retrieve all payment IDs submitted through the form
+            $paymentIds = $request->input('paymentId');
+            
+            // Retrieve all titles submitted through the form
+            $titles = $request->input('title');
+            
+            // Loop through the submitted payment IDs and titles
+            foreach ($paymentIds as $key => $paymentId) {
+                // If payment ID exists, update the corresponding payment record
+                if ($paymentId) {
+                    $payment = Payment::find($paymentId);
+                    if ($payment) {
+                        $payment->title = $titles[$key];
+                        $payment->save();
+                    }
+                } else {
+                    // If payment ID doesn't exist, create a new payment record
+                    $newPayment = new Payment();
+                    $newPayment->title = $titles[$key];
+                    $newPayment->save();
+                }
+            }
+            
+            // Delete payments which were not updated or created
+            Payment::whereNotIn('id', $paymentIds)->delete();
+
+            return redirect()->back()->withMessage('Successful update :)');
+        }catch(QueryException $e){
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
+
 
     /**
      * Remove the specified resource from storage.

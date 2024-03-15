@@ -536,7 +536,7 @@
                     console.log(payload);
                 
                 $.ajax({
-                    url         : `/api/quotes/store`,
+                    url         : `/api/template/update`,
                     method      : "POST",
                     dataType    : "JSON",
                     data        : payload,

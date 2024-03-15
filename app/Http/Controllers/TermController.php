@@ -117,6 +117,41 @@ class TermController extends Controller
         }
     }
 
+    public function termUpdate(UpdateTermRequest $request)
+    {
+        try{
+            // Retrieve all term IDs submitted through the form
+            $termIds = $request->input('termId');
+            
+            // Retrieve all titles submitted through the form
+            $titles = $request->input('title');
+            
+            // Loop through the submitted term IDs and titles
+            foreach ($termIds as $key => $termId) {
+                // If term ID exists, update the corresponding term record
+                if ($termId) {
+                    $term = Term::find($termId);
+                    if ($term) {
+                        $term->title = $titles[$key];
+                        $term->save();
+                    }
+                } else {
+                    // If term ID doesn't exist, create a new term record
+                    $newTerm = new Term();
+                    $newTerm->title = $titles[$key];
+                    $newTerm->save();
+                }
+            }
+            
+            // Delete terms which were not updated or created
+            Term::whereNotIn('id', $termIds)->delete();
+
+            return redirect()->back()->withMessage('Successful update :)');
+        }catch(QueryException $e){
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
+
     /**
      * Remove the specified resource from storage.
      *
