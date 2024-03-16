@@ -114,7 +114,7 @@
                                         <a class="dropdown-item" target="_blank" href="/sheet-pdf/${elementValue.id}">Pdf</a>
                                         <a class="dropdown-item" href="/template/edit/${elementValue.id}">Edit</a>
                                         <button type="button" class="dropdown-item copyLink" target="_blank" href="/sheet-pdf/${elementValue.id}">Copy</button>
-                                        <form style="display: inline;" action="/sheet-delete/${elementValue.id}" method="POST">
+                                        <form style="display: inline;" action="/template-delete/${elementValue.id}" method="POST">
                                             @csrf
                                             @method('delete')
                                             <button onclick="return confirm('Are you sure want to delete ?')" class="btn remove-btn" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Remove</button>

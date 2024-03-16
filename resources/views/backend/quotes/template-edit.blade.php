@@ -31,7 +31,7 @@
                 </li>
                 @foreach ($quotation->quotationItems as $quotationItem)
                 <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="{{ str_replace(' ', '-', $quotationItem->category->title) }}-tab" data-toggle="tab" data-target="#{{ str_replace(' ', '-', $quotationItem->category->title) }}" type="button" role="tab" aria-controls="{{ str_replace(' ', '-', $quotationItem->category->title) }}" aria-selected="false">{{ $quotationItem->category->title }}</button>
+                  <button class="nav-link" id="{{ str_replace(' ', '-', $quotationItem->category->title ?? '') }}-tab" data-toggle="tab" data-target="#{{ str_replace(' ', '-', $quotationItem->category->title ?? '') }}" type="button" role="tab" aria-controls="{{ str_replace(' ', '-', $quotationItem->category->title ?? '') }}" aria-selected="false">{{ $quotationItem->category->title ?? '' }}</button>
                 </li>
                 @endforeach
                 <li class="nav-item" role="presentation">
@@ -137,7 +137,7 @@
                             @foreach ($template->quotation->quotationItems as $quotationItem)
                             <tr>
                                 <td style="text-align: center">{{ $loop->iteration }}</td>
-                                <td>{{ $quotationItem->category->title }}</td>
+                                <td>{{ $quotationItem->category->title ?? '' }}</td>
                                 <td style="text-align: center">{{ $quotationItem->amount }}</td>
                             </tr>
                             @php
@@ -184,7 +184,7 @@
             </div>
 
             @foreach ($quotation->quotationItems as $quotationItem)
-            <div class="tab-pane category fade" id="{{ str_replace(' ', '-', $quotationItem->category->title) }}" role="tabpanel" aria-labelledby="{{ str_replace(' ', '-', $quotationItem->category->title) }}-tab">
+            <div class="tab-pane category fade" id="{{ str_replace(' ', '-', $quotationItem->category->title ?? '') }}" role="tabpanel" aria-labelledby="{{ str_replace(' ', '-', $quotationItem->category->title ?? '') }}-tab">
 
                 <div class="mt-4 mb-4 d-flex justify-content-between">
                     <div>
@@ -211,7 +211,7 @@
                     $check = false;
                 @endphp
                 @foreach ($templateItems as $templateItem)
-                @if ($templateItem[0]->category->title == $quotationItem->category->title)
+                @if (($templateItem[0]->category ?? null) && ($quotationItem->category ?? null) && ($templateItem[0]->category->title == $quotationItem->category->title))
                     @php
                         $check = true;
                     @endphp
