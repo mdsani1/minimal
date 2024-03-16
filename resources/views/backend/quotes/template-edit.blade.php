@@ -245,6 +245,9 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                @php
+                                                    $grandTotal = 0;
+                                                @endphp
                                                 @foreach ($templateItem as $item)  
                                                 @if ($item->sub_category_id == $subcategory->id)
                                                 <tr>
@@ -261,10 +264,19 @@
                                                             {{ $templateItemValue->value }}
                                                         </td>
                                                     @endforeach
+                                                    @php
+                                                        $grandTotal += $item->amount;
+                                                    @endphp
                                                 </tr>
                                                 @endif
                                                 @endforeach
                                             </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="6" style="border:none"> Total</td>
+                                                    <td class="grandTotal">{{ $grandTotal }}</td>
+                                                </tr>
+                                            </tfoot>
                                         </table>
                                     </div>
                                 </div>
@@ -290,6 +302,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @php
+                                        $grandTotal = 0;
+                                    @endphp
                                     @foreach ($templateItem as $item)  
                                     <tr>
                                         <td class="sl">{{ $item->sl }}</td>
@@ -305,9 +320,18 @@
                                                 {{ $templateItemValue->value }}
                                             </td>
                                         @endforeach
+                                        @php
+                                            $grandTotal += $item->amount;
+                                        @endphp
                                     </tr>
                                     @endforeach
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="6" style="border:none"> Total</td>
+                                        <td class="grandTotal">{{ $grandTotal }}</td>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div> 
                     @endif
@@ -535,6 +559,17 @@
                     console.log('in', rate, qty);
 
                 $(tr).find('.amount').text(rate*qty);
+
+                // Calculate and update grand total
+                let grandTotal = 0;
+                $(tbody).find('.amount').each(function() {
+                    if (!isNaN(parseFloat($(this).text()))) {
+                        grandTotal += parseFloat($(this).text());
+                    }
+                });
+
+                // Update the grand total in the footer
+                $(tbody).closest('table').find('.grandTotal').text(grandTotal);
             }
 
             function reqData() {

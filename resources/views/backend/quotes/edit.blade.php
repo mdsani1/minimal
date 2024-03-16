@@ -297,7 +297,7 @@
                 @endphp
                 @foreach ($quoteItems as $quoteItem)
                 @if (($quoteItem[0]->category ?? null) && ($quotationItem->category ?? null) && ($quoteItem[0]->category->title == $quotationItem->category->title))
-                @php
+                    @php
                         $check = true;
                     @endphp
                     @if (count($quotationItem->category->subcategory) > 0)
@@ -330,6 +330,9 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                @php
+                                                    $grandTotal = 0;
+                                                @endphp
                                                 @foreach ($quoteItem as $item)  
                                                 @if ($item->sub_category_id == $subcategory->id)
                                                 <tr>
@@ -346,17 +349,26 @@
                                                             {{ $quoteItemValue->value }}
                                                         </td>
                                                     @endforeach
+                                                    @php
+                                                        $grandTotal += $item->amount;
+                                                    @endphp
                                                 </tr>
                                                 @endif
                                                 @endforeach
                                             </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="6" style="border:none"> Total</td>
+                                                    <td class="grandTotal">{{ $grandTotal }}</td>
+                                                </tr>
+                                            </tfoot>
                                         </table>
                                     </div>
                                 </div>
                             @endforeach
                         </div>
-                       @else 
-                       <div class="table-responsive mt-4">
+                    @else 
+                        <div class="table-responsive mt-4">
                             <table class="table editableTable" id="" style="background: #fff">
                                 <thead>
                                     <input type="hidden" class="categoryId" value="{{ $quoteItem[0]->category_id }}">
@@ -375,6 +387,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @php
+                                        $grandTotal = 0;
+                                    @endphp
                                     @foreach ($quoteItem as $item)  
                                     <tr>
                                         <td class="sl">{{ $item->sl }}</td>
@@ -390,15 +405,78 @@
                                                 {{ $quoteItemValue->value }}
                                             </td>
                                         @endforeach
+                                        @php
+                                            $grandTotal += $item->amount;
+                                        @endphp
                                     </tr>
                                     @endforeach
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="6" style="border:none"> Total</td>
+                                        <td class="grandTotal">{{ $grandTotal }}</td>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div> 
                     @endif
 
                 @endif
                 @endforeach
+
+                @if ($check == false)
+                <div class="table-responsive mt-4">
+                    <table class="table editableTable" id="" style="background: #fff">
+                        <thead>
+                            <input type="hidden" class="categoryId" value="{{ $quoteItem[0]->category_id }}">
+                            <input type="hidden" class="subCategoryId" value="{{ null }}">
+                            <tr>
+                                <th style="background-color: #198754; color:#fff">SL</th>
+                                <th style="background-color: #198754; color:#fff">ITEM</th>
+                                <th style="background-color: #198754; color:#fff">SPECIFICATION</th>
+                                <th style="background-color: #198754; color:#fff">QTY</th>
+                                <th style="background-color: #198754; color:#fff">UNIT</th>
+                                <th style="background-color: #198754; color:#fff">RATE</th>
+                                <th style="background-color: #198754; color:#fff">AMOUNT</th>
+                                @foreach ($quoteItem[0]->quoteItemValues as $data)
+                                    <th id="{{ $data->unique_header }}" class="saveData extracolumn" style="background-color: #198754; color:#fff">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php
+                                $grandTotal = 0;
+                            @endphp
+                            @foreach ($quoteItem as $item)  
+                            <tr>
+                                <td class="sl">{{ $item->sl }}</td>
+                                <td class="item saveData" contenteditable="true">{{ $item->item }}</td>
+                                <td class="specification saveData" contenteditable="true">{{ $item->specification }}</td>
+                                <td class="qty saveData" contenteditable="true">{{ $item->qty }}</td>
+                                <td class="unit saveData" contenteditable="true">{{ $item->unit }}</td>
+                                <td class="rate saveData" contenteditable="true">{{ $item->rate }}</td>
+                                <td class="amount saveData" contenteditable="true">{{ $item->amount }}</td>
+                                @foreach ($item->quoteItemValues as $quoteItemValue)
+                                    <td class=" saveData" contenteditable="true">
+                                        <input type="hidden" class="quoteItemValue" value="{{ $quoteItemValue->unique_header }}">
+                                        {{ $quoteItemValue->value }}
+                                    </td>
+                                @endforeach
+                                @php
+                                    $grandTotal += $item->amount;
+                                @endphp
+                            </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" style="border:none"> Total</td>
+                                <td class="grandTotal">{{ $grandTotal }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div> 
+                @endif
 
             </div>
             @endforeach
@@ -573,7 +651,7 @@
                                 @csrf
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                    <h5 class="modal-title" id="termEdittModalLabel">Payment Schedule</h5>
+                                    <h5 class="modal-title" id="termEdittModalLabel">Terms & Conditions</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -836,12 +914,24 @@
                 let 
                     el = event.target,
                     tr = $(el).closest('tr'),
+                    tbody = $(el).closest('tbody'),
                     rate = parseFloat($(tr).find('.rate').text()), // Parsing as float for decimal values
                     qty = parseInt($(tr).find('.qty').text()); // Parsing as integer
 
                     console.log('in', rate, qty);
 
                 $(tr).find('.amount').text(rate*qty);
+
+                // Calculate and update grand total
+                let grandTotal = 0;
+                $(tbody).find('.amount').each(function() {
+                    if (!isNaN(parseFloat($(this).text()))) {
+                        grandTotal += parseFloat($(this).text());
+                    }
+                });
+
+                // Update the grand total in the footer
+                $(tbody).closest('table').find('.grandTotal').text(grandTotal);
             }
 
             function templateCreate(event) {

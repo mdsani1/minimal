@@ -105,6 +105,9 @@
                               <th style="text-align: center">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
                           @endforeach
                       </tr>
+                      @php
+                          $grandTotal = 0;
+                      @endphp
                       @foreach ($quoteItem as $item)
                           <tr>
                               <td style="text-align: center">{{ $item->sl }}</td>
@@ -117,8 +120,17 @@
                               @foreach ($item->quoteItemValues as $quoteItemValue)
                                   <td style="text-align: center">{{ $quoteItemValue->value }}</td>
                               @endforeach
+                              @php
+                                  $grandTotal += $item->amount;
+                              @endphp
                           </tr>
                       @endforeach
+                      <tfoot>
+                        <tr>
+                            <td colspan="6" style="text-align: right"> Total</td>
+                            <td style="text-align: center" class="grandTotal">{{ $grandTotal }}</td>
+                        </tr>
+                    </tfoot>
                   </table>
               @endforeach
           @endforeach
