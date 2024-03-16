@@ -1,4 +1,5 @@
 // autosuggestions.js
+let specificationData = [];
 
 // Function to show suggestions in a dropdown
 function showSuggestions(cell, suggestions) {
@@ -85,6 +86,7 @@ function createDropdown(cell, suggestions) {
         suggestionItem.addEventListener('click', () => {
             cell.innerText = suggestion;
             hideSuggestions(cell);
+            loadSpecificationData(cell);
         });
         suggestionList.appendChild(suggestionItem);
     });
@@ -110,9 +112,7 @@ function getSuggestions(inputValue, cellIndex) {
     const suggestionsForColumn = {
         1: suggestionData,
         // Add suggestions for the third column if needed
-        2: [
-            // ...your third column suggestions
-        ]
+        2: specificationData
     };
 
     // Get suggestions based on the cell index
@@ -122,6 +122,7 @@ function getSuggestions(inputValue, cellIndex) {
     let filteredSuggestions = columnSuggestions.filter(item => 
         item.toLowerCase().startsWith(inputValue.toLowerCase())
     );
+
 
     return filteredSuggestions;
 }
@@ -136,7 +137,27 @@ function selectSuggestionByNumber(number, items) {
     }
 }
 
+function loadSpecificationData(cell) {
+    const parentTR = $(cell).closest('tr'); 
+    $.ajax({
+        method: "GET",
+        url: "/api/get/specification/" + cell.innerText.trim(),
+        dataType: "json",
+        async: false, // Make the AJAX request synchronous
+        success: function (response) {
+            specificationData = response.suggestions;
+            parentTR.find('.rate').text(response.interior.rate);
+        },
+        error: function (xhr, status, error) {
+            // Handle errors
+            console.error('Error:', error);
+        }
+    });
+}
+
 $(document).ready(function () {
+
+    // Declare specificationData variable
 
     $.ajax({
         method: "GET",
@@ -153,12 +174,11 @@ $(document).ready(function () {
     });
 
     // Attach event listener to the table, delegating to the 'td' elements
-    $('.editableTable').on('input', 'td', function() {
+    $('.editableTable').on('input click', 'td', function() {
         const cell = this; // 'this' refers to the 'td' element that received the input
         const inputValue = cell.innerText.trim().toLowerCase();
         const cellIndex = cell.cellIndex; // cellIndex is 0-based
         const suggestions = getSuggestions(inputValue, cellIndex);
-
         if (suggestions.length > 0) {
             showSuggestions(cell, suggestions);
         } else {
@@ -168,4 +188,6 @@ $(document).ready(function () {
 
     // ... other initialization code ...
 });
+
+
 

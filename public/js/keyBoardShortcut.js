@@ -1,114 +1,123 @@
-// document.addEventListener('DOMContentLoaded', function() {
-//     const table = document.getElementById('editableTable'); // Assuming your table has this ID
+/**
+ * Initializes event listeners on document load to enhance table functionality
+ * with keyboard shortcuts for an editable class.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    // Attaching keydown event listener to the whole document
+    document.addEventListener('keydown', handleTableKeydown);
+});
 
-//     table.addEventListener('keydown', function(event) {
+/**
+ * Handles keydown events within the context of editable tables.
+ * This function supports cell navigation, row/column addition, style toggling, and more, 
+ * while avoiding conflicts with common text editing shortcuts.
+ * 
+ * @param {KeyboardEvent} event - The keydown event object.
+ */
+function handleTableKeydown(event) {
+    const target = event.target;
+    const key = event.key.toLowerCase();
+    // Support for both Ctrl (Windows/Linux) and Cmd (Mac)
+    const ctrlOrCmd = event.ctrlKey || event.metaKey;
+
+    // Ensure the event originates from a cell within an editable table
+    if (!target.matches('.editable td, .editable th')) return;
+
+    switch (true) {
+        // Navigate to the next or previous cell
+        case key === 'tab' && !event.shiftKey:
+        case key === 'tab' && event.shiftKey:
+            event.preventDefault(); // Prevent default tab behavior
+            const direction = event.shiftKey ? 'previous' : 'next';
+            moveFocus(target, direction);
+            break;
         
-//         const target = event.target;
-//         const key = event.key.toLowerCase();
-//         const ctrlOrCmd = event.ctrlKey || event.metaKey; // Support for both Ctrl (Windows/Linux) and Cmd (Mac)
-
-//         if (target.tagName === 'TD' || target.tagName === 'TH') {
-//             if (key === 'Tab' && !event.shiftKey) {
-//                 event.preventDefault(); // Prevent the default tab behavior
-//                 moveFocus(target, 'next');
-//             } else if (key === 'Tab' && event.shiftKey) {
-//                 event.preventDefault(); // Prevent the default shift+tab behavior
-//                 moveFocus(target, 'previous');
-//             }
-//         }
-
-//         if (target.tagName !== 'TD' && target.tagName !== 'TH') return; // Ensure we're only applying styles to table cells
-
-//         // Check for Shift + R to add a row, case-insensitively
-//         if (event.shiftKey && key === 'r') {
-//             event.preventDefault(); // Prevent any default action to ensure it triggers the addRow function only
-//             addRow(); // Call the addRow function to add a new row at the bottom
-//         }
-
-//         // Check for Shift + C to add a column, case-insensitively
-//         if (event.shiftKey && key === 'c') {
-//             event.preventDefault(); // Prevent any default action to ensure it triggers the addColumn function only
-//             addColumn(); // Call the addColumn function to add a new column at the end
-//         }
-
-//         // Check for Shift + T to scroll to the top, case-insensitively
-//         if (event.shiftKey && key === 't') {
-//             event.preventDefault(); // Prevent any default action
-//             window.scrollTo({top: 0, behavior: 'smooth'}); // Scroll to the top of the page smoothly
-//         }
-
-//          // Check for Shift + P to open the PDF preview, case-insensitively
-//          if (event.shiftKey && key === 'p') {
-//             event.preventDefault(); // Prevent any default action
-//             generateAndShowPdfPreview(); // Call the function to generate and show PDF preview
-//         }
-
-//         // Toggle bold
-//         if (ctrlOrCmd && key === 'b') {
-//             event.preventDefault(); // Prevent default browser behavior
-//             toggleStyle(target, 'fontWeight', 'bold', 'normal');
-//         }
-//         // Toggle italic
-//         else if (ctrlOrCmd && key === 'i') {
-//             event.preventDefault(); // Prevent default browser behavior
-//             toggleStyle(target, 'fontStyle', 'italic', 'normal');
-//         }
-//         // Toggle underline
-//         else if (ctrlOrCmd && key === 'u') {
-//             event.preventDefault(); // Prevent default browser behavior
-//             toggleStyle(target, 'textDecoration', 'underline', 'none');
-//         }
-//     });
-
-//     function moveFocus(currentCell, direction) {
-//         const cells = Array.from(document.querySelectorAll('#editableTable td, #editableTable th'));
-//         const currentIndex = cells.indexOf(currentCell);
-//         if (direction === 'next') {
-//             const nextCell = cells[currentIndex + 1] || cells[0];
-//             nextCell.focus();
-//         } else if (direction === 'previous') {
-//             const prevCell = cells[currentIndex - 1] || cells[cells.length - 1];
-//             prevCell.focus();
-//         }
-//     }
-
-//     function addRow() {
-//         const tableBody = document.querySelector('#editableTable tbody');
-//         const columnCount = document.querySelector('#editableTable tr').children.length;
-//         const newRow = document.createElement('tr');
-
-//         for (let i = 0; i < columnCount; i++) {
-//             const newCell = document.createElement('td');
-//             newCell.contentEditable = 'true';
-//             newCell.textContent = '-'; // or any default content you want
-//             newRow.appendChild(newCell);
-//         }
-
-//         tableBody.appendChild(newRow);
-//     }
-
-//     // Function to add a new column to the table
-//     function addColumn() {
-//         const rows = document.querySelectorAll('#editableTable tr');
+        // Add a new row with Alt + R
+        case event.altKey && key === 'r':
+            event.preventDefault();
+            addRow(target.closest('.editable'));
+            break;
         
-//         // Iterate over each row in the table to add a new cell
-//         rows.forEach((row, index) => {
-//             if (index === 0) { // Assuming the first row is the header
-//                 const headerCell = document.createElement('th');
-//                 headerCell.textContent = 'New Header'; // Set header text or leave blank
-//                 headerCell.contentEditable = 'true';
-//                 row.appendChild(headerCell);
-//             } else {
-//                 const newCell = document.createElement('td');
-//                 newCell.contentEditable = 'true';
-//                 newCell.textContent = '-'; // or any default content you want for new cells
-//                 row.appendChild(newCell);
-//             }
-//         });
-//     }
+        // Add a new column with Alt + C
+        case event.altKey && key === 'c':
+            event.preventDefault();
+            addColumn(target.closest('.editable'));
+            break;
+        
+        // Scroll to the top with Alt + T
+        case event.altKey && key === 't':
+            event.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            break;
+        
+        // Show PDF preview with Alt + P
+        case event.altKey && key === 'p':
+            event.preventDefault();
+            generateAndShowPdfPreview();
+            break;
+        
+        // Handle keydown events for Ctrl/Cmd + B, I, U
+        case ctrlOrCmd && (key === 'b' || key === 'i' || key === 'u'):
+            event.preventDefault(); // Prevent default browser behavior
+            // Map the keys to the corresponding execCommand commands
+            const commandMap = { 'b': 'bold', 'i': 'italic', 'u': 'underline' };
+            const command = commandMap[key];
+            // Execute the command for the selected text
+            document.execCommand(command, false, null);
+            break;
 
-//     function toggleStyle(element, styleProperty, activeValue, inactiveValue) {
-//         const currentStyle = window.getComputedStyle(element)[styleProperty];
-//         element.style[styleProperty] = currentStyle !== activeValue ? activeValue : inactiveValue;
-//     }
-// });
+    }
+}
+
+
+/**
+ * Moves the focus to the next or previous cell in an editable table.
+ * @param {HTMLElement} currentCell - The currently focused table cell.
+ * @param {String} direction - The direction to move ('next' or 'previous').
+ */
+function moveFocus(currentCell, direction) {
+    const cells = Array.from(currentCell.closest('.editable').querySelectorAll('td, th'));
+    const currentIndex = cells.indexOf(currentCell);
+    const nextIndex = direction === 'next' ? (currentIndex + 1) % cells.length : (currentIndex - 1 + cells.length) % cells.length;
+    cells[nextIndex].focus();
+}
+
+/**
+ * Adds a new row to the specified table.
+ * @param {HTMLElement} table - The table to which a row will be added.
+ */
+function addRow(table) {
+    const tableBody = table.querySelector('tbody');
+    const columnCount = table.querySelector('tr').children.length;
+    const newRow = document.createElement('tr');
+
+    for (let i = 0; i < columnCount; i++) {
+        const newCell = document.createElement('td');
+        newCell.contentEditable = 'true';
+        newCell.textContent = '-';
+        newRow.appendChild(newCell);
+    }
+
+    tableBody.appendChild(newRow);
+}
+
+/**
+ * Adds a new column to the specified table.
+ * @param {HTMLElement} table - The table to which a column will be added.
+ */
+function addColumn(table) {
+    const rows = table.querySelectorAll('tr');
+    
+    rows.forEach((row, index) => {
+        const newCell = document.createElement(index === 0 ? 'th' : 'td');
+        newCell.contentEditable = 'true';
+        newCell.textContent = index === 0 ? 'New Header' : '-';
+        row.appendChild(newCell);
+    });
+}
+
+
+function toggleStyle(element, styleProperty, activeValue, inactiveValue) {
+    const currentStyle = window.getComputedStyle(element)[styleProperty];
+    element.style[styleProperty] = currentStyle !== activeValue ? activeValue : inactiveValue;
+}

@@ -36,6 +36,53 @@ class BackendApiController extends Controller
         }
     }
 
+    public function getSpecification($title)
+    {
+        // Fetching specifications from the Interior model
+        $data1 = Interior::where('item', $title)->pluck('specification1')->first();
+        $data2 = Interior::where('item', $title)->pluck('specification2')->first();
+        $data3 = Interior::where('item', $title)->pluck('specification3')->first();
+
+        // Fetching associated specifications from the related InteriorSpecification model
+        $interior = Interior::with('interiorSpecifications')->where('item', $title)->first();
+
+        // Merging specifications into one array
+        $allSpecifications = [];
+        if ($data1 !== null) {
+            $allSpecifications[] = $data1;
+        }
+        if ($data2 !== null) {
+            $allSpecifications[] = $data2;
+        }
+        if ($data3 !== null) {
+            $allSpecifications[] = $data3;
+        }
+
+        // If there are associated specifications from InteriorSpecification model, add them to the array
+        if ($interior && $interior->interiorSpecifications) {
+            foreach ($interior->interiorSpecifications as $specification) {
+                $allSpecifications[] = $specification->specification;
+            }
+        }
+
+        // Remove duplicates and sort the array
+        $suggestions = array_unique($allSpecifications);
+        sort($suggestions);
+
+        // Return the JSON response
+        if (!empty($suggestions)) {
+            return response()->json([
+                'suggestions' => $suggestions,
+                'interior' => $interior,
+            ], 200);
+        } else {
+            return response()->json([
+                "message" => "No Data Found!"
+            ], 400);
+        }
+    }
+
+
     public function addTemplate(Request $request, $id)
     {
 
