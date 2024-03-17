@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('purpose')->nullable();
             $table->string('type')->nullable();
             $table->date('date')->nullable();
+            $table->tinyInteger('active_bank')->default(0);
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->string('deleted_by')->nullable();

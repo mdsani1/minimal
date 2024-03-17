@@ -105,6 +105,21 @@
                         </div>
                     </div>
 
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="active_bank">Bank Information Show</label>
+
+                            <select class="form-control mt-2" name="active_bank" id="">
+                                <option value="0" {{ $quotation->active_bank == 0 ? 'selected' : '' }}>Show</option>
+                                <option value="1" {{ $quotation->active_bank == 1 ? 'selected' : '' }}>OFF</option>
+                            </select>
+
+                            @error("active_bank")
+                                <span class="sm text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
                     
                     <div class="col-md-12 mt-3">
                         <hr>

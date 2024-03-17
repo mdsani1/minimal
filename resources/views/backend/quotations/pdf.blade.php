@@ -207,6 +207,7 @@
          <p class="text-dark"><b style="font-weight: 900">{{ $loop->iteration }}</b>. {{ $payment->title }}</p>
       @endforeach
 
+      @if ($quotation->active_bank == 0)
       <h5 class="text-dark mt-3"><span style=""><u>Bank Account Information</u></span></h5>
 
       <table class="table terTable" style="width: 70%; border: 0px solid #fff;">
@@ -227,6 +228,8 @@
               <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;">: {{ $bank->account_number }}</td>
           </tr>
       </table>
+      @endif
+
 
       <h5 class="text-dark mt-3"><span style=""><u>Terms & Conditions</u></span></h5>
 

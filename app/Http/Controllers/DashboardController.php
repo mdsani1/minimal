@@ -189,4 +189,13 @@ class DashboardController extends Controller
             return redirect()->back()->withInput()->withErrors($e->getMessage());
         }
     }
+
+    public function quoteBank($id)
+    {
+        $quote = Quote::find($id);
+        $quote->quotation->update([
+            'active_bank' => 1
+        ]);
+        return redirect()->back()->withMessage('Successful delete :)');
+    }
 }

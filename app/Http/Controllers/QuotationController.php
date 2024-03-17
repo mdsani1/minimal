@@ -441,6 +441,19 @@ class QuotationController extends Controller
         }
     }
 
+    public function quotationItemDelete($id)
+    {
+        try{
+            $quotationItem = QuotationItem::find($id);
+            $quotationItem->update(['deleted_by' => auth()->user()->id]);
+            $quotationItem->delete();
+
+            return redirect()->back()->withMessage('Successful delete :)');
+        }catch(QueryException $e){
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
+
     public function delete($id)
     {
         try{

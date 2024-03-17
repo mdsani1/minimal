@@ -81,8 +81,8 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="title">Title</label>
-                                                <input type="text" class="form-control" name="title" placeholder="Enter Title" value="{{ old('title') }}" required>
+                                                <label for="title">Zone Name </label>
+                                                <input type="text" class="form-control" name="title" placeholder="Enter Zone Name" value="{{ old('title') }}" required>
                                                 @error("title")
                                                     <span class="sm text-danger">{{ $message }}</span>
                                                 @enderror
@@ -134,7 +134,7 @@
                     <form style="display: inline;" action="/sheet-delete/{{ $quote->id }}" method="POST">
                         @csrf
                         @method('delete')
-                        <button onclick="return confirm('Are you sure want to delete ?')" class="btn btn-danger mt-3" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Remove</button>
+                        <button onclick="return confirm('Are you sure want to delete ?')" class="btn btn-danger mt-3" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Delete</button>
                     </form>                
                 </div>
 
@@ -282,13 +282,13 @@
                         <button class="btn btn-primary downloadPdfButton" id="">Download PDF</button>
                     </div>
                     <div class="d-flex">
-                        <a href="{{ route('quotations.index') }}" class="btn btn-primary mr-2">Exit</a>
+                        <a href="{{ route('quotations.index') }}" class="btn btn-warning mr-2">Exit</a>
                         <a href="/sheet-pdf/{{ $quote->id }}" class="btn btn-info mr-2">Pdf</a>
                         <a href="/sheet-pdf/{{ $quote->id }}" class="btn btn-primary mr-2 copyLink">Copy</a>
-                        <form style="display: inline;" action="/sheet-delete/{{ $quote->id }}" method="POST">
+                        <form style="display: inline;" action="/quotationItem-delete/{{ $quotationItem->id }}" method="POST">
                             @csrf
                             @method('delete')
-                            <button onclick="return confirm('Are you sure want to delete ?')" class="btn btn-danger" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Remove</button>
+                            <button onclick="return confirm('Are you sure want to delete ?')" class="btn btn-danger" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Delete</button>
                         </form>     
                     </div>
                 </div>
@@ -555,7 +555,8 @@
                             </div>
                         </div>
 
-                        <h5 class="text-dark mt-3"><span style=""><u>Bank Account Information</u></span></h5>
+                        @if ($quote->quotation->active_bank == 0)
+                        <h5 class="text-dark mt-3"><span style=""><u>Bank Account Information</u></span><a href="{{ route('quote.bank', $quote->id) }}" onclick="return confirm('Are you sure want to delete ?')" class="btn btn-sm ml-1" ><i class="fas fa-times-circle text-danger"></i></a></h5>
 
                         <table class="table terTable" style="width: 70%; border: 0px solid #fff;">
                             <tr>
@@ -575,6 +576,7 @@
                                 <td class="text-dark mb-0 mt-0 pt-0 pb-0 ml-0 pl-0" style="width: 50% ;border: 0px solid #fff;" data-toggle="modal" data-target="#bankeditModal">: {{ $bank->account_number }}</td>
                             </tr>
                         </table>
+                        @endif
 
                         <!-- Modal -->
                         <div class="modal fade" id="bankeditModal" tabindex="-1" aria-labelledby="bankeditModalLabel" aria-hidden="true">

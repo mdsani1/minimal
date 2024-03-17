@@ -106,6 +106,7 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/quotation-to-sheet/{id}', [QuotationController::class, 'quotationToSheet'])->name('quotation-to-sheet');
     Route::get('/quotations-duplicate/{id}', [QuotationController::class, 'duplicate'])->name('quotations.duplicate');
     Route::get('/version-copy/{id}', [QuotationController::class, 'versionCopy'])->name('version-copy');
+    Route::delete('/quotationItem-delete/{id}', [QuotationController::class, 'quotationItemDelete'])->name('quotationItem-delete');
 
     Route::post('/change-histories/{id}', [QuotationController::class, 'changeHistories'])->name('change-histories');
     Route::resource('quotations', QuotationController::class);
@@ -116,6 +117,7 @@ Route::middleware(['auth','web'])->group(function () {
     Route::patch('/bank/update/{bank}', [BankController::class, 'bankUpdate'])->name('bank.update');
     Route::post('/term/update', [TermController::class, 'termUpdate'])->name('term.update');
     Route::post('/payment/update', [PaymentController::class, 'paymentUpdate'])->name('payment.update');
+    Route::get('/quote/bank/{id}', [DashboardController::class, 'quoteBank'])->name('quote.bank');
 });
 
 

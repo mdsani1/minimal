@@ -11,10 +11,16 @@ function showSuggestions(cell, suggestions) {
     const dropdown = createDropdown(cell, suggestions);
 
     // Position the dropdown beneath the cell
-    const cellRect = cell.getBoundingClientRect();
+    // const cellRect = cell.getBoundingClientRect();
     // dropdown.style.top = `10px`;
     // dropdown.style.top = `${cellRect.bottom}px`;
     // dropdown.style.left = `${cellRect.left}px`;
+
+    // Calculate and set the position of the dropdown
+    const cellRect = cell.getBoundingClientRect();
+    dropdown.style.position = 'absolute';
+    dropdown.style.left = `${cellRect.right + window.scrollX}px`;
+    dropdown.style.top = `${cellRect.top + window.scrollY}px`;
 
     // Show the dropdown
     dropdown.style.display = 'block';
@@ -145,7 +151,12 @@ function loadSpecificationData(cell) {
         dataType: "json",
         async: false, // Make the AJAX request synchronous
         success: function (response) {
-            specificationData = response.suggestions;
+            console.log(response.suggestions.length);
+            if (response.suggestions.length > 1) {
+                specificationData = response.suggestions;
+            } else {
+                parentTR.find('.specification').text(response.suggestions[0]);
+            }
             parentTR.find('.rate').text(response.interior.rate);
         },
         error: function (xhr, status, error) {

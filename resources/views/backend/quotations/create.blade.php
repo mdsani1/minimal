@@ -66,7 +66,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="area">Area</label>
                             <input type="text" class="form-control mt-2" name="area" placeholder="Enter Address" value="{{ old('area') }}" required>
@@ -76,7 +76,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="address">Address</label>
                             <input type="text" class="form-control mt-2" name="address" placeholder="Enter Address" value="{{ old('address') }}" required>
@@ -86,11 +86,26 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="city">City</label>
                             <input type="text" class="form-control mt-2" name="city" placeholder="Enter Address" value="{{ old('city') }}" required>
                             @error("city")
+                                <span class="sm text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="active_bank">Bank Information Show</label>
+
+                            <select class="form-control mt-2" name="active_bank" id="">
+                                <option value="0" selected>Show</option>
+                                <option value="1">OFF</option>
+                            </select>
+
+                            @error("active_bank")
                                 <span class="sm text-danger">{{ $message }}</span>
                             @enderror
                         </div>
