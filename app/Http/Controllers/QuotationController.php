@@ -18,6 +18,7 @@ use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\QuoteItemValue;
 use App\Models\Term;
+use App\Models\TermInfo;
 use Illuminate\Support\Facades\DB;
 
 class QuotationController extends Controller
@@ -53,7 +54,7 @@ class QuotationController extends Controller
     public function store(StoreQuotationRequest $request)
     {
         try{
-            DB::beginTransaction();
+            // DB::beginTransaction();
 
             $quotationData = $request->except(['work_scope', 'amount']);
 
@@ -95,7 +96,6 @@ class QuotationController extends Controller
             foreach ($workScopes as $index => $workScope) {
                 $quotationItemData = [
                     'work_scope' => $workScope,
-                    'amount' => $amounts[$index] ?? null, // safeguard in case array sizes are not matching
                     'quotation_id' => $quotation->id,
                 ];
                 QuotationItem::create(['created_by' => auth()->user()->id] + $quotationItemData);
@@ -109,7 +109,6 @@ class QuotationController extends Controller
                 'created_by'    => auth()->user()->id
             ]);
 
-            
             foreach ($quotation->quotationItems as $key => $quotationItem) {
 
                 $quoteItem = QuoteItem::create([
@@ -121,7 +120,7 @@ class QuotationController extends Controller
         
             }
 
-            DB::commit();
+            // DB::commit();
             
             return redirect()->route('quotations.index')->withMessage('Successful create :)');
         }catch(QueryException $e){
@@ -193,6 +192,12 @@ class QuotationController extends Controller
                     'city'      => $quotation->city,
                     'purpose'   => $quotation->purpose,
                     'type'      => $quotation->type,
+                    'first_person'      => $quotation->first_person,
+                    'first_person_email'      => $quotation->first_person_email,
+                    'first_person_designation'      => $quotation->first_person_designation,
+                    'second_person'      => $quotation->second_person,
+                    'second_person_email'      => $quotation->second_person_email,
+                    'second_person_designation'      => $quotation->second_person_designation,
                     'date'      => now(),
                     'created_by' => auth()->user()->id
                 ]);
@@ -280,7 +285,7 @@ class QuotationController extends Controller
     public function versionCopy($id)
     {
         try{
-            DB::beginTransaction();
+            // DB::beginTransaction();
             $sheet = Quote::find($id);
             $lastQuote = Quote::where('quotation_id', $sheet->quotation_id)->orderBy('id', 'desc')->first();
             $version = $lastQuote->version;
@@ -341,7 +346,7 @@ class QuotationController extends Controller
                 }
             }
 
-            DB::commit();
+            // DB::commit();
 
             return redirect()->route('quotations.index')->withMessage('Successful Duplicate :)');
         }catch(QueryException $e){
@@ -491,13 +496,20 @@ class QuotationController extends Controller
 
     public function pdf($id)
     {
-        $quotation = Quotation::find($id);
+        $quote = Quote::find($id);
+        $quotation = Quotation::find($quote->quotation->id);
         $organization = Organization::latest()->first();
         $payments = Payment::get();
         $terms = Term::get();
         $bank = Bank::latest()->first();
+        $termInfo = TermInfo::latest()->first();
+        $quoteItems = QuoteItem::with('quoteItemValues')->where('quote_id',$id)->get()->groupBy('category_id');
+        $groupedItems = $quoteItems->map(function ($group) {
+            return $group->sum('amount');
+        });
 
-        $view = view('backend.quotations.pdf', compact('quotation','organization','payments','terms','bank'))->render();
+
+        $view = view('backend.quotations.pdf', compact('quotation','organization','payments','terms','bank','termInfo','groupedItems'))->render();
 
         $mpdf = new \Mpdf\Mpdf([
             'default_font_size' => 9,

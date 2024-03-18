@@ -16,6 +16,7 @@ use App\Models\Template;
 use App\Models\TemplateItem;
 use App\Models\TemplateItemValue;
 use App\Models\Term;
+use App\Models\TermInfo;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -54,33 +55,51 @@ class DashboardController extends Controller
         $payments = Payment::get();
         $terms = Term::get();
         $bank = Bank::latest()->first();
-        return view('backend.quotes.editable', compact('quotation','quotations','organization','payments','terms','bank'));
+        $termInfo = TermInfo::latest()->first();
+        return view('backend.quotes.editable', compact('quotation','quotations','organization','payments','terms','bank','termInfo'));
     }
 
     public function pdf($id)
     {
         $quote = Quote::find($id);
-        // $quoteItems = QuoteItem::with('quoteItemValues')->where('quote_id',$id)->get()->groupBy('category_id');
-        $quoteItems = QuoteItem::with('quoteItemValues')
+
+        if ($quote) {
+            $quoteZoneItems = QuoteItem::with('quoteItemValues')
                 ->where('quote_id', $id)
+                ->whereNotNull('sub_category_id')
                 ->get()
                 ->groupBy(['category_id', 'sub_category_id']);
-        $externalMenus = QuoteItemValue::where('quote_id', $quote->id)->distinct()->pluck('header');
-        $organization = Organization::latest()->first();
 
-        $view = view('backend.quotes.pdf', compact('quote','organization','externalMenus','quoteItems'))->render();
+            // Retrieve QuoteItems with null sub_category_id
+            $quoteWorkItems = QuoteItem::with('quoteItemValues')
+                ->where('quote_id', $id)
+                ->whereNull('sub_category_id')
+                ->get()
+                ->groupBy(['category_id', 'sub_category_id']);
 
-        $mpdf = new \Mpdf\Mpdf([
-            'default_font_size' => 9,
-            'format' => 'A4-L',
-            'margin_left' => 4,
-            'margin_right' => 0,
-            'margin_top' => 4,
-            'margin_bottom' => 0,
-        ]);
-        $mpdf->SetTitle('Quotation');
-        $mpdf->WriteHTML($view);
-        $mpdf->Output(time() . '-Sheet' . ".pdf", "I");
+            // Merge the two collections, ignoring keys from $quoteWorkItems if they exist in $quoteZoneItems
+            $quoteItems = $quoteZoneItems->merge($quoteWorkItems->except($quoteZoneItems->keys()));
+
+            $externalMenus = QuoteItemValue::where('quote_id', $quote->id)->distinct()->pluck('header');
+            $organization = Organization::latest()->first();
+
+            $view = view('backend.quotes.pdf', compact('quote','organization','externalMenus','quoteItems'))->render();
+
+            $mpdf = new \Mpdf\Mpdf([
+                'default_font_size' => 9,
+                'format' => 'A4-L',
+                'margin_left' => 4,
+                'margin_right' => 0,
+                'margin_top' => 4,
+                'margin_bottom' => 0,
+            ]);
+            $mpdf->SetTitle('Quotation');
+            $mpdf->WriteHTML($view);
+            $mpdf->Output(time() . '-Sheet' . ".pdf", "I");
+        } else {
+            return redirect()->back();
+        }
+
     }
     
     public function destroy($id)
@@ -120,8 +139,13 @@ class DashboardController extends Controller
         $categories = Category::orderBY('title','asc')
                             ->pluck('title','id')
                             ->toArray();
+        $termInfo = TermInfo::latest()->first();
+        $quoteItems = QuoteItem::with('quoteItemValues')->where('quote_id',$id)->get()->groupBy('category_id');
+        $groupedItems = $quoteItems->map(function ($group) {
+            return $group->sum('amount');
+        });
 
-        return view('backend.quotes.edit', compact('quote','quotation','quotations','externalMenus','organization','quoteItems','payments','terms','bank','categories'));
+        return view('backend.quotes.edit', compact('quote','quotation','quotations','externalMenus','organization','quoteItems','payments','terms','bank','categories','termInfo','groupedItems'));
     }
 
     public function templateEdit($id)
@@ -135,8 +159,10 @@ class DashboardController extends Controller
         $quotation = Quotation::find($template->quotation_id);
         $terms = Term::get();
         $bank = Bank::latest()->first();
+        $termInfo = TermInfo::latest()->first();
 
-        return view('backend.quotes.template-edit', compact('template','quotation','quotations','externalMenus','organization','templateItems','payments','terms','bank'));
+
+        return view('backend.quotes.template-edit', compact('template','quotation','quotations','externalMenus','organization','templateItems','payments','terms','bank','termInfo'));
     }
 
     public function templatePdf($id)
@@ -197,5 +223,18 @@ class DashboardController extends Controller
             'active_bank' => 1
         ]);
         return redirect()->back()->withMessage('Successful delete :)');
+    }
+
+    public function templateItemDelete($id)
+    {
+        try{
+            $templateItem = TemplateItem::find($id);
+            $templateItem->update(['deleted_by' => auth()->user()->id]);
+            $templateItem->delete();
+
+            return redirect()->back()->withMessage('Successful delete :)');
+        }catch(QueryException $e){
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
     }
 }

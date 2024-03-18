@@ -17,7 +17,7 @@
 
         <div class="">
             <input type="hidden" class="quotationId" value="{{ $template->quotation_id }}">
-            <h3 class="mt-5 border text-center ">{{ $template->quotation->ref }} ({{ $template->version }})</h3>
+            <h3 class="mt-5 border text-center ">{{ $template->quotation->ref ?? '' }} ({{ $template->version }})</h3>
 
             <h1 class="mt-5">
                 <input type="text" class="form-control template_title" name="template_title" style="background: none; border:none; font-size:30px" value="{{ $template->title }}">
@@ -41,7 +41,7 @@
             <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                 <div class="d-flex justify-content-end">
-                    <a href="{{ route('template') }}" class="btn btn-primary mr-2 mt-3">Exit</a>
+                    <a href="{{ route('template') }}" class="btn btn-warning mr-2 mt-3">Exit</a>
                     {{-- <a href="{{ route('quotations.edit', $quotation->id) }}" class="btn btn-warning mr-2 mt-3">Quotation Edit</a> --}}
                     <a href="/template-pdf/{{ $template->id }}" class="btn btn-info mr-2 mt-3">Pdf</a>
                     <a href="/template-pdf/{{ $template->id }}" class="btn btn-primary mr-2 mt-3 copyLink">Copy</a>
@@ -49,7 +49,7 @@
                     <form style="display: inline;" action="/template-delete/{{ $template->id }}" method="POST">
                         @csrf
                         @method('delete')
-                        <button onclick="return confirm('Are you sure want to delete ?')" class="btn btn-danger mt-3" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Remove</button>
+                        <button onclick="return confirm('Are you sure want to delete ?')" class="btn btn-danger mt-3" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Delete Full Sheet</button>
                     </form>                
                 </div>
 
@@ -166,15 +166,16 @@
                             <div class="column" st>
                     
                                 <p style="margin-top: 50px;">...........................................................</p>
-                                <p><b>Nazrul Islam</b></p>
-                                <p>Email: nazrul@minimallimited.com</p>
-                                <p>Sales Manager</p>
+                                <p><b>{{ $template->quotation->first_person }}</b></p>
+                                <p>Email: {{ $template->quotation->first_person_email }}</p>
+                                <p>{{ $template->quotation->first_person_designation }}</p>
                                 <p>Minimal Limited</p>
                             </div>
                             <div class="column" style="text-align: right">
                                 <p style="margin-top: 50px;">...........................................................</p>
-                                <p><b>A B M Shafiqul Alam</b></p>
-                                <p>Director</p>
+                                <p><b>{{ $template->quotation->second_person }}</b></p>
+                                <p>Email: {{ $template->quotation->second_person_email }}</p>
+                                <p>{{ $template->quotation->second_person_designation }}</p>
                                 <p>Minimal Limited</p>
                             </div>
                             </div>
@@ -191,20 +192,20 @@
                         <button class="btn btn-success addRowBtn" id="">Add Row</button>
                         <button class="btn btn-info addColumnBtn" id="">Add Column</button>
                         <!-- Button to trigger PDF preview -->
-                        <button class="btn btn-warning pdfPreviewButton" id="">Preview PDF</button>
+                        {{-- <button class="btn btn-warning pdfPreviewButton" id="">Preview PDF</button> --}}
 
                         <!-- Button to download the PDF directly -->
-                        <button class="btn btn-primary downloadPdfButton" id="">Download PDF</button>
+                        {{-- <button class="btn btn-primary downloadPdfButton" id="">Download PDF</button> --}}
                     </div>
                     <div class="d-flex">
-                        <a href="{{ route('template') }}" class="btn btn-primary mr-2">Exit</a>
+                        <a href="{{ route('template') }}" class="btn btn-warning mr-2">Exit</a>
                         <a href="/template-pdf/{{ $template->id }}" class="btn btn-info mr-2">Pdf</a>
                         <a href="/template-pdf/{{ $template->id }}" class="btn btn-primary mr-2 copyLink">Copy</a>
-                        <form style="display: inline;" action="/template-delete/{{ $template->id }}" method="POST">
+                        {{-- <form style="display: inline;" action="/templateItem-delete/{{ $quotationItem->id }}" method="POST">
                             @csrf
                             @method('delete')
-                            <button onclick="return confirm('Are you sure want to delete ?')" class="btn btn-danger" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Remove</button>
-                        </form>     
+                            <button onclick="return confirm('Are you sure want to delete ?')" class="btn btn-danger" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Delete</button>
+                        </form>      --}}
                     </div>
                 </div>
                 @php
@@ -396,12 +397,14 @@
                            <p class="text-dark"><b style="font-weight: 900">{{ $loop->iteration }}</b>. {{ $term->title }}</p>
                         @endforeach
 
-                        <p class="mt-2 text-dark" style="font-weight: 900">Special Note: This quotation might change due to addition, reduction and/or change of design and excution, human errors which will be setteled later in concern of both parties.</p>
-
+                        <p class="mt-2 text-dark" style="font-weight: 900" data-toggle="modal" data-target="#terminfoEdittModal">Special Note: {{ $termInfo->note }}
                         <p class="mt-2 text-dark">Sincerely Yours,</p>
 
-                        <p class="mt-4 text-dark">A.B.M Shafiqul Alam</p>
-                        <p class="text-dark">Director</p>
+                        <p class="mt-4 text-dark" data-toggle="modal" data-target="#terminfoEdittModal">{{ $termInfo->name }}</p>
+                        @if ($termInfo->email != null)
+                        <p class="mt-4 text-dark" data-toggle="modal" data-target="#terminfoEdittModal">{{ $termInfo->email }}</p>
+                        @endif
+                        <p class="text-dark" data-toggle="modal" data-target="#terminfoEdittModal">{{ $termInfo->designation }}</p>
                         <p class="text-dark">Minimal Limited</p>
 
                     </div>
@@ -421,7 +424,7 @@
         <style>
             .page {
                 width: 21cm;
-                height: 33.7cm;
+                height: 40cm;
                 margin: 0;
                 background-color: #fff;
                 padding: 20px;
@@ -553,10 +556,9 @@
                 let 
                     el = event.target,
                     tr = $(el).closest('tr'),
+                    tbody = $(el).closest('tbody'),
                     rate = parseFloat($(tr).find('.rate').text()), // Parsing as float for decimal values
                     qty = parseInt($(tr).find('.qty').text()); // Parsing as integer
-
-                    console.log('in', rate, qty);
 
                 $(tr).find('.amount').text(rate*qty);
 

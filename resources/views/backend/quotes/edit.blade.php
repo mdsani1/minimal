@@ -15,21 +15,6 @@
 
     <div>
 
-        <!-- Button for scroll-to-top -->
-        {{-- <button id="scrollToTopButton" aria-label="Scroll to top" title="Scroll to top" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 100;">
-            <i class="fas fa-chevron-up"></i>
-        </button> --}}
-
-
-
-        <!-- The Modal for PDF preview -->
-        {{-- <div id="pdfPreviewModal" class="modal">
-            <div class="modal-content">
-            <span class="close">&times;</span> <!-- Close button -->
-            <iframe id="pdfPreviewIframe" style="width:100%;height:100%;"></iframe>
-            </div>
-        </div> --}}
-
         <div class="">
             <input type="hidden" class="quotationId" value="{{ $quote->quotation_id }}">
             <h3 class="mt-5 border text-center">{{ $quote->quotation->ref }} ({{ $quote->version }})</h3>
@@ -100,7 +85,7 @@
                     </div>
 
                     <a href="{{ route('quotations.edit', $quotation->id) }}" class="btn btn-warning mr-2 mt-3">Quotation Edit</a>
-                    <a href="/sheet-pdf/{{ $quote->id }}" class="btn btn-info mr-2 mt-3">Pdf</a>
+                    <a href="{{ route('quotations.pdf',['id' => $quote->id]) }}" class="btn btn-info mr-2 mt-3">Pdf</a>
                     <a href="/sheet-pdf/{{ $quote->id }}" class="btn btn-primary mr-2 mt-3 copyLink">Copy</a>
                     {{-- <button type="button" class="btn btn-success mr-2 mt-3 template" value="{{ $quote->id }}"><i class="fa-solid fa-bookmark"></i> Template</button> --}}
                     <!-- Button trigger modal -->
@@ -134,7 +119,7 @@
                     <form style="display: inline;" action="/sheet-delete/{{ $quote->id }}" method="POST">
                         @csrf
                         @method('delete')
-                        <button onclick="return confirm('Are you sure want to delete ?')" class="btn btn-danger mt-3" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Delete</button>
+                        <button onclick="return confirm('Are you sure want to delete ?')" class="btn btn-danger mt-3" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Delete Full Sheet</button>
                     </form>                
                 </div>
 
@@ -223,11 +208,16 @@
                             <tr>
                                 <td style="text-align: center">{{ $loop->iteration }}</td>
                                 <td>{{ $quotationItem->category->title ?? '' }}</td>
-                                <td style="text-align: center">{{ $quotationItem->amount }}</td>
+                                @foreach ($groupedItems as $index => $value)
+                                    @if ($index == $quotationItem->work_scope)
+                                        <td style="text-align: center">{{ $value ?? 0 }}</td>
+                                        @php
+                                            $total += $value;
+                                        @endphp
+                                    @endif
+                                @endforeach
                             </tr>
-                            @php
-                                $total += $quotationItem->amount;
-                            @endphp
+                            
                             @endforeach
                             <tr>
                                 <td colspan="2" style="border: 0px solid !important; text-align:right">GRAND TOTAL</td>
@@ -251,15 +241,17 @@
                             <div class="column" st>
                     
                                 <p style="margin-top: 50px;">...........................................................</p>
-                                <p><b>Nazrul Islam</b></p>
-                                <p>Email: nazrul@minimallimited.com</p>
-                                <p>Sales Manager</p>
+                                <p><b>{{ $quote->quotation->first_person }}</b></p>
+                                <p>Email: {{ $quote->quotation->first_person_email }}</p>
+                                <p>{{ $quote->quotation->first_person_designation }}</p>
                                 <p>Minimal Limited</p>
                             </div>
                             <div class="column" style="text-align: right">
                                 <p style="margin-top: 50px;">...........................................................</p>
-                                <p><b>A B M Shafiqul Alam</b></p>
-                                <p>Director</p>
+                                <p><b>{{ $quote->quotation->second_person }}</b></p>
+                                <p>Email: {{ $quote->quotation->second_person_email }}</p>
+                                <p>{{ $quote->quotation->second_person_designation }}</p>
+
                                 <p>Minimal Limited</p>
                             </div>
                             </div>
@@ -267,6 +259,7 @@
                     </div>
                 </div>
             </div>
+
 
             @foreach ($quotation->quotationItems as $quotationItem)
             <div class="tab-pane category fade" id="{{ str_replace(' ', '-', $quotationItem->category->title ?? '') }}" role="tabpanel" aria-labelledby="{{ str_replace(' ', '-', $quotationItem->category->title ?? '') }}-tab">
@@ -276,10 +269,10 @@
                         <button class="btn btn-success addRowBtn" id="">Add Row</button>
                         <button class="btn btn-info addColumnBtn" id="">Add Column</button>
                         <!-- Button to trigger PDF preview -->
-                        <button class="btn btn-warning pdfPreviewButton" id="">Preview PDF</button>
+                        {{-- <button class="btn btn-warning pdfPreviewButton" id="">Preview PDF</button> --}}
 
                         <!-- Button to download the PDF directly -->
-                        <button class="btn btn-primary downloadPdfButton" id="">Download PDF</button>
+                        {{-- <button class="btn btn-primary downloadPdfButton" id="">Download PDF</button> --}}
                     </div>
                     <div class="d-flex">
                         <a href="{{ route('quotations.index') }}" class="btn btn-warning mr-2">Exit</a>
@@ -318,8 +311,8 @@
                                                 <input type="hidden" class="subCategoryId" value="{{ $subcategory->id }}">
                                                 <tr>
                                                     <th style="background-color: #198754; color:#fff">SL</th>
-                                                    <th style="background-color: #198754; color:#fff">ITEM</th>
-                                                    <th style="background-color: #198754; color:#fff">SPECIFICATION</th>
+                                                    <th style="background-color: #198754; color:#fff; width:20%">ITEM</th>
+                                                    <th style="background-color: #198754; color:#fff; width:40%">SPECIFICATION</th>
                                                     <th style="background-color: #198754; color:#fff">QTY</th>
                                                     <th style="background-color: #198754; color:#fff">UNIT</th>
                                                     <th style="background-color: #198754; color:#fff">RATE</th>
@@ -375,8 +368,8 @@
                                     <input type="hidden" class="subCategoryId" value="{{ null }}">
                                     <tr>
                                         <th style="background-color: #198754; color:#fff">SL</th>
-                                        <th style="background-color: #198754; color:#fff">ITEM</th>
-                                        <th style="background-color: #198754; color:#fff">SPECIFICATION</th>
+                                        <th style="background-color: #198754; color:#fff; width:20%">ITEM</th>
+                                        <th style="background-color: #198754; color:#fff; width:40%">SPECIFICATION</th>
                                         <th style="background-color: #198754; color:#fff">QTY</th>
                                         <th style="background-color: #198754; color:#fff">UNIT</th>
                                         <th style="background-color: #198754; color:#fff">RATE</th>
@@ -693,13 +686,78 @@
                             </div>
                         </div>
 
-                        <p class="mt-2 text-dark" style="font-weight: 900">Special Note: This quotation might change due to addition, reduction and/or change of design and excution, human errors which will be setteled later in concern of both parties.</p>
-
+                        <p class="mt-2 text-dark" style="font-weight: 900" data-toggle="modal" data-target="#terminfoEdittModal">Special Note: {{ $termInfo->note }}
                         <p class="mt-2 text-dark">Sincerely Yours,</p>
 
-                        <p class="mt-4 text-dark">A.B.M Shafiqul Alam</p>
-                        <p class="text-dark">Director</p>
+                        <p class="mt-4 text-dark" data-toggle="modal" data-target="#terminfoEdittModal">{{ $termInfo->name }}</p>
+                        @if ($termInfo->email != null)
+                        <p class="mt-4 text-dark" data-toggle="modal" data-target="#terminfoEdittModal">{{ $termInfo->email }}</p>
+                        @endif
+                        <p class="text-dark" data-toggle="modal" data-target="#terminfoEdittModal">{{ $termInfo->designation }}</p>
                         <p class="text-dark">Minimal Limited</p>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="terminfoEdittModal" tabindex="-1" aria-labelledby="terminfoEdittModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" style="min-width: 60%">
+                            <form action="{{ route('terminfos.update',$termInfo->id) }}" method="POST" style="min-width: 100%">
+                                @csrf
+                                @method('patch')
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <h5 class="modal-title" id="termEdittModalLabel">Terms Information</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="name">Name *</label>
+                                                <input type="text" class="form-control mt-2" name="name" placeholder="Enter Name" value="{{ old('name',$termInfo->name) }}" required>
+                                                @error("name")
+                                                    <span class="sm text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                    
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="email">Email</label>
+                                                <input type="text" class="form-control mt-2" name="email" placeholder="Enter Email" value="{{ old('email',$termInfo->email) }}">
+                                                @error("email")
+                                                    <span class="sm text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                    
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="designation">Designation *</label>
+                                                <input type="text" class="form-control mt-2" name="designation" placeholder="Enter Designation" value="{{ old('designation',$termInfo->designation) }}" required>
+                                                @error("designation")
+                                                    <span class="sm text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                    
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="note">Note *</label>
+                                                <textarea class="form-control mt-2" name="note" placeholder="Note" cols="30" rows="6">{{ $termInfo->note }}</textarea>
+                                                @error("note")
+                                                    <span class="sm text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </div>
+                                </div>
+                            </form>
+                            </div>
+                        </div>
 
                     </div>
                 </div>
@@ -718,7 +776,7 @@
         <style>
             .page {
                 width: 21cm;
-                height: 33.7cm;
+                height: 40cm;
                 margin: 0;
                 background-color: #fff;
                 padding: 20px;
@@ -919,8 +977,6 @@
                     tbody = $(el).closest('tbody'),
                     rate = parseFloat($(tr).find('.rate').text()), // Parsing as float for decimal values
                     qty = parseInt($(tr).find('.qty').text()); // Parsing as integer
-
-                    console.log('in', rate, qty);
 
                 $(tr).find('.amount').text(rate*qty);
 

@@ -158,6 +158,7 @@ function loadSpecificationData(cell) {
                 parentTR.find('.specification').text(response.suggestions[0]);
             }
             parentTR.find('.rate').text(response.interior.rate);
+            parentTR.find('.unit').text(response.interior.unit);
         },
         error: function (xhr, status, error) {
             // Handle errors

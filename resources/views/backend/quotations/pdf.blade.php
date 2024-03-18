@@ -140,12 +140,16 @@
         @foreach ($quotation->quotationItems as $quotationItem)
         <tr>
           <td style="text-align: center">{{ $loop->iteration }}</td>
-          <td>{{ $quotationItem->category->title }}</td>
-          <td style="text-align: center">{{ $quotationItem->amount }}</td>
+          <td>{{ $quotationItem->category->title ?? '' }}</td>
+          @foreach ($groupedItems as $index => $value)
+              @if ($index == $quotationItem->work_scope)
+                  <td style="text-align: center">{{ $value ?? 0 }}</td>
+                  @php
+                      $total += $value;
+                  @endphp
+              @endif
+          @endforeach
         </tr>
-        @php
-            $total += $quotationItem->amount;
-        @endphp
         @endforeach
         <tr>
           <td colspan="2" style="border: 0px solid !important; text-align:right">GRAND TOTAL</td>
@@ -169,15 +173,16 @@
         <div class="column" st>
 
           <p style="margin-top: 50px;">...........................................................</p>
-          <p><b>Nazrul Islam</b></p>
-          <p>Email: nazrul@minimallimited.com</p>
-          <p>Sales Manager</p>
+          <p><b>{{ $quotation->first_person }}</b></p>
+          <p>Email: {{ $quotation->first_person_email }}</p>
+          <p>{{ $quotation->first_person_designation }}</p>
           <p>Minimal Limited</p>
         </div>
         <div class="column" style="text-align: right">
           <p style="margin-top: 50px;">...........................................................</p>
-          <p><b>A B M Shafiqul Alam</b></p>
-          <p>Director</p>
+          <p><b>{{ $quotation->second_person }}</b></p>
+          <p>Email: {{ $quotation->second_person_email }}</p>
+          <p>{{ $quotation->second_person_designation }}</p>
           <p>Minimal Limited</p>
         </div>
       </div>
@@ -237,12 +242,15 @@
          <p class="text-dark"><b style="font-weight: 900">{{ $loop->iteration }}</b>. {{ $term->title }}</p>
       @endforeach
 
-      <p class="mt-2 text-dark" style="font-weight: 900">Special Note: This quotation might change due to addition, reduction and/or change of design and excution, human errors which will be setteled later in concern of both parties.</p>
+      <p class="mt-2 text-dark" style="font-weight: 900">Special Note: {{ $termInfo->note }}</p>
 
       <p class="mt-2 text-dark" style="margin-top: 10px">Sincerely Yours,</p>
 
-      <p class="mt-4 text-dark" style="margin-top: 10px">A.B.M Shafiqul Alam</p>
-      <p class="text-dark">Director</p>
+      <p class="mt-4 text-dark" style="margin-top: 10px">{{ $termInfo->name }}</p>
+      @if ($termInfo->email != null)
+      <p class="text-dark">{{ $termInfo->email }}</p>
+      @endif
+      <p class="text-dark">{{ $termInfo->designation }}</p>
       <p class="text-dark">Minimal Limited</p>
 
   </div>

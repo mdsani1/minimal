@@ -120,6 +120,76 @@
                         </div>
                     </div>
 
+                    <div class="col-md-12">
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6" style="border-right:1px solid #ddd">
+                                <p class="text-center"><span><u>First</u></span></p>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="first_person">Name</label>
+                                            <input type="text" class="form-control mt-2" name="first_person" placeholder="Enter Name" value="{{ old('first_person',$quotation->first_person) }}">
+                                            @error("first_person")
+                                                <span class="sm text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 mt-2">
+                                        <div class="form-group">
+                                            <label for="first_person_email">Email</label>
+                                            <input type="text" class="form-control mt-2" name="first_person_email" placeholder="Enter Email" value="{{ old('first_person_email',$quotation->first_person_email) }}">
+                                            @error("first_person_email")
+                                                <span class="sm text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 mt-2">
+                                        <div class="form-group">
+                                            <label for="first_person_designation">Designation</label>
+                                            <input type="text" class="form-control mt-2" name="first_person_designation" placeholder="Enter Designation" value="{{ old('first_person_designation',$quotation->first_person_designation) }}">
+                                            @error("first_person_designation")
+                                                <span class="sm text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="text-center"><span><u>Second</u></span></p>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="second_person">Name</label>
+                                            <input type="text" class="form-control mt-2" name="second_person" placeholder="Enter Name" value="{{ old('second_person',$quotation->second_person) }}">
+                                            @error("second_person")
+                                                <span class="sm text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 mt-2">
+                                        <div class="form-group">
+                                            <label for="second_person_email">Email</label>
+                                            <input type="text" class="form-control mt-2" name="second_person_email" placeholder="Enter Email" value="{{ old('second_person_email',$quotation->second_person_email) }}">
+                                            @error("second_person_email")
+                                                <span class="sm text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 mt-2">
+                                        <div class="form-group">
+                                            <label for="second_person_designation">Designation</label>
+                                            <input type="text" class="form-control mt-2" name="second_person_designation" placeholder="Enter Designation" value="{{ old('second_person_designation',$quotation->second_person_designation) }}">
+                                            @error("second_person_designation")
+                                                <span class="sm text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     
                     <div class="col-md-12 mt-3">
                         <hr>
@@ -188,6 +258,7 @@
                 $('select').select2();
                 loadcategory();
                 type();
+                slHandler();
                 $(document).on('change', '.work_scope', doubleCheck);
                 $(document).on('change', '#purposeSelect', loadType);
 

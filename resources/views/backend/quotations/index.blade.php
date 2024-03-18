@@ -119,7 +119,7 @@
                         <td class="text-center">
                             <a class="btn btn-sm btn-primary" href="{{ route('quotations.show', ['quotation'=>$quotation->id]) }}" role="button" style="border-radius: 50%"><i class="far fa-eye text-white"></i></a>
                             <a class="btn btn-sm btn-warning" href="{{ route('quotations.edit',['quotation' => $quotation->id]) }}" role="button" style="border-radius: 50%"><i class="fas fa-pen-nib text-white"></i></a>
-                            <a class="btn btn-sm btn-info text-white" href="{{ route('quotations.pdf',['id' => $quotation->id]) }}" role="button" style="border-radius: 50%"><i class="fas fa-file-pdf"></i></a>
+                            {{-- <a class="btn btn-sm btn-info text-white" href="{{ route('quotations.pdf',['id' => $quotation->id]) }}" role="button" style="border-radius: 50%"><i class="fas fa-file-pdf"></i></a> --}}
                             {{-- <a class="btn btn-sm btn-success text-white" title="Duplicate" href="{{ route('quotations.duplicate',['id' => $quotation->id]) }}" role="button" style="border-radius: 50%"><i class="fas fa-copy"></i></a> --}}
 
                             <form style="display: inline;" action="{{ route('quotations.destroy', ['quotation'=>$quotation->id]) }}" method="POST">

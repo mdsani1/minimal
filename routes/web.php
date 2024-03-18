@@ -13,6 +13,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RoleNavItemController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\TermController;
+use App\Http\Controllers\TermInfoController;
 use App\Http\Controllers\UserController;
 use App\Models\Organization;
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,7 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/template/edit/{id}', [DashboardController::class, 'templateEdit'])->name('template-edit');
     Route::get('/template-pdf/{id}', [DashboardController::class, 'templatePdf'])->name('template.pdf');
     Route::delete('/template-delete/{id}', [DashboardController::class, 'templateDestroy'])->name('template.delete');
+    Route::delete('/templateItem-delete/{id}', [DashboardController::class, 'templateItemDelete'])->name('templateItem-delete');
 
 
     Route::resource('roles', RoleController::class);
@@ -108,10 +110,12 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/version-copy/{id}', [QuotationController::class, 'versionCopy'])->name('version-copy');
     Route::delete('/quotationItem-delete/{id}', [QuotationController::class, 'quotationItemDelete'])->name('quotationItem-delete');
 
+
     Route::post('/change-histories/{id}', [QuotationController::class, 'changeHistories'])->name('change-histories');
     Route::resource('quotations', QuotationController::class);
 
     Route::resource('terms', TermController::class);
+    Route::resource('terminfos', TermInfoController::class);
     Route::resource('payments', PaymentController::class);
     Route::resource('banks', BankController::class);
     Route::patch('/bank/update/{bank}', [BankController::class, 'bankUpdate'])->name('bank.update');
