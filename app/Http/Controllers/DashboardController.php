@@ -77,8 +77,13 @@ class DashboardController extends Controller
                 ->get()
                 ->groupBy(['category_id', 'sub_category_id']);
 
-            // Merge the two collections, ignoring keys from $quoteWorkItems if they exist in $quoteZoneItems
-            $quoteItems = $quoteZoneItems->merge($quoteWorkItems->except($quoteZoneItems->keys()));
+            if(!$quoteZoneItems->isEmpty()) {
+                // Merge the two collections, ignoring keys from $quoteWorkItems if they exist in $quoteZoneItems
+                $quoteItems = $quoteZoneItems->merge($quoteWorkItems->except($quoteZoneItems->keys()->all()));
+            } else {
+                $quoteItems = $quoteWorkItems;
+            }
+
 
             $externalMenus = QuoteItemValue::where('quote_id', $quote->id)->distinct()->pluck('header');
             $organization = Organization::latest()->first();
@@ -168,26 +173,53 @@ class DashboardController extends Controller
     public function templatePdf($id)
     {
         $template = Template::find($id);
-        $templateItems = TemplateItem::with('templateItemValues')
+
+        if ($template) {
+            $templateZoneItems = TemplateItem::with('templateItemValues')
                 ->where('template_id', $id)
+                ->whereNotNull('sub_category_id')
                 ->get()
                 ->groupBy(['category_id', 'sub_category_id']);
-        $externalMenus = TemplateItemValue::where('template_id', $template->id)->distinct()->pluck('header');
-        $organization = Organization::latest()->first();
 
-        $view = view('backend.quotes.template-pdf', compact('template','organization','externalMenus','templateItems'))->render();
+            // Retrieve TemplateItems with null sub_category_id
+            $templateWorkItems = TemplateItem::with('templateItemValues')
+                ->where('template_id', $id)
+                ->whereNull('sub_category_id')
+                ->get()
+                ->groupBy(['category_id', 'sub_category_id']);
 
-        $mpdf = new \Mpdf\Mpdf([
-            'default_font_size' => 9,
-            'format' => 'A4-L',
-            'margin_left' => 4,
-            'margin_right' => 0,
-            'margin_top' => 4,
-            'margin_bottom' => 0,
-        ]);
-        $mpdf->SetTitle('Quotation');
-        $mpdf->WriteHTML($view);
-        $mpdf->Output(time() . '-Sheet' . ".pdf", "I");
+            if(!$templateZoneItems->isEmpty()) {
+                // Merge the two collections, ignoring keys from $templateWorkItems if they exist in $templateZoneItems
+                $templateItems = $templateZoneItems->merge($templateWorkItems->except($templateZoneItems->keys()->all()));
+            } else {
+                $templateItems = $templateWorkItems;
+            }
+
+
+            // $templateItems = TemplateItem::with('templateItemValues')
+            //         ->where('template_id', $id)
+            //         ->get()
+            //         ->groupBy(['category_id', 'sub_category_id']);
+
+            $externalMenus = TemplateItemValue::where('template_id', $template->id)->distinct()->pluck('header');
+            $organization = Organization::latest()->first();
+    
+            $view = view('backend.quotes.template-pdf', compact('template','organization','externalMenus','templateItems'))->render();
+    
+            $mpdf = new \Mpdf\Mpdf([
+                'default_font_size' => 9,
+                'format' => 'A4-L',
+                'margin_left' => 4,
+                'margin_right' => 0,
+                'margin_top' => 4,
+                'margin_bottom' => 0,
+            ]);
+            $mpdf->SetTitle('Quotation');
+            $mpdf->WriteHTML($view);
+            $mpdf->Output(time() . '-Sheet' . ".pdf", "I");
+        } else {
+            return redirect()->back();
+        }
     }
 
     public function templateDestroy($id)
