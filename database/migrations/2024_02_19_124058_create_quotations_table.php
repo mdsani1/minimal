@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('quotations', function (Blueprint $table) {
             $table->id();
+            $table->string('title')->default('Financial Proposal For');
             $table->string('ref')->nullable();
             $table->string('name')->nullable();
             $table->string('area')->nullable();
@@ -23,11 +24,15 @@ return new class extends Migration
             $table->date('date')->nullable();
             $table->tinyInteger('active_bank')->default(0);
             $table->string('first_person')->nullable();
-            $table->string('first_person_email')->nullable();
-            $table->string('first_person_designation')->nullable();
+            $table->string('first_person_signature')->nullable();
             $table->string('second_person')->nullable();
-            $table->string('second_person_email')->nullable();
-            $table->string('second_person_designation')->nullable();
+            $table->string('second_person_signature')->nullable();
+            $table->string('third_person')->nullable();
+            $table->string('third_person_signature')->nullable();
+            $table->string('fourth_person')->nullable();
+            $table->string('fourth_person_signature')->nullable();
+            $table->string('fifth_person')->nullable();
+            $table->string('fifth_person_signature')->nullable();
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->string('deleted_by')->nullable();

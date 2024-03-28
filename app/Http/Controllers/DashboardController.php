@@ -269,4 +269,18 @@ class DashboardController extends Controller
             return redirect()->back()->withInput()->withErrors($e->getMessage());
         }
     }
+
+    public function quotationItemZoneDelete($quoteId, $zoneId)
+    {
+        try{
+            $quoteItem = QuoteItem::where('quote_id', $quoteId)->where('sub_category_id', $zoneId)->first();
+            $quoteItem->update(['deleted_by' => auth()->user()->id]);
+            $quoteItem->delete();
+
+            return redirect()->back()->withMessage('Successful delete :)');
+        }catch(QueryException $e){
+            dd($e->getMessage());
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
 }

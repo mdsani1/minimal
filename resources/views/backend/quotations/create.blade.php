@@ -29,7 +29,7 @@
         </div>
         <div class="card-body">
             <x-backend.layouts.elements.errors :errors="$errors"/>
-            <form action="{{ route('quotations.store') }}" method="POST">
+            <form action="{{ route('quotations.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row mb-3">
                     <div class="col-md-4">
@@ -114,67 +114,97 @@
                     <div class="col-md-12">
                         <hr>
                         <div class="row">
-                            <div class="col-md-6" style="border-right:1px solid #ddd">
+                            <div class="col-md-4" style="border-right:1px solid #ddd">
                                 <p class="text-center"><span><u>First</u></span></p>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="first_person">Name</label>
-                                            <input type="text" class="form-control mt-2" name="first_person" placeholder="Enter Name" value="{{ old('first_person') }}">
+                                            <label for="first_person">First Information</label>
+                                            <textarea class="form-control mt-2" name="first_person" id="" cols="30" rows="5"></textarea>
                                             @error("first_person")
                                                 <span class="sm text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
                                     </div>
-                                    <div class="col-md-12 mt-2">
-                                        <div class="form-group">
-                                            <label for="first_person_email">Email</label>
-                                            <input type="text" class="form-control mt-2" name="first_person_email" placeholder="Enter Email" value="{{ old('first_person_email') }}">
-                                            @error("first_person_email")
-                                                <span class="sm text-danger">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12 mt-2">
-                                        <div class="form-group">
-                                            <label for="first_person_designation">Designation</label>
-                                            <input type="text" class="form-control mt-2" name="first_person_designation" placeholder="Enter Designation" value="{{ old('first_person_designation') }}">
-                                            @error("first_person_designation")
-                                                <span class="sm text-danger">{{ $message }}</span>
-                                            @enderror
-                                        </div>
+                                    <div class="col-md-12">
+                                        <label for="">Signature</label>
+                                        <input type="file" class="form-control mt-2" name="first_person_signature">
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+
+                            <div class="col-md-4" style="border-right:1px solid #ddd">
                                 <p class="text-center"><span><u>Second</u></span></p>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="second_person">Name</label>
-                                            <input type="text" class="form-control mt-2" name="second_person" placeholder="Enter Name" value="{{ old('second_person') }}">
+                                            <label for="second_person">Second Information</label>
+                                            <textarea class="form-control mt-2" name="second_person" id="" cols="30" rows="5"></textarea>
                                             @error("second_person")
                                                 <span class="sm text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
                                     </div>
-                                    <div class="col-md-12 mt-2">
+                                    <div class="col-md-12">
+                                        <label for="">Signature</label>
+                                        <input type="file" class="form-control mt-2" name="second_person_signature">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4" style="border-right:1px solid #ddd">
+                                <p class="text-center"><span><u>Third</u></span></p>
+                                <div class="row">
+                                    <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="second_person_email">Email</label>
-                                            <input type="text" class="form-control mt-2" name="second_person_email" placeholder="Enter Email" value="{{ old('second_person_email') }}">
-                                            @error("second_person_email")
+                                            <label for="third_person">Third Information</label>
+                                            <textarea class="form-control mt-2" name="third_person" id="" cols="30" rows="5"></textarea>
+                                            @error("third_person")
                                                 <span class="sm text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
                                     </div>
-                                    <div class="col-md-12 mt-2">
+                                    <div class="col-md-12">
+                                        <label for="">Signature</label>
+                                        <input type="file" class="form-control mt-2" name="third_person_signature">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4" style="border-right:1px solid #ddd">
+                                <p class="text-center"><span><u>Fourth</u></span></p>
+                                <div class="row">
+                                    <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="second_person_designation">Designation</label>
-                                            <input type="text" class="form-control mt-2" name="second_person_designation" placeholder="Enter Designation" value="{{ old('second_person_designation') }}">
-                                            @error("second_person_designation")
+                                            <label for="fourth_person">Fourth Information</label>
+                                            <textarea class="form-control mt-2" name="fourth_person" id="" cols="30" rows="5"></textarea>
+                                            @error("fourth_person")
                                                 <span class="sm text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="">Signature</label>
+                                        <input type="file" class="form-control mt-2" name="fourth_person_signature">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4" style="border-right:1px solid #ddd">
+                                <p class="text-center"><span><u>Fifth</u></span></p>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="fifth_person">Fifth Information</label>
+                                            <textarea class="form-control mt-2" name="fifth_person" id="" cols="30" rows="5"></textarea>
+                                            @error("fifth_person")
+                                                <span class="sm text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="">Signature</label>
+                                        <input type="file" class="form-control mt-2" name="fifth_person_signature">
                                     </div>
                                 </div>
                             </div>

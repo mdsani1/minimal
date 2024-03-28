@@ -113,7 +113,6 @@ class InteriorController extends Controller
     {
         try{
             $interior = Interior::find($id);
-
             
             $filename = null;
             
@@ -127,7 +126,10 @@ class InteriorController extends Controller
                 $interiorData['image'] = $filename;
             }
 
-            $interior->update(['updated_by' => auth()->user()->id] + $interiorData);
+            $interior->update([
+                'active'    => $request->active ?? '1',
+                'updated_by' => auth()->user()->id
+            ] + $interiorData);
 
             if(isset($request->specification)){
                 foreach ($request->specification as $key => $value) {

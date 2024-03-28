@@ -56,6 +56,8 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/template-pdf/{id}', [DashboardController::class, 'templatePdf'])->name('template.pdf');
     Route::delete('/template-delete/{id}', [DashboardController::class, 'templateDestroy'])->name('template.delete');
     Route::delete('/templateItem-delete/{id}', [DashboardController::class, 'templateItemDelete'])->name('templateItem-delete');
+    Route::delete('/quotationItemZone-delete/{quoteId}/{zoneId}', [DashboardController::class, 'quotationItemZoneDelete'])->name('quotationItemZone-delete');
+    
 
 
     Route::resource('roles', RoleController::class);
@@ -109,6 +111,11 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/quotations-duplicate/{id}', [QuotationController::class, 'duplicate'])->name('quotations.duplicate');
     Route::get('/version-copy/{id}', [QuotationController::class, 'versionCopy'])->name('version-copy');
     Route::delete('/quotationItem-delete/{id}', [QuotationController::class, 'quotationItemDelete'])->name('quotationItem-delete');
+
+    Route::patch('/quotation-title-update/{id}', [QuotationController::class, 'quotationTitleUpdate'])->name('quotation-title-update');
+    Route::patch('/sheet-date-update/{id}', [QuotationController::class, 'sheetDateUpdate'])->name('sheet-date-update');
+    Route::patch('/sheet-change-update/{id}', [QuotationController::class, 'sheetChangeUpdate'])->name('sheet-change-update');
+    Route::patch('/quotaion-date-update/{id}', [QuotationController::class, 'updateDate'])->name('quotaion-date-update');
 
 
     Route::post('/change-histories/{id}', [QuotationController::class, 'changeHistories'])->name('change-histories');

@@ -18,7 +18,7 @@ function initializeTableCells() {
         });
 
         cell.addEventListener('input', () => {
-            const inputValue = cell.innerText.trim().toLowerCase();
+            const inputValue = cell.innerHTML.trim().toLowerCase();
             const suggestions = getSuggestions(inputValue);
 
             if (suggestions.length > 0) {
@@ -118,7 +118,7 @@ function moveCursor(cell) {
 function saveTableCellContent(cell) {
   const rowIndex = cell.parentNode.rowIndex;
   const cellIndex = cell.cellIndex;
-  const newValue = cell.innerText;
+  const newValue = cell.innerHTML;
 
   // Here you can perform any logic to save the edited content, such as sending it to a server or storing it locally.
   console.log(`Row: ${rowIndex}, Column: ${cellIndex}, New Value: ${newValue}`);

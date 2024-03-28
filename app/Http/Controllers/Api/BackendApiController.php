@@ -46,24 +46,46 @@ class BackendApiController extends Controller
         // Fetching associated specifications from the related InteriorSpecification model
         $interior = Interior::with('interiorSpecifications')->where('item', $title)->first();
 
+        $dimensionText = '';
+        if ($interior->active == 0) {
+
+            $dimensionText .= ($dimensionText ? "\n" : '') . 'Dimension: ' .'<span class="editableareaData length_feet" contenteditable="true">'. $interior->length_feet .'</span>'. "' " .'<span class="editableareaData length_inche" contenteditable="true">'. $interior->length_inche .'</span>'. '"' . " (L)";
+
+            if ($interior->width_feet !== null) {
+                $dimensionText .= ' x ' .'<span class="editableareaData width_feet" contenteditable="true">'. $interior->width_feet.'</span>' . "' " .'<span class="editableareaData width_inche" contenteditable="true">'. $interior->width_inche.'</span>' . '"'. " (W)";
+            }
+
+            if ($interior->height_feet !== null) {
+                $dimensionText .= ' x ' . $interior->height_feet . "' " . $interior->height_inche . '"'. " (H)";
+        }
+        }
+
         // Merging specifications into one array
         $allSpecifications = [];
         if ($data1 !== null) {
-            $allSpecifications[] = $data1;
+            $allSpecifications[] = $data1 . "\n" . $dimensionText;
         }
         if ($data2 !== null) {
-            $allSpecifications[] = $data2;
+            $allSpecifications[] = $data2 . "\n" . $dimensionText;
         }
         if ($data3 !== null) {
-            $allSpecifications[] = $data3;
+            $allSpecifications[] = $data3 . "\n" . $dimensionText;
         }
+
 
         // If there are associated specifications from InteriorSpecification model, add them to the array
         if ($interior && $interior->interiorSpecifications) {
-            foreach ($interior->interiorSpecifications as $specification) {
-                $allSpecifications[] = $specification->specification;
+            if ($interior->active == 0) {
+                foreach ($interior->interiorSpecifications as $specification) {
+                    $allSpecifications[] = $specification->specification . '<br>' . $dimensionText;
+                }
+            } else {
+                foreach ($interior->interiorSpecifications as $specification) {
+                    $allSpecifications[] = $specification->specification;
+                }
             }
         }
+        
 
         // Remove duplicates and sort the array
         $suggestions = array_unique($allSpecifications);
@@ -358,6 +380,42 @@ class BackendApiController extends Controller
         }
     }
 
+    public function columnDelete(Request $request){
+        try{
+            $quote = Quote::where('quotation_id',$request->quotationId)->where('title',$request->quote_title)->latest()->first();
+            $quoteItemvalue = QuoteItemValue::where('quote_id', $quote->id)->where('category_id', $request->category_id)->where('sub_category_id', $request->sub_category_id)->where('unique_header', $request->headerId)->latest()->get();  
+            
+            foreach ($quoteItemvalue as $key => $value) {
+                $value->delete();
+            }
+            
+            return response()->json([
+                "message" => "Successfull Delete :)",
+            ]);
+
+        }catch(QueryException $e){
+            return response()->json(['error' => $e->getMessage()]);
+        }
+    }
+
+    public function rowDelete(Request $request){
+        try{
+            $quote = Quote::where('quotation_id',$request->quotationId)->where('title',$request->quote_title)->latest()->first();
+            $quoteItemvalue = QuoteItemValue::where('quote_id', $quote->id)->where('category_id', $request->category_id)->where('sub_category_id', $request->sub_category_id)->where('unique_header', $request->headerId)->latest()->get();  
+            
+            foreach ($quoteItemvalue as $key => $value) {
+                $value->delete();
+            }
+            
+            return response()->json([
+                "message" => "Successfull Delete :)",
+            ]);
+
+        }catch(QueryException $e){
+            return response()->json(['error' => $e->getMessage()]);
+        }
+    }
+
     public function list()
     {
         try{
@@ -387,6 +445,15 @@ class BackendApiController extends Controller
                 'updated_by'    => auth()->user()->id
             ]);
             
+            $slValues = array_column($request->item_data, 'sl');
+
+            // Step 2: Delete records from the database where 'sl' does not exist in $slValues
+            QuoteItem::where('quote_id', $quote->id)
+                    ->where('category_id', $request->category_id)
+                    ->where('sub_category_id', $request->sub_category_id)
+                    ->whereNotIn('sl', $slValues)
+                    ->delete();
+
             foreach ($request->item_data as $key => $value) {
 
                 $interiorCheck = Interior::where('item',$value['item'])->first();

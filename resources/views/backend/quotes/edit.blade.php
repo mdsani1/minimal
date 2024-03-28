@@ -116,6 +116,32 @@
                         </div>
                     </div>
 
+                    <!-- Modal -->
+                    <div class="modal fade" id="quotationTitle" tabindex="-1" aria-labelledby="quotationTitleLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" style="min-width:60%">
+                        <div class="modal-content">
+                            <form action="{{ route('quotation-title-update',$quote->quotation->id) }}" method="POST">
+                                @csrf
+                                @method('patch')
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="quotationTitleLabel">Quotation</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <label for="">Title</label>
+                                        <input type="text" class="form-control" name="title" id="title" value="{{ $quote->quotation->title }}">
+                                    </div>
+                                    <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    </div>
+                            </form>
+                        </div>
+                        </div>
+                    </div>
+
                     <form style="display: inline;" action="/sheet-delete/{{ $quote->id }}" method="POST">
                         @csrf
                         @method('delete')
@@ -146,15 +172,40 @@
                                     $dateString = $quote->quotation->date;
                                     $formattedDate = date("F j, Y", strtotime($dateString));
                                 @endphp 
-                                <p style="margin-top: 20px">{{ $formattedDate }}</p>
+                                <p style="margin-top: 20px" data-toggle="modal" data-target="#quotationDate">{{ $formattedDate }}</p>
+                                <!-- Modal -->
+                                <div class="modal fade" id="quotationDate" tabindex="-1" aria-labelledby="quotationDateLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" style="min-width:60%">
+                                    <div class="modal-content">
+                                        <form action="{{ route('quotaion-date-update',$quote->quotation->id) }}" method="POST">
+                                            @csrf
+                                            @method('patch')
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="quotationDateLabel">Quotation</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <label for="">Date</label>
+                                                    <input type="date" class="form-control" name="date" id="date" value="{{ $quote->quotation->date }}">
+                                                </div>
+                                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                                </div>
+                                        </form>
+                                    </div>
+                                    </div>
+                                </div>
                             </div>
                             </div>
                         </div>
                         
                         <div style="background-color:#bbb; text-align:center; border:3px solid #09e240; width:100%;">
-                            <h4>Financial Proposal For Residence Interior & Electrical Works</h4>
+                            <h4 data-toggle="modal" data-target="#quotationTitle">{{ $quote->quotation->title }}</h4>
                             <h4>Of</h4>
-                            <h3>{{ $quote->quotation->name }} | {{ $quote->quotation->address }}</h3>
+                            <h3>{{ $quote->quotation->name }} | {{ $quote->quotation->area }}</h3>
                         </div>
                     
                         <div class="d-flex justify-content-center" style="margin-top: 20px;">
@@ -172,19 +223,70 @@
                             @foreach ($quotation->sheets as $sheet)
                                 @if ($loop->first)
                                 <tr>
-                                    <td style="text-align: center">{{ $quotation->date }}</td>
+                                    <td style="text-align: center" data-toggle="modal" data-target="#SheetDate{{ $sheet->id }}">{{ $sheet->date }}</td>
                                     <td style="text-align: center">{{ $sheet->version }}</td>
-                                    <td>- Initial quotation</td>
+                                    <td data-toggle="modal" data-target="#sheetChange{{ $sheet->id }}">{{ $sheet->change }}</td>
                                     <td style="text-align: center">{{ $quotation->user->name }}</td>
                                 </tr>
                                 @else
                                 <tr>
-                                    <td style="text-align: center">{{ $sheet->date }}</td>
+                                    <td style="text-align: center" data-toggle="modal" data-target="#SheetDate{{ $sheet->id }}">{{ $sheet->date }}</td>
                                     <td style="text-align: center">{{ $sheet->version }}</td>
-                                    <td>- Change Update </td>
+                                    <td data-toggle="modal" data-target="#sheetChange{{ $sheet->id }}">{{ $sheet->change }}</td>
                                     <td style="text-align: center">{{ $sheet->user->name }}</td>
                                 </tr>
                                 @endif
+                                <!-- Modal -->
+                                <div class="modal fade" id="SheetDate{{ $sheet->id }}" tabindex="-1" aria-labelledby="SheetDate{{ $sheet->id }}Label" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" style="min-width:60%">
+                                    <div class="modal-content">
+                                        <form action="{{ route('sheet-date-update',$sheet->id) }}" method="POST">
+                                            @csrf
+                                            @method('patch')
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="SheetDate{{ $sheet->id }}Label">Quotation</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <label for="">Date</label>
+                                                    <input type="date" class="form-control" name="date" id="date" value="{{ $sheet->date }}">
+                                                </div>
+                                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                                </div>
+                                        </form>
+                                    </div>
+                                    </div>
+                                </div>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="sheetChange{{ $sheet->id }}" tabindex="-1" aria-labelledby="sheetChange{{ $sheet->id }}Label" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" style="min-width:60%">
+                                    <div class="modal-content">
+                                        <form action="{{ route('sheet-change-update',$sheet->id) }}" method="POST">
+                                            @csrf
+                                            @method('patch')
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="sheetChange{{ $sheet->id }}Label">Quotation</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <label for="">Change</label>
+                                                    <input type="text" class="form-control" name="change" id="change" value="{{ $sheet->change }}">
+                                                </div>
+                                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                                </div>
+                                        </form>
+                                    </div>
+                                    </div>
+                                </div>
                             @endforeach
                             </table>
                         </div>
@@ -226,7 +328,7 @@
                     
                             </table>
                             @php
-                                $number = $total ?? 0;
+                                $number = round($total ?? 0, 0);
                                 $numFormatter = new NumberFormatter("en", NumberFormatter::SPELLOUT);
                                 $totalamountofwords =  $numFormatter->format($number);
                             @endphp
@@ -237,23 +339,60 @@
                         <div style="margin-top: 30px;">
                             <p style="margin-left: 8px">Sincerely Yours,</p>
                     
-                            <div class="row">
-                            <div class="column" st>
-                    
-                                <p style="margin-top: 50px;">...........................................................</p>
-                                <p><b>{{ $quote->quotation->first_person }}</b></p>
-                                <p>Email: {{ $quote->quotation->first_person_email }}</p>
-                                <p>{{ $quote->quotation->first_person_designation }}</p>
-                                <p>Minimal Limited</p>
-                            </div>
-                            <div class="column" style="text-align: right">
-                                <p style="margin-top: 50px;">...........................................................</p>
-                                <p><b>{{ $quote->quotation->second_person }}</b></p>
-                                <p>Email: {{ $quote->quotation->second_person_email }}</p>
-                                <p>{{ $quote->quotation->second_person_designation }}</p>
-
-                                <p>Minimal Limited</p>
-                            </div>
+                            <div class="row" style="display: flex; justify-content:space-around">
+                                <div class="column2">
+                                    <p style="margin-top: 50px;">
+                                        <span style="border-bottom: 1px dotted #ddd; display: inline-block; padding: 5px;">
+                                            @isset($quote->quotation->first_person_signature)
+                                                <img src="{{ asset('images/' . $quote->quotation->first_person_signature) }}" alt="" style="width: 200px; height: 100px">
+                                            @endisset                                        </span>
+                                    </p>
+                                    <p>{!! $quote->quotation->first_person !!}</p>
+                                </div>
+                                @if ($quote->quotation->second_person != null  && $quote->quotation->second_person != '')
+                                <div class="column2" style="text-align: right">
+                                    <p style="margin-top: 50px;">
+                                        <span style="border-bottom: 1px dotted #ddd; display: inline-block; padding: 5px;">
+                                            @isset($quote->quotation->second_person_signature)
+                                                <img src="{{ asset('images/' . $quote->quotation->second_person_signature) }}" alt="" style="width: 200px; height: 100px">
+                                            @endisset                                        </span>
+                                    </p>
+                                    <p><b>{!! $quote->quotation->second_person !!}</b></p>
+                                </div>
+                                @endif
+                                @if ($quote->quotation->third_person != null  && $quote->quotation->third_person != '')
+                                <div class="column2" style="text-align: right">
+                                    <p style="margin-top: 50px;">
+                                        <span style="border-bottom: 1px dotted #ddd; display: inline-block; padding: 5px;">
+                                            @isset($quote->quotation->third_person_signature)
+                                                <img src="{{ asset('images/' . $quote->quotation->third_person_signature) }}" alt="" style="width: 200px; height: 100px">
+                                            @endisset                                          </span>
+                                    </p>
+                                    <p><b>{!! $quote->quotation->third_person !!}</b></p>
+                                </div>
+                                @endif
+                                @if ($quote->quotation->fourth_person != null  && $quote->quotation->fourth_person != '')
+                                <div class="column2" style="text-align: right">
+                                    <p style="margin-top: 50px;">
+                                        <span style="border-bottom: 1px dotted #ddd; display: inline-block; padding: 5px;">
+                                            @isset($quote->quotation->fourth_person_signature)
+                                                <img src="{{ asset('images/' . $quote->quotation->fourth_person_signature) }}" alt="" style="width: 200px; height: 100px">
+                                            @endisset                                          </span>
+                                    </p>
+                                    <p><b>{!! $quote->quotation->fourth_person !!}</b></p>
+                                </div>
+                                @endif
+                                @if ($quote->quotation->fifth_person != null  && $quote->quotation->fifth_person != '')
+                                <div class="column2" style="text-align: right">
+                                    <p style="margin-top: 50px;">
+                                        <span style="border-bottom: 1px dotted #ddd; display: inline-block; padding: 5px;">
+                                            @isset($quote->quotation->fifth_person_signature)
+                                                <img src="{{ asset('images/' . $quote->quotation->fifth_person_signature) }}" alt="" style="width: 200px; height: 100px">
+                                            @endisset                                          </span>
+                                    </p>
+                                    <p><b>{!! $quote->quotation->fifth_person !!}</b></p>
+                                </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -288,6 +427,8 @@
                 @php
                     $check = false;
                 @endphp
+
+                @if (isset($quoteItems))
                 @foreach ($quoteItems as $quoteItem)
                 @if (($quoteItem[0]->category ?? null) && ($quotationItem->category ?? null) && ($quoteItem[0]->category->title == $quotationItem->category->title))
                     @php
@@ -304,6 +445,16 @@
                         <div class="tab-content" id="myTabContent">
                             @foreach ($quotationItem->category->subcategory as $subcategory)
                                 <div class="tab-pane zone fade {{ $loop->first ? 'show active' : '' }}" id="home{{ $subcategory->id }}" role="tabpanel" aria-labelledby="home-tab-{{ $subcategory->id }}">
+                                    <div class="d-flex justify-content-end mt-3">
+                                        <div>
+                                            <form style="display: inline;" action="{{ route('quotationItemZone-delete', ['quoteId' => $quote->id, 'zoneId' => $subcategory->id]) }}" method="POST">
+                                                @csrf
+                                                @method('delete')
+                                                <button onclick="return confirm('Are you sure you want to delete?')" class="btn btn-danger" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Zone Delete</button>
+                                            </form>
+                                              
+                                        </div>
+                                    </div>
                                     <div class="table-responsive mt-4">
                                         <table class="table editableTable" id="" style="background: #fff">
                                             <thead>
@@ -318,7 +469,10 @@
                                                     <th style="background-color: #198754; color:#fff">RATE</th>
                                                     <th style="background-color: #198754; color:#fff">AMOUNT</th>
                                                     @foreach ($quoteItem[0]->quoteItemValues as $data)
-                                                        <th id="{{ $data->unique_header }}" class="saveData extracolumn" style="background-color: #198754; color:#fff">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
+                                                        <th id="{{ $data->unique_header }}" class="saveDataTd extracolumnTd" style="background-color: #198754; color:#fff">
+                                                            <span contenteditable="true" class="newcloumnHeader saveData extracolumn" style="background-color: #198754; color:#fff">{{ ucwords(str_replace('_', ' ', $data->header)) }}</span>
+                                                            <button class="btn text-danger removeColumn" style="position: relative; top: -12px; right: 5px;">X</button>
+                                                        </th>
                                                     @endforeach
                                                 </tr>
                                             </thead>
@@ -329,15 +483,18 @@
                                                 @foreach ($quoteItem as $item)  
                                                 @if ($item->sub_category_id == $subcategory->id)
                                                 <tr>
-                                                    <td class="sl">{{ $item->sl }}</td>
+                                                    <td class="sl">
+                                                        <span class="slNo">{{ $item->sl }}</span>
+                                                        <button class="btn rowColumn text-danger" style="position: relative; top: -12px; right: 5px;">X</button>
+                                                    </td>
                                                     <td class="item saveData" contenteditable="true">{{ $item->item }}</td>
-                                                    <td class="specification saveData" contenteditable="true">{{ $item->specification }}</td>
+                                                    <td class="specification saveData" contenteditable="true">{!! $item->specification !!}</td>
                                                     <td class="qty saveData" contenteditable="true">{{ $item->qty }}</td>
                                                     <td class="unit saveData" contenteditable="true">{{ $item->unit }}</td>
                                                     <td class="rate saveData" contenteditable="true">{{ $item->rate }}</td>
-                                                    <td class="amount saveData" contenteditable="true">{{ $item->amount }}</td>
+                                                    <td class="amount saveData">{{ $item->amount }}</td>
                                                     @foreach ($item->quoteItemValues as $quoteItemValue)
-                                                        <td class=" saveData" contenteditable="true">
+                                                        <td class="saveData {{ $quoteItemValue->unique_header }}" contenteditable="true">
                                                             <input type="hidden" class="quoteItemValue" value="{{ $quoteItemValue->unique_header }}">
                                                             {{ $quoteItemValue->value }}
                                                         </td>
@@ -375,7 +532,10 @@
                                         <th style="background-color: #198754; color:#fff">RATE</th>
                                         <th style="background-color: #198754; color:#fff">AMOUNT</th>
                                         @foreach ($quoteItem[0]->quoteItemValues as $data)
-                                            <th id="{{ $data->unique_header }}" class="saveData extracolumn" style="background-color: #198754; color:#fff">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
+                                            <th id="{{ $data->unique_header }}" class="saveDataTd extracolumnTd" style="background-color: #198754; color:#fff">
+                                                <span contenteditable="true" class="newcloumnHeader saveData extracolumn" style="background-color: #198754; color:#fff">{{ ucwords(str_replace('_', ' ', $data->header)) }}</span>
+                                                <button class="btn text-danger removeColumn" style="position: relative; top: -12px; right: 5px;">X</button>
+                                            </th>
                                         @endforeach
                                     </tr>
                                 </thead>
@@ -385,15 +545,18 @@
                                     @endphp
                                     @foreach ($quoteItem as $item)  
                                     <tr>
-                                        <td class="sl">{{ $item->sl }}</td>
+                                        <td class="sl">
+                                            <span class="slNo">{{ $item->sl }}</span>
+                                            <button class="btn rowColumn text-danger" style="position: relative; top: -12px; right: 5px;">X</button>
+                                        </td>
                                         <td class="item saveData" contenteditable="true">{{ $item->item }}</td>
-                                        <td class="specification saveData" contenteditable="true">{{ $item->specification }}</td>
+                                        <td class="specification saveData" contenteditable="true">{!! $item->specification !!}</td>
                                         <td class="qty saveData" contenteditable="true">{{ $item->qty }}</td>
                                         <td class="unit saveData" contenteditable="true">{{ $item->unit }}</td>
                                         <td class="rate saveData" contenteditable="true">{{ $item->rate }}</td>
-                                        <td class="amount saveData" contenteditable="true">{{ $item->amount }}</td>
+                                        <td class="amount saveData">{{ $item->amount }}</td>
                                         @foreach ($item->quoteItemValues as $quoteItemValue)
-                                            <td class=" saveData" contenteditable="true">
+                                            <td class="saveData {{ $quoteItemValue->unique_header }}" contenteditable="true">
                                                 <input type="hidden" class="quoteItemValue" value="{{ $quoteItemValue->unique_header }}">
                                                 {{ $quoteItemValue->value }}
                                             </td>
@@ -416,59 +579,91 @@
 
                 @endif
                 @endforeach
+                @endif
 
                 @if ($check == false)
-                <div class="table-responsive mt-4">
-                    <table class="table editableTable" id="" style="background: #fff">
-                        <thead>
-                            <input type="hidden" class="categoryId" value="{{ $quoteItem[0]->category_id }}">
-                            <input type="hidden" class="subCategoryId" value="{{ null }}">
-                            <tr>
-                                <th style="background-color: #198754; color:#fff">SL</th>
-                                <th style="background-color: #198754; color:#fff">ITEM</th>
-                                <th style="background-color: #198754; color:#fff">SPECIFICATION</th>
-                                <th style="background-color: #198754; color:#fff">QTY</th>
-                                <th style="background-color: #198754; color:#fff">UNIT</th>
-                                <th style="background-color: #198754; color:#fff">RATE</th>
-                                <th style="background-color: #198754; color:#fff">AMOUNT</th>
-                                @foreach ($quoteItem[0]->quoteItemValues as $data)
-                                    <th id="{{ $data->unique_header }}" class="saveData extracolumn" style="background-color: #198754; color:#fff">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
-                                @endforeach
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php
-                                $grandTotal = 0;
-                            @endphp
-                            @foreach ($quoteItem as $item)  
-                            <tr>
-                                <td class="sl">{{ $item->sl }}</td>
-                                <td class="item saveData" contenteditable="true">{{ $item->item }}</td>
-                                <td class="specification saveData" contenteditable="true">{{ $item->specification }}</td>
-                                <td class="qty saveData" contenteditable="true">{{ $item->qty }}</td>
-                                <td class="unit saveData" contenteditable="true">{{ $item->unit }}</td>
-                                <td class="rate saveData" contenteditable="true">{{ $item->rate }}</td>
-                                <td class="amount saveData" contenteditable="true">{{ $item->amount }}</td>
-                                @foreach ($item->quoteItemValues as $quoteItemValue)
-                                    <td class=" saveData" contenteditable="true">
-                                        <input type="hidden" class="quoteItemValue" value="{{ $quoteItemValue->unique_header }}">
-                                        {{ $quoteItemValue->value }}
-                                    </td>
-                                @endforeach
-                                @php
-                                    $grandTotal += $item->amount;
-                                @endphp
-                            </tr>
+                @if (count($quotationItem->category->subcategory) > 0)
+                        <ul class="nav nav-tabs border-info" id="myTab" role="tablist">
+                            @foreach ($quotationItem->category->subcategory as $subcategory)
+                                <li class="nav-item" role="presentation">
+                                <button class="nav-link {{ $loop->first ? 'active' : '' }}" id="home-tab-{{ $subcategory->id }}" data-toggle="tab" data-target="#home{{ $subcategory->id }}" type="button" role="tab" aria-controls="home{{ $subcategory->id }}" aria-selected="true">{{ $subcategory->title }}</button>
+                                </li>
                             @endforeach
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="6" style="border:none"> Total</td>
-                                <td class="grandTotal">{{ $grandTotal }}</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div> 
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            @foreach ($quotationItem->category->subcategory as $subcategory)
+                                <div class="tab-pane zone fade {{ $loop->first ? 'show active' : '' }}" id="home{{ $subcategory->id }}" role="tabpanel" aria-labelledby="home-tab-{{ $subcategory->id }}">
+                                    <div class="d-flex justify-content-end mt-3">
+                                        <div>
+                                            <form style="display: inline;" action="{{ route('quotationItemZone-delete', ['quoteId' => $quote->id, 'zoneId' => $subcategory->id]) }}" method="POST">
+                                                @csrf
+                                                @method('delete')
+                                                <button onclick="return confirm('Are you sure you want to delete?')" class="btn btn-danger" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Zone Delete</button>
+                                            </form>
+                                              
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive mt-4">
+                                        <table class="table editableTable" id="" style="background: #fff">
+                                            <thead>
+                                                <input type="hidden" class="categoryId" value="{{ $quotationItem->category->id }}">
+                                                <input type="hidden" class="subCategoryId" value="{{ $subcategory->id }}">
+                                                <tr>
+                                                    <th style="background-color: #198754; color:#fff">SL</th>
+                                                    <th style="background-color: #198754; color:#fff; width:20%">ITEM</th>
+                                                    <th style="background-color: #198754; color:#fff; width:40%">SPECIFICATION</th>
+                                                    <th style="background-color: #198754; color:#fff">QTY</th>
+                                                    <th style="background-color: #198754; color:#fff">UNIT</th>
+                                                    <th style="background-color: #198754; color:#fff">RATE</th>
+                                                    <th style="background-color: #198754; color:#fff">AMOUNT</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                            <tfoot>
+                                                @php
+                                                    $grandTotal = 0;
+                                                @endphp
+                                                <tr>
+                                                    <td colspan="6" style="border:none"> Total</td>
+                                                    <td class="grandTotal">{{ $grandTotal }}</td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                @else 
+                    <div class="table-responsive mt-4">
+                        <table class="table editableTable" id="" style="background: #fff">
+                            <thead>
+                                <input type="hidden" class="categoryId" value="{{ $quotationItem->category->id }}">
+                                <input type="hidden" class="subCategoryId" value="{{ null }}">
+                                <tr>
+                                    <th style="background-color: #198754; color:#fff">SL</th>
+                                    <th style="background-color: #198754; color:#fff; width:20%">ITEM</th>
+                                    <th style="background-color: #198754; color:#fff; width:40%">SPECIFICATION</th>
+                                    <th style="background-color: #198754; color:#fff">QTY</th>
+                                    <th style="background-color: #198754; color:#fff">UNIT</th>
+                                    <th style="background-color: #198754; color:#fff">RATE</th>
+                                    <th style="background-color: #198754; color:#fff">AMOUNT</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            <tfoot>
+                                @php
+                                    $grandTotal = 0;
+                                @endphp
+                                <tr>
+                                    <td colspan="6" style="border:none"> Total</td>
+                                    <td class="grandTotal">{{ $grandTotal }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div> 
+                @endif
                 @endif
 
             </div>
@@ -482,7 +677,7 @@
                     <div class="page termSection">
                         <div class="row">
                             <div class="column"> 
-                                <p></p>
+                                <img src="{{ asset('backend/images/organization/'.$organization->image ?? '') }}" alt="" style="width: 70%">
                             </div>
                             <div class="column organization-details">
                             <div class="text-dark">
@@ -789,6 +984,31 @@
                 width: 50%;
                 padding: 10px;
             }
+
+            <?php
+            if ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
+                $quote->quotation->second_person !== null && $quote->quotation->second_person !== '' &&
+                $quote->quotation->third_person !== null && $quote->quotation->third_person !== '' &&
+                $quote->quotation->fourth_person !== null && $quote->quotation->fourth_person !== '' &&
+                $quote->quotation->fifth_person !== null && $quote->quotation->fifth_person !== '') {
+                echo '.column2 { float: left; width: 20%; padding: 10px; }';
+            } elseif ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
+                $quote->quotation->second_person !== null && $quote->quotation->second_person !== '' &&
+                $quote->quotation->third_person !== null && $quote->quotation->third_person !== '' &&
+                $quote->quotation->fourth_person !== null && $quote->quotation->fourth_person !== '') {
+                echo '.column2 { float: left; width: 25%; padding: 10px; }';
+            } elseif ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
+                $quote->quotation->second_person !== null && $quote->quotation->second_person !== '' &&
+                $quote->quotation->third_person !== null && $quote->quotation->third_person !== '') {
+                echo '.column2 { float: left; width: 33.3%; padding: 10px; }';
+            } elseif ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
+                $quote->quotation->second_person !== null && $quote->quotation->second_person !== '') {
+                echo '.column2 { float: left; width: 50%; padding: 10px; }';
+            } else {
+                echo '.column2 { float: left; width: 100%; padding: 10px; }';
+            }
+            ?>
+
             
             /* Clear floats after the columns */
             .row:after {
@@ -831,6 +1051,11 @@
                 color: #fff !important;
                 background-color: #198754;
             }
+
+            b{
+                font-weight: bold;
+                color: #000;
+            }
         </style>
     @endpush
 
@@ -857,9 +1082,12 @@
                 $('#sidebarToggle').trigger('click');
                 $(document).on('click', '.template', templateCreate);
                 // $(document).on('input', '.saveData', triggerCreate);
-                // $(document).on('change || keyup', '.saveData', triggerCreate);
                 $(document).on('click', '.autosuggestion-dropdown li', function(event) {
                     triggerCreate(event);
+                });
+
+                $(document).on('input change keyup', 'u', function(event) {
+                    qtyCalculation(event);
                 });
 
                 $(document).on('input change keyup', '.saveData', function(event) {
@@ -966,19 +1194,54 @@
                 // Initial SL number update
                 updateTermSerialNumbers();
             });
+
+            function qtyCalculation(event) {
+                console.log('in');
+                let el = event.target;
+
+                // Retrieve dimensions from response
+                let lengthFeet = parseFloat($(el).closest('td').find('.length_feet').val());
+                let lengthInches = parseFloat($(el).closest('td').find('.length_inche').val());
+                let widthFeet = parseFloat($(el).closest('td').find('.width_feet').val());
+                let widthInches = parseFloat($(el).closest('td').find('.width_inche').val());
+
+                // Check if any of the values are NaN (Not a Number)
+                if (isNaN(lengthFeet) || isNaN(lengthInches) || isNaN(widthFeet) || isNaN(widthInches)) {
+                    // Handle the case where any of the values are not valid
+                    console.log("Invalid input");
+                    return;
+                }
+
+                // Convert dimensions to inches
+                let lengthTotalInches = lengthFeet * 12 + lengthInches;
+                let widthTotalInches = widthFeet * 12 + widthInches;
+
+                // Calculate the area in square inches
+                let areaInSquareInches = lengthTotalInches * widthTotalInches;
+
+                // Convert square inches to square feet
+                let areaInSquareFeet = areaInSquareInches / 144;
+                console.log(areaInSquareFeet);
+            }
+
         </script>
         <script>
 
             const subTotal = event => {
 
-                let 
-                    el = event.target,
+                let el = event.target,
                     tr = $(el).closest('tr'),
                     tbody = $(el).closest('tbody'),
                     rate = parseFloat($(tr).find('.rate').text()), // Parsing as float for decimal values
-                    qty = parseInt($(tr).find('.qty').text()); // Parsing as integer
+                    qty = parseFloat($(tr).find('.qty').text()), // Parsing as integer
+                    amount = rate * qty;
 
-                $(tr).find('.amount').text(rate*qty);
+                    if(!isNaN(amount)){
+                        $(tr).find('.amount').text(amount.toFixed(2));
+                    }else{
+                        $(tr).find('.amount').text(0);
+                    }
+
 
                 // Calculate and update grand total
                 let grandTotal = 0;
@@ -989,7 +1252,7 @@
                 });
 
                 // Update the grand total in the footer
-                $(tbody).closest('table').find('.grandTotal').text(grandTotal);
+                $(tbody).closest('table').find('.grandTotal').text(grandTotal.toFixed(2));
             }
 
             function templateCreate(event) {
@@ -1065,11 +1328,19 @@
                     $(tr).find('td').each(function (tdIndex, td) {
                         let data = {};
                         // Get the text content of the corresponding th and clean it
-                        let thText = table.find('thead th').eq(tdIndex).text().trim().replace(/\s+/g, '_').toLowerCase(); // Use table.find() to search within the table
+                        let thText = table.find('thead th').eq(tdIndex).text().trim().replace(/\s+/g, '_').toLowerCase().replace(/_x$/, ''); // Use table.find() to search within the table
                         
                         // Get the value of the current cell and assign it to the corresponding property in item
                         if(thText == 'sl' || thText == 'item' || thText == 'specification' || thText == 'qty' || thText == 'unit' || thText == 'rate' || thText == 'amount') {
-                            var tdText = $(td).clone()           // Clone the td element
+                            if(thText == 'sl'){
+                                var tdText = $(td).find('.slNo').text().trim();
+                                item[thText] = tdText;
+                            } else if (thText == 'specification') {
+                                // Extract inner HTML for specification column
+                                var tdHTML = $(td).html().trim();
+                                item[thText] = tdHTML;
+                            }else{
+                                var tdText = $(td).clone()           // Clone the td element
                                             .children()          // Select the children elements
                                             .remove()            // Remove them
                                             .end()               // Go back to the cloned td element
@@ -1077,7 +1348,8 @@
                                             .trim();             // Trim any leading/trailing whitespace
 
                             item[thText] = tdText;
-                        } else {
+                            }
+                        }else {
                             // missingItem[thText] = $(td).text().trim();
                             let input = $(td).find('input');
                             if (input.length > 0) {

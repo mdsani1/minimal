@@ -33,5 +33,7 @@ Route::group(['middleware' => ['api', 'auth', 'web'], 'as' => 'api.'], function 
     Route::get('/sheet/list', [BackendApiController::class, 'list']);
     Route::put('/template/update/{id}', [BackendApiController::class, 'templateUpdate']);
     Route::get('/get/specification/{title}', [BackendApiController::class, 'getSpecification']);
+    Route::post('/column/delete', [BackendApiController::class, 'columnDelete']);
+    Route::post('/row/delete', [BackendApiController::class, 'rowDelete']);
 });
 

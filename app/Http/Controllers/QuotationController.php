@@ -11,6 +11,7 @@ use Illuminate\Database\QueryException;
 use App\Http\Requests\StoreQuotationRequest;
 use App\Http\Requests\UpdateQuotationRequest;
 use App\Models\Bank;
+use Intervention\Image\Facades\Image;
 use App\Models\ChangeHistories;
 use App\Models\Organization;
 use App\Models\Payment;
@@ -56,20 +57,20 @@ class QuotationController extends Controller
         try{
             // DB::beginTransaction();
 
-            $quotationData = $request->except(['work_scope', 'amount']);
+            $quotationData = $request->except(['work_scope', 'amount','first_person','second_person','third_person','fourth_person','fifth_person']);
 
             $workScopes = $request->input('work_scope', []);
             $amounts = $request->input('amount', []);
 
             if($request->purpose == 'Residential (R)' && $request->type != null) {
                 if($request->type == 'Basic (B)') {
-                    $refPurpose = 'RB';
+                    $refPurpose = 'R/B';
                 } else if ($request->type == 'Premium (P)') {
-                    $refPurpose = 'RP';
+                    $refPurpose = 'R/P';
                 } else if ($request->type == 'Compact Luxury (C)') {
-                    $refPurpose = 'RC';
+                    $refPurpose = 'R/C';
                 } else if ($request->type == 'Luxury (L)') {
-                    $refPurpose = 'RL';
+                    $refPurpose = 'R/L';
                 }
             } else if($request->purpose == 'Residential (R)') {
                 $refPurpose = 'R';
@@ -85,8 +86,76 @@ class QuotationController extends Controller
             $nextReferenceNumber = Quotation::whereYear('created_at', $currentYear)->count() + 1;
             $referenceNumber = str_pad($nextReferenceNumber, 3, '0', STR_PAD_LEFT); // Pad with leading zeros
             
-            $referenceCode = 'MNML/' . $request->input('name') . '/' . $currentYearLastTwoDigits . '-' . $referenceNumber . '-' . $refPurpose;
+            $referenceCode = 'MNML/' . $request->input('name') . '/' . $currentYearLastTwoDigits . '-' . $referenceNumber . '' . $refPurpose;
             $quotationData['ref'] = $referenceCode;
+
+            $first_person = nl2br($request->input('first_person'));
+            $second_person = nl2br($request->input('second_person'));
+            $third_person = nl2br($request->input('third_person'));
+            $fourth_person = nl2br($request->input('fourth_person'));
+            $fifth_person = nl2br($request->input('fifth_person'));
+
+            $quotationData['first_person'] = $first_person;
+            $quotationData['second_person'] = $second_person;
+            $quotationData['third_person'] = $third_person;
+            $quotationData['fourth_person'] = $fourth_person;
+            $quotationData['fifth_person'] = $fifth_person;
+            $quotationData['change']    = '- Initial quotation';
+
+            if ($request->hasFile('first_person_signature')) {
+                $image = $request->file('first_person_signature');
+                $filename = 'first_person_signature_' . time() . '.' . $image->getClientOriginalExtension();
+                $path = public_path('images/' . $filename);
+    
+                // Resize and save the image
+                Image::make($image)->fit(200, 200)->save($path);
+
+                $quotationData['first_person_signature'] = $filename;
+            }
+
+            if ($request->hasFile('second_person_signature')) {
+                $image = $request->file('second_person_signature');
+                $filename = 'second_person_signature_' . time() . '.' . $image->getClientOriginalExtension();
+                $path = public_path('images/' . $filename);
+    
+                // Resize and save the image
+                Image::make($image)->fit(200, 200)->save($path);
+
+                $quotationData['second_person_signature'] = $filename;
+            }
+
+            if ($request->hasFile('third_person_signature')) {
+                $image = $request->file('third_person_signature');
+                $filename = 'third_person_signature_' . time() . '.' . $image->getClientOriginalExtension();
+                $path = public_path('images/' . $filename);
+    
+                // Resize and save the image
+                Image::make($image)->fit(200, 200)->save($path);
+
+                $quotationData['third_person_signature'] = $filename;
+            }
+
+            if ($request->hasFile('fourth_person_signature')) {
+                $image = $request->file('fourth_person_signature');
+                $filename = 'fourth_person_signature_' . time() . '.' . $image->getClientOriginalExtension();
+                $path = public_path('images/' . $filename);
+    
+                // Resize and save the image
+                Image::make($image)->fit(200, 200)->save($path);
+
+                $quotationData['fourth_person_signature'] = $filename;
+            }
+
+            if ($request->hasFile('fifth_person_signature')) {
+                $image = $request->file('fifth_person_signature');
+                $filename = 'fifth_person_signature_' . time() . '.' . $image->getClientOriginalExtension();
+                $path = public_path('images/' . $filename);
+    
+                // Resize and save the image
+                Image::make($image)->fit(200, 200)->save($path);
+
+                $quotationData['fifth_person_signature'] = $filename;
+            }
 
             $quotation = Quotation::create([
                 'date'      => now(),
@@ -109,16 +178,16 @@ class QuotationController extends Controller
                 'created_by'    => auth()->user()->id
             ]);
 
-            foreach ($quotation->quotationItems as $key => $quotationItem) {
+            // foreach ($quotation->quotationItems as $key => $quotationItem) {
 
-                $quoteItem = QuoteItem::create([
-                    'quote_id'      => $quote->id,
-                    'category_id'   => $quotationItem->work_scope,
-                    'sl'            => '1',
-                    'created_by'    => auth()->user()->id
-                ] );
+            //     $quoteItem = QuoteItem::create([
+            //         'quote_id'      => $quote->id,
+            //         'category_id'   => $quotationItem->work_scope,
+            //         'sl'            => '1',
+            //         'created_by'    => auth()->user()->id
+            //     ] );
         
-            }
+            // }
 
             // DB::commit();
             
@@ -391,13 +460,83 @@ class QuotationController extends Controller
     public function update(UpdateQuotationRequest $request, $id)
     {
         try {
+            
             $quotation = Quotation::find($id);
             
-            $quotationData = $request->except(['work_scope', 'amount', 'quotationItemId']);
+            $quotationData = $request->except(['work_scope', 'amount', 'quotationItemId','first_person','second_person','third_person','fourth_person','fifth_person']);
 
             $workScopes = $request->input('work_scope', []);
             $amounts = $request->input('amount', []);
             $quotationItemIds = $request->input('quotationItemId', []);
+
+            $first_person = nl2br($request->input('first_person'));
+            $second_person = nl2br($request->input('second_person'));
+            $third_person = nl2br($request->input('third_person'));
+            $fourth_person = nl2br($request->input('fourth_person'));
+            $fifth_person = nl2br($request->input('fifth_person'));
+
+            $quotationData['first_person'] = $first_person;
+            $quotationData['second_person'] = $second_person;
+            $quotationData['third_person'] = $third_person;
+            $quotationData['fourth_person'] = $fourth_person;
+            $quotationData['fifth_person'] = $fifth_person;
+
+
+
+            if ($request->hasFile('first_person_signature')) {
+                $image = $request->file('first_person_signature');
+                $filename = 'first_person_signature_' . time() . '.' . $image->getClientOriginalExtension();
+                $path = public_path('images/' . $filename);
+    
+                // Resize and save the image
+                Image::make($image)->fit(200, 100)->save($path);
+
+                $quotationData['first_person_signature'] = $filename;
+            }
+
+            if ($request->hasFile('second_person_signature')) {
+                $image = $request->file('second_person_signature');
+                $filename = 'second_person_signature_' . time() . '.' . $image->getClientOriginalExtension();
+                $path = public_path('images/' . $filename);
+    
+                // Resize and save the image
+                Image::make($image)->fit(200, 100)->save($path);
+
+                $quotationData['second_person_signature'] = $filename;
+            }
+
+            if ($request->hasFile('third_person_signature')) {
+                $image = $request->file('third_person_signature');
+                $filename = 'third_person_signature_' . time() . '.' . $image->getClientOriginalExtension();
+                $path = public_path('images/' . $filename);
+    
+                // Resize and save the image
+                Image::make($image)->fit(200, 100)->save($path);
+
+                $quotationData['third_person_signature'] = $filename;
+            }
+
+            if ($request->hasFile('fourth_person_signature')) {
+                $image = $request->file('fourth_person_signature');
+                $filename = 'fourth_person_signature_' . time() . '.' . $image->getClientOriginalExtension();
+                $path = public_path('images/' . $filename);
+    
+                // Resize and save the image
+                Image::make($image)->fit(200, 100)->save($path);
+
+                $quotationData['fourth_person_signature'] = $filename;
+            }
+
+            if ($request->hasFile('fifth_person_signature')) {
+                $image = $request->file('fifth_person_signature');
+                $filename = 'fifth_person_signature_' . time() . '.' . $image->getClientOriginalExtension();
+                $path = public_path('images/' . $filename);
+    
+                // Resize and save the image
+                Image::make($image)->fit(200, 100)->save($path);
+
+                $quotationData['fifth_person_signature'] = $filename;
+            }
 
             $quotation->update(['updated_by' => auth()->user()->id] + $quotationData);
 
@@ -421,6 +560,20 @@ class QuotationController extends Controller
             }
 
             return redirect()->route('quotations.index')->withMessage('Successful update :)');
+        } catch (QueryException $e) {
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
+
+    public function updateDate(UpdateQuotationRequest $request, $id)
+    {
+        try {
+            
+            $quotation = Quotation::find($id);
+
+            $quotation->update(['updated_by' => auth()->user()->id] + $request->all());
+
+            return redirect()->back()->withMessage('Successful update :)');
         } catch (QueryException $e) {
             return redirect()->back()->withInput()->withErrors($e->getMessage());
         }
@@ -497,31 +650,58 @@ class QuotationController extends Controller
     public function pdf($id)
     {
         $quote = Quote::find($id);
-        $quotation = Quotation::find($quote->quotation->id);
-        $organization = Organization::latest()->first();
-        $payments = Payment::get();
-        $terms = Term::get();
-        $bank = Bank::latest()->first();
-        $termInfo = TermInfo::latest()->first();
-        $quoteItems = QuoteItem::with('quoteItemValues')->where('quote_id',$id)->get()->groupBy('category_id');
-        $groupedItems = $quoteItems->map(function ($group) {
-            return $group->sum('amount');
-        });
+
+        if ($quote) {
+            $quotation = Quotation::find($quote->quotation->id);
+            $organization = Organization::latest()->first();
+            $payments = Payment::get();
+            $terms = Term::get();
+            $bank = Bank::latest()->first();
+            $termInfo = TermInfo::latest()->first();
+            $quoteItems = QuoteItem::with('quoteItemValues')->where('quote_id',$id)->get()->groupBy('category_id');
+            $groupedItems = $quoteItems->map(function ($group) {
+                return $group->sum('amount');
+            });
+
+            $quoteZoneItems = QuoteItem::with('quoteItemValues')
+                ->where('quote_id', $id)
+                ->whereNotNull('sub_category_id')
+                ->get()
+                ->groupBy(['category_id', 'sub_category_id']);
+
+            // Retrieve QuoteItems with null sub_category_id
+            $quoteWorkItems = QuoteItem::with('quoteItemValues')
+                ->where('quote_id', $id)
+                ->whereNull('sub_category_id')
+                ->get()
+                ->groupBy(['category_id', 'sub_category_id']);
+
+            if(!$quoteZoneItems->isEmpty()) {
+                // Merge the two collections, ignoring keys from $quoteWorkItems if they exist in $quoteZoneItems
+                $quoteItems = $quoteZoneItems->merge($quoteWorkItems->except($quoteZoneItems->keys()->all()));
+            } else {
+                $quoteItems = $quoteWorkItems;
+            }
 
 
-        $view = view('backend.quotations.pdf', compact('quotation','organization','payments','terms','bank','termInfo','groupedItems'))->render();
+            $externalMenus = QuoteItemValue::where('quote_id', $quote->id)->distinct()->pluck('header');
+            $organization = Organization::latest()->first();
 
-        $mpdf = new \Mpdf\Mpdf([
-            'default_font_size' => 9,
-            'format' => 'A4',
-            'margin_left' => 4,
-            'margin_right' => 0,
-            'margin_top' => 4,
-            'margin_bottom' => 0,
-        ]);
-        $mpdf->SetTitle('Quotation');
-        $mpdf->WriteHTML($view);
-        $mpdf->Output(time() . '-quotation' . ".pdf", "I");
+            $view = view('backend.quotations.pdf', compact('quotation','organization','payments','terms','bank','termInfo','groupedItems','quote','organization','externalMenus','quoteItems'))->render();
+            $mpdf = new \Mpdf\Mpdf([
+                'default_font_size' => 9,
+                'format' => 'A4',
+                'margin_left' => 4,
+                'margin_right' => 0,
+                'margin_top' => 4,
+                'margin_bottom' => 0,
+            ]);
+            $mpdf->SetTitle('Quotation');
+            $mpdf->WriteHTML($view);
+            $mpdf->Output(time() . '-quotation' . ".pdf", "I");
+        } else {
+            return redirect()->back();
+        }
     }
 
     public function quotationToSheet($id)
@@ -529,6 +709,57 @@ class QuotationController extends Controller
         $sheet = Quote::where('quotation_id', $id)->orderBy('id', 'desc')->first();
         if($sheet != null) {
             return redirect()->route('go-to-sheet-edit', $sheet->id);
+        }
+    }
+
+    public function quotationTitleUpdate(UpdateQuotationRequest $request, $id)
+    {
+        try {
+            
+            $quotation = Quotation::find($id);
+
+            $quotation->update([
+                'title'         => $request->title,
+                'updated_by'    => auth()->user()->id
+            ]);
+
+            return redirect()->back()->withMessage('Successful update :)');
+        } catch (QueryException $e) {
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
+
+    public function sheetDateUpdate(UpdateQuotationRequest $request, $id)
+    {
+        try {
+            
+            $quote = Quote::find($id);
+
+            $quote->update([
+                'date'          => $request->date,
+                'updated_by'    => auth()->user()->id
+            ]);
+
+            return redirect()->back()->withMessage('Successful update :)');
+        } catch (QueryException $e) {
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
+
+    public function sheetChangeUpdate(UpdateQuotationRequest $request, $id)
+    {
+        try {
+            
+            $quote = Quote::find($id);
+
+            $quote->update([
+                'change'          => $request->change,
+                'updated_by'    => auth()->user()->id
+            ]);
+
+            return redirect()->back()->withMessage('Successful update :)');
+        } catch (QueryException $e) {
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
         }
     }
 }

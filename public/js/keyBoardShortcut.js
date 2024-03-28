@@ -3,8 +3,16 @@
  * with keyboard shortcuts for an editable class.
  */
 document.addEventListener('DOMContentLoaded', () => {
+    let table;
+
+    if ($('#myTabContent .category.active.show .zone.active.show').find('.editableTable').length > 0) {
+        table = $('#myTabContent .category.active.show .zone.active.show').find('.editableTable');
+    } else {
+        table = $('#myTabContent .category.active.show').find('.editableTable');
+    }
+
     // Attaching keydown event listener to the whole document
-    document.addEventListener('keydown', handleTableKeydown);
+    document.addEventListener('keydown', (event) => handleTableKeydown(event, table));
 });
 
 /**
@@ -13,15 +21,15 @@ document.addEventListener('DOMContentLoaded', () => {
  * while avoiding conflicts with common text editing shortcuts.
  * 
  * @param {KeyboardEvent} event - The keydown event object.
+ * @param {HTMLElement} table - The editable table on which the keydown event is occurring.
  */
-function handleTableKeydown(event) {
+function handleTableKeydown(event, table) {
     const target = event.target;
     const key = event.key.toLowerCase();
     // Support for both Ctrl (Windows/Linux) and Cmd (Mac)
     const ctrlOrCmd = event.ctrlKey || event.metaKey;
-
     // Ensure the event originates from a cell within an editable table
-    if (!target.matches('.editable td, .editable th')) return;
+    if (target.matches('.editable td, .editable th')) return;
 
     switch (true) {
         // Navigate to the next or previous cell
@@ -35,13 +43,13 @@ function handleTableKeydown(event) {
         // Add a new row with Alt + R
         case event.altKey && key === 'r':
             event.preventDefault();
-            addRow(target.closest('.editable'));
+            addRow(table);
             break;
         
         // Add a new column with Alt + C
         case event.altKey && key === 'c':
             event.preventDefault();
-            addColumn(target.closest('.editable'));
+            addColumn(table);
             break;
         
         // Scroll to the top with Alt + T
@@ -65,7 +73,6 @@ function handleTableKeydown(event) {
             // Execute the command for the selected text
             document.execCommand(command, false, null);
             break;
-
     }
 }
 

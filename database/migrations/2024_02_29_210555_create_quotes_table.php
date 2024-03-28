@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('quotation_id')->nullable();
             $table->string('title');
             $table->string('version');
+            $table->string('change')->default('	- Change Update');
             $table->date('date');
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();

@@ -19,10 +19,10 @@ return new class extends Migration
             $table->string('sl')->nullable();
             $table->text('item')->nullable();
             $table->text('specification')->nullable();
-            $table->string('qty')->nullable();
+            $table->float('qty',8, 2)->nullable();
             $table->string('unit')->nullable();
-            $table->string('rate')->nullable();
-            $table->string('amount')->nullable();
+            $table->float('rate',8, 2)->nullable();
+            $table->float('amount', 8, 2)->nullable();
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->string('deleted_by')->nullable();

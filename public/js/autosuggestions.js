@@ -88,9 +88,9 @@ function createDropdown(cell, suggestions) {
     const suggestionList = document.createElement('ul');
     suggestions.forEach(suggestion => {
         const suggestionItem = document.createElement('li');
-        suggestionItem.textContent = suggestion;
+        suggestionItem.innerHTML = suggestion;
         suggestionItem.addEventListener('click', () => {
-            cell.innerText = suggestion;
+            cell.innerHTML = suggestion;
             hideSuggestions(cell);
             loadSpecificationData(cell);
         });
@@ -145,20 +145,62 @@ function selectSuggestionByNumber(number, items) {
 
 function loadSpecificationData(cell) {
     const parentTR = $(cell).closest('tr'); 
+    const parentTbody = $(cell).closest('tbody'); 
     $.ajax({
         method: "GET",
         url: "/api/get/specification/" + cell.innerText.trim(),
         dataType: "json",
         async: false, // Make the AJAX request synchronous
         success: function (response) {
-            console.log(response.suggestions.length);
             if (response.suggestions.length > 1) {
                 specificationData = response.suggestions;
             } else {
-                parentTR.find('.specification').text(response.suggestions[0]);
+                // Set the dimensionText to the .specification element of the parentTR
+                parentTR.find('.specification').innerHTML(response.suggestions[0]);
             }
-            parentTR.find('.rate').text(response.interior.rate);
-            parentTR.find('.unit').text(response.interior.unit);
+
+            // Retrieve dimensions from response
+            let lengthFeet = parseFloat(response.interior.length_feet);
+            let lengthInches = parseFloat(response.interior.length_inche);
+            let widthFeet = parseFloat(response.interior.width_feet);
+            let widthInches = parseFloat(response.interior.width_inche);
+
+            // Check if any of the values are NaN (Not a Number)
+            // Convert dimensions to inches
+            let lengthTotalInches = lengthFeet * 12 + lengthInches;
+            let widthTotalInches = widthFeet * 12 + widthInches;
+
+            // Calculate the area in square inches
+            let areaInSquareInches = lengthTotalInches * widthTotalInches;
+
+            // Convert square inches to square feet
+            let areaInSquareFeet = areaInSquareInches / 144;
+
+            let amount = (areaInSquareFeet * parseFloat(response.interior.rate)).toFixed(2);
+
+            if (isNaN(areaInSquareFeet)) {
+                parentTR.find('.qty').text();
+                parentTR.find('.rate').text(response.interior.rate);
+                parentTR.find('.unit').text(response.interior.unit);
+            }else{
+                console.log(areaInSquareFeet);
+                parentTR.find('.qty').text(areaInSquareFeet.toFixed(2));
+                parentTR.find('.rate').text(response.interior.rate);
+                parentTR.find('.unit').text(response.interior.unit);
+                parentTR.find('.amount').text(amount);
+            }
+
+            // Calculate and update grand total
+            let grandTotal = 0;
+            $(parentTbody).find('.amount').each(function() {
+                if (!isNaN(parseFloat($(this).text()))) {
+                    grandTotal += parseFloat($(this).text());
+                }
+            });
+
+            // Update the grand total in the footer
+            $(parentTbody).closest('table').find('.grandTotal').text(grandTotal.toFixed(2));
+
         },
         error: function (xhr, status, error) {
             // Handle errors

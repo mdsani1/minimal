@@ -18,6 +18,30 @@
       width: 46%;
       padding: 10px;
     }
+
+    <?php
+      if ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
+          $quote->quotation->second_person !== null && $quote->quotation->second_person !== '' &&
+          $quote->quotation->third_person !== null && $quote->quotation->third_person !== '' &&
+          $quote->quotation->fourth_person !== null && $quote->quotation->fourth_person !== '' &&
+          $quote->quotation->fifth_person !== null && $quote->quotation->fifth_person !== '') {
+          echo '.column2 { float: left; width: 20%; padding: 0px; }';
+      } elseif ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
+          $quote->quotation->second_person !== null && $quote->quotation->second_person !== '' &&
+          $quote->quotation->third_person !== null && $quote->quotation->third_person !== '' &&
+          $quote->quotation->fourth_person !== null && $quote->quotation->fourth_person !== '') {
+          echo '.column2 { float: left; width: 25%; padding: 0px; }';
+      } elseif ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
+          $quote->quotation->second_person !== null && $quote->quotation->second_person !== '' &&
+          $quote->quotation->third_person !== null && $quote->quotation->third_person !== '') {
+          echo '.column2 { float: left; width: 33.3%; padding: 0px; }';
+      } elseif ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
+          $quote->quotation->second_person !== null && $quote->quotation->second_person !== '') {
+          echo '.column2 { float: left; width: 50%; padding: 0px; }';
+      } else {
+          echo '.column2 { float: left; width: 100%; padding: 0px; }';
+      }
+      ?>
     
     /* Clear floats after the columns */
     .row:after {
@@ -88,7 +112,7 @@
     <div style="background-color:#bbb; text-align:center; border:3px solid #09e240; width:94%; margin-left:10px">
       <h4>Financial Proposal For Residence Interior & Electrical Works</h4>
       <h4>Of</h4>
-      <h3>{{ $quotation->name }} | {{ $quotation->address }}</h3>
+      <h3>{{ $quotation->name }} | {{ $quotation->area }}</h3>
     </div>
 
     <div style="margin-top: 20px;">
@@ -107,14 +131,14 @@
               <tr>
                 <td style="text-align: center">{{ $quotation->date }}</td>
                 <td style="text-align: center">{{ $sheet->version }}</td>
-                <td>- Initial quotation</td>
+                <td>{{ $sheet->change }}</td>
                 <td style="text-align: center">{{ $quotation->user->name }}</td>
               </tr>
               @else
               <tr>
                 <td style="text-align: center">{{ $sheet->date }}</td>
                 <td style="text-align: center">{{ $sheet->version }}</td>
-                <td>- Change Update </td>
+                <td>{{ $sheet->change }}</td>
                 <td style="text-align: center">{{ $sheet->user->name }}</td>
               </tr>
             @endif
@@ -158,7 +182,7 @@
 
       </table>
         @php
-            $number = $total ?? 0;
+            $number = round($total ?? 0, 0);
             $numFormatter = new NumberFormatter("en", NumberFormatter::SPELLOUT);
             $totalamountofwords =  $numFormatter->format($number);
         @endphp
@@ -170,26 +194,124 @@
       <p style="margin-left: 8px">Sincerely Yours,</p>
 
       <div class="row">
-        <div class="column" st>
-
-          <p style="margin-top: 50px;">...........................................................</p>
-          <p><b>{{ $quotation->first_person }}</b></p>
-          <p>Email: {{ $quotation->first_person_email }}</p>
-          <p>{{ $quotation->first_person_designation }}</p>
-          <p>Minimal Limited</p>
-        </div>
-        <div class="column" style="text-align: right">
-          <p style="margin-top: 50px;">...........................................................</p>
-          <p><b>{{ $quotation->second_person }}</b></p>
-          <p>Email: {{ $quotation->second_person_email }}</p>
-          <p>{{ $quotation->second_person_designation }}</p>
-          <p>Minimal Limited</p>
-        </div>
+          <div class="column2">
+              <p style="margin-top: 50px;">
+                  <span>
+                    @if ($quote && $quote->quotation && $quote->quotation->first_person_signature)
+                        <img src="{{ public_path('images/' . $quote->quotation->first_person_signature) }}" alt="" style="width: 200px; height: 100px">
+                    @endif                                
+                  </span>
+              </p>
+              <p>{!! $quote->quotation->first_person !!}</p>
+          </div>
+          @if ($quote->quotation->second_person != null  && $quote->quotation->second_person != '')
+          <div class="column2" style="text-align: right">
+              <p style="margin-top: 50px;">
+                  <span>
+                      @isset($quote->quotation->second_person_signature)
+                          <img src="{{ public_path('images/' . $quote->quotation->second_person_signature) }}" alt="" style="width: 200px; height: 100px">
+                      @endisset                                        </span>
+              </p>
+              <p>{!! $quote->quotation->second_person !!}</p>
+          </div>
+          @endif
+          @if ($quote->quotation->third_person != null  && $quote->quotation->third_person != '')
+          <div class="column2" style="text-align: right">
+              <p style="margin-top: 50px;">
+                  <span>
+                      @isset($quote->quotation->third_person_signature)
+                          <img src="{{ public_path('images/' . $quote->quotation->third_person_signature) }}" alt="" style="width: 200px; height: 100px">
+                      @endisset                                          </span>
+              </p>
+              <p>{!! $quote->quotation->third_person !!}</p>
+          </div>
+          @endif
+          @if ($quote->quotation->fourth_person != null  && $quote->quotation->fourth_person != '')
+          <div class="column2" style="text-align: right">
+              <p style="margin-top: 50px;">
+                  <span>
+                      @isset($quote->quotation->fourth_person_signature)
+                          <img src="{{ public_path('images/' . $quote->quotation->fourth_person_signature) }}" alt="" style="width: 200px; height: 100px">
+                      @endisset                                          </span>
+              </p>
+              <p>{!! $quote->quotation->fourth_person !!}</p>
+          </div>
+          @endif
+          @if ($quote->quotation->fifth_person != null  && $quote->quotation->fifth_person != '')
+          <div class="column2" style="text-align: right">
+              <p style="margin-top: 50px;">
+                  <span>
+                      @isset($quote->quotation->fifth_person_signature)
+                          <img src="{{ public_path('images/' . $quote->quotation->fifth_person_signature) }}" alt="" style="width: 200px; height: 100px">
+                      @endisset                                          </span>
+              </p>
+              <p>{!! $quote->quotation->fifth_person !!}</p>
+          </div>
+          @endif
       </div>
-    </div>
+  </div>
   </div>
 
   <div>
+    <p style="text-align: center; font-size:20px">{{ $quote->title }}</p>
+
+    <div style="width:95%; margin-left:10px; margin-top:8px">
+      @foreach ($quoteItems as $categoryId => $subCategories)
+          @foreach ($subCategories as $subCategoryId => $quoteItem)
+              <p style="font-size: 18px">
+                {{ $quoteItem->first()->category->title ?? '' }} 
+                @if ($quoteItem->first()->subCategory != null)
+                    ({{ $quoteItem->first()->subCategory->title }})
+                @endif
+              </p>
+              <table style="margin-bottom: 30px">
+                  <tr style="background-color:#bbb;">
+                      <th style="text-align: center">SL </th>
+                      <th style="text-align: center; width:20%">ITEM</th>
+                      <th style="text-align: center; width:40%">SPECIFICATION</th>
+                      <th style="text-align: center">QTY</th>
+                      <th style="text-align: center">UNIT</th>
+                      <th style="text-align: center">RATE</th>
+                      <th style="text-align: center">AMOUNT</th>
+                      @foreach ($quoteItem->first()->quoteItemValues as $data)
+                          <th style="text-align: center">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
+                      @endforeach
+                  </tr>
+                  @php
+                      $grandTotal = 0;
+                  @endphp
+                  @foreach ($quoteItem as $item)
+                      <tr>
+                          <td style="text-align: center">{{ $item->sl }}</td>
+                          <td style="text-align: center; width:30%">{{ $item->item }}</td>
+                          <td style="text-align: center">{!! $item->specification !!}</td>
+                          <td style="text-align: center">{{ $item->qty }}</td>
+                          <td style="text-align: center">{{ $item->unit }}</td>
+                          <td style="text-align: center">{{ $item->rate }}</td>
+                          <td style="text-align: center">{{ $item->amount }}</td>
+                          @foreach ($item->quoteItemValues as $quoteItemValue)
+                              <td style="text-align: center">{{ $quoteItemValue->value }}</td>
+                          @endforeach
+                          @php
+                              $grandTotal += $item->amount;
+                          @endphp
+                      </tr>
+                  @endforeach
+                  <tfoot>
+                    <tr>
+                        <td colspan="6" style="text-align: right"> Total</td>
+                        <td style="text-align: center" class="grandTotal">{{ $grandTotal }}</td>
+                    </tr>
+                </tfoot>
+              </table>
+          @endforeach
+      @endforeach
+
+      </div>
+  </div>
+</div>
+
+  <div style="page-break-before: always;">
     <div class="page termSection">
       <div class="row">
           <div class="column"> 

@@ -74,7 +74,15 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="unit">Unit *</label>
-                            <input type="text" class="form-control mt-2" name="unit" placeholder="Enter Unit" value="{{ old('unit', $interior->unit) }}" required>
+                            <select class="form-control mt-2" name="unit" id="" required>
+                                <option value="">Please Select</option>
+                                <option value="sft" {{ $interior->unit == 'sft' ? 'selected' : '' }}>sft</option>
+                                <option value="nos" {{ $interior->unit == 'nos' ? 'selected' : '' }}>nos</option>
+                                <option value="job" {{ $interior->unit == 'job' ? 'selected' : '' }}>job</option>
+                                <option value="rft" {{ $interior->unit == 'rft' ? 'selected' : '' }}>rft</option>
+                                <option value="mtr" {{ $interior->unit == 'mtr' ? 'selected' : '' }}>mtr</option>
+                                <option value="lumpsum" {{ $interior->unit == 'lumpsum' ? 'selected' : '' }}>lumpsum</option>
+                            </select>
                             @error("unit")
                                 <span class="sm text-danger">{{ $message }}</span>
                             @enderror
@@ -92,22 +100,25 @@
                     </div>
 
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="length">Length</label>
-                            <input type="text" class="form-control mt-2" name="length" placeholder="Enter Length" value="{{ old('length', $interior->length) }}">
-                            @error("length")
-                                <span class="sm text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="width">Width</label>
-                            <input type="text" class="form-control mt-2" name="width" placeholder="Enter Width" value="{{ old('width', $interior->width) }}">
-                            @error("width")
-                                <span class="sm text-danger">{{ $message }}</span>
-                            @enderror
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="length_feet">Length</label>
+                                    <input type="text" class="form-control mt-2" name="length_feet" placeholder="Enter Feet" value="{{ old('length_feet', $interior->length_feet) }}">
+                                    @error("length_feet")
+                                        <span class="sm text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="length_inche"></label>
+                                    <input type="text" class="form-control mt-2" name="length_inche" placeholder="Enter Inches" value="{{ old('length_inche', $interior->length_inche) }}">
+                                    @error("length_inche")
+                                        <span class="sm text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -115,9 +126,9 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="feet">Height</label>
-                                    <input type="text" class="form-control mt-2" name="feet" placeholder="Enter Feet" value="{{ old('feet', $interior->feet) }}">
-                                    @error("feet")
+                                    <label for="feet">Width</label>
+                                    <input type="text" class="form-control mt-2" name="width_feet" placeholder="Enter Feet" value="{{ old('width_feet', $interior->width_feet) }}">
+                                    @error("width_feet")
                                         <span class="sm text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -125,13 +136,45 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="inche"></label>
-                                    <input type="text" class="form-control mt-2" name="inche" placeholder="Enter Inches" value="{{ old('inche', $interior->inche) }}">
-                                    @error("inche")
+                                    <input type="text" class="form-control mt-2" name="width_inche" placeholder="Enter Inches" value="{{ old('width_inche', $interior->width_inche) }}">
+                                    @error("width_inche")
                                         <span class="sm text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="height_feet">Height</label>
+                                    <input type="text" class="form-control mt-2" name="height_feet" placeholder="Enter Feet" value="{{ old('height_feet', $interior->height_feet) }}">
+                                    @error("height_feet")
+                                        <span class="sm text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="height_inche"></label>
+                                    <input type="text" class="form-control mt-2" name="height_inche" placeholder="Enter Inches" value="{{ old('height_inche', $interior->height_inche) }}">
+                                    @error("height_inche")
+                                        <span class="sm text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="description">Show</label>
+
+                        <div class="form-group form-check mt-3">
+                            <input type="checkbox" class="form-check-input" id="exampleCheck1" name="active" value="0" {{ $interior->active == 0 ? 'checked' : '' }}>
+                            <label class="form-check-label" for="exampleCheck1">Yes</label>
+                          </div>
                     </div>
 
                     <div class="col-md-12">
