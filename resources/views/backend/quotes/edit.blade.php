@@ -327,11 +327,71 @@
                             </tr>
                     
                             </table>
-                            @php
+                            {{-- @php
                                 $number = round($total ?? 0, 0);
                                 $numFormatter = new NumberFormatter("en", NumberFormatter::SPELLOUT);
                                 $totalamountofwords =  $numFormatter->format($number);
-                            @endphp
+                            @endphp --}}
+
+                            <?php
+                            function numberToWords($number) {
+                                $words = array(
+                                    '0' => 'zero',
+                                    '1' => 'one',
+                                    '2' => 'two',
+                                    '3' => 'three',
+                                    '4' => 'four',
+                                    '5' => 'five',
+                                    '6' => 'six',
+                                    '7' => 'seven',
+                                    '8' => 'eight',
+                                    '9' => 'nine',
+                                    '10' => 'ten',
+                                    '11' => 'eleven',
+                                    '12' => 'twelve',
+                                    '13' => 'thirteen',
+                                    '14' => 'fourteen',
+                                    '15' => 'fifteen',
+                                    '16' => 'sixteen',
+                                    '17' => 'seventeen',
+                                    '18' => 'eighteen',
+                                    '19' => 'nineteen',
+                                    '20' => 'twenty',
+                                    '30' => 'thirty',
+                                    '40' => 'forty',
+                                    '50' => 'fifty',
+                                    '60' => 'sixty',
+                                    '70' => 'seventy',
+                                    '80' => 'eighty',
+                                    '90' => 'ninety',
+                                );
+
+                                if ($number < 21) {
+                                    return $words[$number];
+                                }
+
+                                if ($number < 100) {
+                                    $tens = floor($number / 10) * 10;
+                                    $units = $number % 10;
+                                    return $words[$tens] . ($units ? '-' . $words[$units] : '');
+                                }
+
+                                if ($number < 1000) {
+                                    $hundreds = floor($number / 100);
+                                    $remainder = $number % 100;
+                                    return $words[$hundreds] . ' hundred' . ($remainder ? ' and ' . numberToWords($remainder) : '');
+                                }
+
+                                // Add more cases as needed
+
+                                return 'number out of range';
+                            }
+
+                            // Example usage:
+                            $total = round($total ?? 0, 0);
+                            $totalamountofwords = numberToWords($total);
+                            ?>
+
                     
                             <h3 style="margin-top: 20px">In Words - {{ ucwords($totalamountofwords) }}</h3>
                         </div> 

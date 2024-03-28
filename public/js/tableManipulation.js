@@ -45,6 +45,7 @@ $(document).ready(function() {
         }
 
         let headerId = $(this).closest('th').attr('id');
+        console.log(headerId);
 
         $.ajax({
             method: "post",
@@ -116,7 +117,7 @@ $(document).ready(function() {
                 </td>`).addClass(thValue); // Add class from th to td
             } else {
                 if(i > 6) {
-                    newCell = $(`<td class="saveData" contenteditable="true">
+                    newCell = $(`<td class="saveData ${thValueId}" contenteditable="true">
                     <input type="hidden" class="quoteItemValue" value="${thValueId}">
                     </td>`).addClass(thValue); // Add class from th to td
                 }else if(i == 6){

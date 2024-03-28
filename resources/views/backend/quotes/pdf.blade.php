@@ -112,7 +112,7 @@
                                   <tr>
                                       <td style="text-align: center">{{ $item->sl }}</td>
                                       <td style="text-align: center; width:30%">{{ $item->item }}</td>
-                                      <td style="text-align: center">{{ $item->specification }}</td>
+                                      <td style="text-align: center">{!! $item->specification !!}</td>
                                       <td style="text-align: center">{{ $item->qty }}</td>
                                       <td style="text-align: center">{{ $item->unit }}</td>
                                       <td style="text-align: center">{{ $item->rate }}</td>

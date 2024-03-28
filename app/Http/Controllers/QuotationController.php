@@ -100,7 +100,6 @@ class QuotationController extends Controller
             $quotationData['third_person'] = $third_person;
             $quotationData['fourth_person'] = $fourth_person;
             $quotationData['fifth_person'] = $fifth_person;
-            $quotationData['change']    = '- Initial quotation';
 
             if ($request->hasFile('first_person_signature')) {
                 $image = $request->file('first_person_signature');
@@ -108,7 +107,7 @@ class QuotationController extends Controller
                 $path = public_path('images/' . $filename);
     
                 // Resize and save the image
-                Image::make($image)->fit(200, 200)->save($path);
+                $image->move(public_path('images'), $filename);
 
                 $quotationData['first_person_signature'] = $filename;
             }
@@ -119,7 +118,7 @@ class QuotationController extends Controller
                 $path = public_path('images/' . $filename);
     
                 // Resize and save the image
-                Image::make($image)->fit(200, 200)->save($path);
+                $image->move(public_path('images'), $filename);
 
                 $quotationData['second_person_signature'] = $filename;
             }
@@ -130,7 +129,7 @@ class QuotationController extends Controller
                 $path = public_path('images/' . $filename);
     
                 // Resize and save the image
-                Image::make($image)->fit(200, 200)->save($path);
+                $image->move(public_path('images'), $filename);
 
                 $quotationData['third_person_signature'] = $filename;
             }
@@ -141,7 +140,7 @@ class QuotationController extends Controller
                 $path = public_path('images/' . $filename);
     
                 // Resize and save the image
-                Image::make($image)->fit(200, 200)->save($path);
+                $image->move(public_path('images'), $filename);
 
                 $quotationData['fourth_person_signature'] = $filename;
             }
@@ -152,7 +151,7 @@ class QuotationController extends Controller
                 $path = public_path('images/' . $filename);
     
                 // Resize and save the image
-                Image::make($image)->fit(200, 200)->save($path);
+                $image->move(public_path('images'), $filename);
 
                 $quotationData['fifth_person_signature'] = $filename;
             }
@@ -174,20 +173,10 @@ class QuotationController extends Controller
                 'title'         => $request->input('name') . ' New Sheet',
                 'quotation_id'  => $quotation->id,
                 'version'       => 'V1.0',
+                'change'        => '- Initial quotation',
                 'date'          => now(),
                 'created_by'    => auth()->user()->id
             ]);
-
-            // foreach ($quotation->quotationItems as $key => $quotationItem) {
-
-            //     $quoteItem = QuoteItem::create([
-            //         'quote_id'      => $quote->id,
-            //         'category_id'   => $quotationItem->work_scope,
-            //         'sl'            => '1',
-            //         'created_by'    => auth()->user()->id
-            //     ] );
-        
-            // }
 
             // DB::commit();
             
