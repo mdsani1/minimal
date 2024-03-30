@@ -1045,29 +1045,29 @@
                 padding: 10px;
             }
 
-            <?php
-            if ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
-                $quote->quotation->second_person !== null && $quote->quotation->second_person !== '' &&
-                $quote->quotation->third_person !== null && $quote->quotation->third_person !== '' &&
-                $quote->quotation->fourth_person !== null && $quote->quotation->fourth_person !== '' &&
-                $quote->quotation->fifth_person !== null && $quote->quotation->fifth_person !== '') {
-                echo '.column2 { float: left; width: 20%; padding: 10px; }';
-            } elseif ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
-                $quote->quotation->second_person !== null && $quote->quotation->second_person !== '' &&
-                $quote->quotation->third_person !== null && $quote->quotation->third_person !== '' &&
-                $quote->quotation->fourth_person !== null && $quote->quotation->fourth_person !== '') {
-                echo '.column2 { float: left; width: 25%; padding: 10px; }';
-            } elseif ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
-                $quote->quotation->second_person !== null && $quote->quotation->second_person !== '' &&
-                $quote->quotation->third_person !== null && $quote->quotation->third_person !== '') {
-                echo '.column2 { float: left; width: 33.3%; padding: 10px; }';
-            } elseif ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
-                $quote->quotation->second_person !== null && $quote->quotation->second_person !== '') {
-                echo '.column2 { float: left; width: 50%; padding: 10px; }';
-            } else {
-                echo '.column2 { float: left; width: 100%; padding: 10px; }';
-            }
-            ?>
+                <?php
+                if ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
+                    $quote->quotation->second_person !== null && $quote->quotation->second_person !== '' &&
+                    $quote->quotation->third_person !== null && $quote->quotation->third_person !== '' &&
+                    $quote->quotation->fourth_person !== null && $quote->quotation->fourth_person !== '' &&
+                    $quote->quotation->fifth_person !== null && $quote->quotation->fifth_person !== '') {
+                    echo '.column2 { float: left; width: 20%; padding: 10px; }';
+                } elseif ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
+                    $quote->quotation->second_person !== null && $quote->quotation->second_person !== '' &&
+                    $quote->quotation->third_person !== null && $quote->quotation->third_person !== '' &&
+                    $quote->quotation->fourth_person !== null && $quote->quotation->fourth_person !== '') {
+                    echo '.column2 { float: left; width: 25%; padding: 10px; }';
+                } elseif ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
+                    $quote->quotation->second_person !== null && $quote->quotation->second_person !== '' &&
+                    $quote->quotation->third_person !== null && $quote->quotation->third_person !== '') {
+                    echo '.column2 { float: left; width: 33.3%; padding: 10px; }';
+                } elseif ($quote->quotation->first_person !== null && $quote->quotation->first_person !== '' &&
+                    $quote->quotation->second_person !== null && $quote->quotation->second_person !== '') {
+                    echo '.column2 { float: left; width: 50%; padding: 10px; }';
+                } else {
+                    echo '.column2 { float: left; width: 100%; padding: 10px; }';
+                }
+                ?>
 
             
             /* Clear floats after the columns */
@@ -1141,7 +1141,7 @@
                 // $('select').select2();
                 $('#sidebarToggle').trigger('click');
                 $(document).on('click', '.template', templateCreate);
-                // $(document).on('input', '.saveData', triggerCreate);
+                $(document).on('input', '.qtyCalculations', qtyCalculation);
                 $(document).on('click', '.autosuggestion-dropdown li', function(event) {
                     triggerCreate(event);
                 });
@@ -1245,6 +1245,78 @@
                     updateTermSerialNumbers(); // Update SL numbers
                 });
 
+                $(document).on('input', '.specification input[type="number"]', function(event) {
+                    let tr = $(this).closest('tr');
+                    let inputValue = $(this).val();
+                    
+                    // Check the name attribute of the input field
+                    if ($(this).attr('name') === 'length_feet') {
+                        let targetInput = tr.find('.length_feet');
+
+                        // Clone the original input field DOM element
+                        let newLengthInche = `<input type="number" class="form-control qtyCalculations length_feet mt-2" name="length_feet" placeholder="Enter Feet" value="${inputValue}">`;
+                        
+                        // Replace the original input field with the new input field
+                        targetInput.replaceWith(newLengthInche);
+                    }
+
+                    // Check the name attribute of the input field
+                    if ($(this).attr('name') === 'length_inche') {
+                        let targetInput = tr.find('.length_inche');
+
+                        // Clone the original input field DOM element
+                        let newLengthInche = `<input type="number" class="form-control qtyCalculations length_inche mt-2" name="length_inche" placeholder="Enter Inches" value="${inputValue}">`;
+                        
+                        // Replace the original input field with the new input field
+                        targetInput.replaceWith(newLengthInche);
+                    }
+
+                    // Check the name attribute of the input field
+                    if ($(this).attr('name') === 'width_feet') {
+                        let targetInput = tr.find('.width_feet');
+
+                        // Clone the original input field DOM element
+                        let newLengthInche = `<input type="number" class="form-control qtyCalculations width_feet mt-2" name="width_feet" placeholder="Enter Feet" value="${inputValue}">`;
+                        
+                        // Replace the original input field with the new input field
+                        targetInput.replaceWith(newLengthInche);
+                    }
+
+                    // Check the name attribute of the input field
+                    if ($(this).attr('name') === 'width_inche') {
+                        let targetInput = tr.find('.width_inche');
+
+                        // Clone the original input field DOM element
+                        let newLengthInche = `<input type="number" class="form-control qtyCalculations width_inche mt-2" name="width_inche" placeholder="Enter Inches" value="${inputValue}">`;
+                        
+                        // Replace the original input field with the new input field
+                        targetInput.replaceWith(newLengthInche);
+                    }
+
+                    // Check the name attribute of the input field
+                    if ($(this).attr('name') === 'height_feet') {
+                        let targetInput = tr.find('.height_feet');
+
+                        // Clone the original input field DOM element
+                        let newLengthInche = `<input type="number" class="form-control qtyCalculations height_feet mt-2" name="height_feet" placeholder="Enter Feet" value="${inputValue}">`;
+                        
+                        // Replace the original input field with the new input field
+                        targetInput.replaceWith(newLengthInche);
+                    }
+
+                    // Check the name attribute of the input field
+                    if ($(this).attr('name') === 'height_inche') {
+                        let targetInput = tr.find('.height_inche');
+
+                        // Clone the original input field DOM element
+                        let newLengthInche = `<input type="number" class="form-control qtyCalculations height_inche mt-2" name="height_inche" placeholder="Enter Inches" value="${inputValue}">`;
+                        
+                        // Replace the original input field with the new input field
+                        targetInput.replaceWith(newLengthInche);
+                    }
+
+                });
+
                 // Delete row
                 $(document).on('click', '.deleteTermRow', function() {
                     $(this).closest('tr').remove();
@@ -1256,8 +1328,9 @@
             });
 
             function qtyCalculation(event) {
-                console.log('in');
-                let el = event.target;
+                let el = event.target,
+                    tr = $(el).closest('tr');
+
 
                 // Retrieve dimensions from response
                 let lengthFeet = parseFloat($(el).closest('td').find('.length_feet').val());
@@ -1281,7 +1354,7 @@
 
                 // Convert square inches to square feet
                 let areaInSquareFeet = areaInSquareInches / 144;
-                console.log(areaInSquareFeet);
+                $(tr).find('.qty').text(areaInSquareFeet.toFixed(2));
             }
 
         </script>
@@ -1389,7 +1462,6 @@
                         let data = {};
                         // Get the text content of the corresponding th and clean it
                         let thText = table.find('thead th').eq(tdIndex).text().trim().replace(/\s+/g, '_').toLowerCase().replace(/_x$/, ''); // Use table.find() to search within the table
-                        
                         // Get the value of the current cell and assign it to the corresponding property in item
                         if(thText == 'sl' || thText == 'item' || thText == 'specification' || thText == 'qty' || thText == 'unit' || thText == 'rate' || thText == 'amount') {
                             if(thText == 'sl'){
@@ -1398,7 +1470,23 @@
                             } else if (thText == 'specification') {
                                 // Extract inner HTML for specification column
                                 var tdHTML = $(td).html().trim();
+
+                                // Create a jQuery object from tdHTML
+                                // var specificationdata = $(td);
+                                // var lengthFeet = $(td).find('.length_feet').val();
+                                // var lengthInches = $(td).find('.length_inche').val();
+                                // var widthFeet = $(td).find('.width_feet').val();
+                                // var widthInches = $(td).find('.width_inche').val();
+
+                                // var formattedDimensions = 'Dimension: '+lengthFeet + "' " + lengthInches + '" (L) x ' + widthFeet + "' " + widthInches + '" (W)';
+
+                                // // Extract text content excluding div elements
+                                // var textContent = specificationdata.find('*').not('div').text().trim();
+                                // textContent += '<br>' + formattedDimensions;
+
                                 item[thText] = tdHTML;
+
+                                // Now you can use the item object as needed
                             }else{
                                 var tdText = $(td).clone()           // Clone the td element
                                             .children()          // Select the children elements

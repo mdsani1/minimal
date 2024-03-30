@@ -166,8 +166,13 @@ class DashboardController extends Controller
         $bank = Bank::latest()->first();
         $termInfo = TermInfo::latest()->first();
 
+        $quoteItems = TemplateItem::with('templateItemValues')->where('template_id',$id)->get()->groupBy('category_id');
+        $groupedItems = $quoteItems->map(function ($group) {
+            return $group->sum('amount');
+        });
 
-        return view('backend.quotes.template-edit', compact('template','quotation','quotations','externalMenus','organization','templateItems','payments','terms','bank','termInfo'));
+
+        return view('backend.quotes.template-edit', compact('groupedItems','template','quotation','quotations','externalMenus','organization','templateItems','payments','terms','bank','termInfo'));
     }
 
     public function templatePdf($id)

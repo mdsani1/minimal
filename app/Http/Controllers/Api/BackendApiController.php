@@ -49,14 +49,43 @@ class BackendApiController extends Controller
         $dimensionText = '';
         if ($interior->active == 0) {
 
-            $dimensionText .= ($dimensionText ? "\n" : '') . 'Dimension: ' .'<span class="editableareaData length_feet" contenteditable="true">'. $interior->length_feet .'</span>'. "' " .'<span class="editableareaData length_inche" contenteditable="true">'. $interior->length_inche .'</span>'. '"' . " (L)";
+            $dimensionText .= ($dimensionText ? "\n" : '') .
+            '<div class="row">' .
+                '<div class="col-md-6">' .
+                    '<label for="length_feet">Length Feet</label>'.
+                    '<input type="number" class="form-control qtyCalculations length_feet mt-2" name="length_feet" contenteditable="true" placeholder="Enter Feet" value="'.$interior->length_feet.'">' .
+                '</div>' .
+                '<div class="col-md-6">' .
+                '<label for="length_inche">Length Inches</label>'.
+                    '<input type="number" class="form-control qtyCalculations length_inche mt-2" name="length_inche" placeholder="Enter Inches" value="'.$interior->length_inche.'">' .
+                '</div>' .
+            '</div>';
+
 
             if ($interior->width_feet !== null) {
-                $dimensionText .= ' x ' .'<span class="editableareaData width_feet" contenteditable="true">'. $interior->width_feet.'</span>' . "' " .'<span class="editableareaData width_inche" contenteditable="true">'. $interior->width_inche.'</span>' . '"'. " (W)";
+                $dimensionText .= '<div class="row">' .
+                '<div class="col-md-6">' .
+                    '<label for="width_feet">Width Feet</label>'.
+                    '<input type="number" class="form-control qtyCalculations width_feet mt-2" name="width_feet" placeholder="Enter Feet" value="'.$interior->width_feet.'">' .
+                '</div>' .
+                '<div class="col-md-6">' .
+                '<label for="width_inche">Width Inches</label>'.
+                    '<input type="number" class="form-control qtyCalculations width_inche mt-2" name="width_inche" placeholder="Enter Inches" value="'.$interior->width_inche.'">' .
+                '</div>' .
+            '</div>';
             }
 
             if ($interior->height_feet !== null) {
-                $dimensionText .= ' x ' . $interior->height_feet . "' " . $interior->height_inche . '"'. " (H)";
+                $dimensionText .= '<div class="row">' .
+                '<div class="col-md-6">' .
+                    '<label for="height_feet">Height Feet</label>'.
+                    '<input type="number" class="form-control height_feet mt-2" name="height_feet" placeholder="Enter Feet" value="'.$interior->height_feet.'">' .
+                '</div>' .
+                '<div class="col-md-6">' .
+                '<label for="height_inche">Height Inches</label>'.
+                    '<input type="number" class="form-control height_inche mt-2" name="height_inche" placeholder="Enter Inches" value="'.$interior->height_inche.'">' .
+                '</div>' .
+            '</div>';
         }
         }
 

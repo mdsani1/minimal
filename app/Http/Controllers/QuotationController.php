@@ -218,13 +218,13 @@ class QuotationController extends Controller
 
                 if($purpose == 'Residential (R)' && $type != null) {
                     if($type == 'Basic (B)') {
-                        $refPurpose = 'RB';
+                        $refPurpose = 'R/B';
                     } else if ($type == 'Premium (P)') {
-                        $refPurpose = 'RP';
+                        $refPurpose = 'R/P';
                     } else if ($type == 'Compact Luxury (C)') {
-                        $refPurpose = 'RC';
+                        $refPurpose = 'R/C';
                     } else if ($type == 'Luxury (L)') {
-                        $refPurpose = 'RL';
+                        $refPurpose = 'R/L';
                     }
                 } else if($purpose == 'Residential (R)') {
                     $refPurpose = 'R';
@@ -240,24 +240,29 @@ class QuotationController extends Controller
                 $nextReferenceNumber = Quotation::whereYear('created_at', $currentYear)->count() + 1;
                 $referenceNumber = str_pad($nextReferenceNumber, 3, '0', STR_PAD_LEFT); // Pad with leading zeros
                 
-                $referenceCode = 'MNML/' . $name . '/' . $currentYearLastTwoDigits . '-' . $referenceNumber . '-' . $refPurpose. ' Copy ';
+                $referenceCode = 'MNML/' . $name . '/' . $currentYearLastTwoDigits . '-' . $referenceNumber . '' . $refPurpose. ' Copy ';
 
                 $data = Quotation::create([
-                    'ref'       => $referenceCode,
-                    'name'      => $quotation->name,
-                    'area'      => $quotation->area,
-                    'address'   => $quotation->address,
-                    'city'      => $quotation->city,
-                    'purpose'   => $quotation->purpose,
-                    'type'      => $quotation->type,
-                    'first_person'      => $quotation->first_person,
-                    'first_person_email'      => $quotation->first_person_email,
-                    'first_person_designation'      => $quotation->first_person_designation,
-                    'second_person'      => $quotation->second_person,
-                    'second_person_email'      => $quotation->second_person_email,
-                    'second_person_designation'      => $quotation->second_person_designation,
-                    'date'      => now(),
-                    'created_by' => auth()->user()->id
+                    'ref'                           => $referenceCode,
+                    'name'                          => $quotation->name,
+                    'area'                          => $quotation->area,
+                    'address'                       => $quotation->address,
+                    'city'                          => $quotation->city,
+                    'purpose'                       => $quotation->purpose,
+                    'type'                          => $quotation->type,
+                    'active_bank'                   => $quotation->active_bank,
+                    'first_person'                  => $quotation->first_person,
+                    'first_person_signature'        => $quotation->first_person_signature,
+                    'second_person'                 => $quotation->second_person,
+                    'second_person_signature'       => $quotation->second_person_signature,
+                    'third_person'                  => $quotation->third_person,
+                    'third_person_signature'        => $quotation->third_person_signature,
+                    'fourth_person'                 => $quotation->third_person_signature,
+                    'fourth_person_signature'       => $quotation->third_person_signature,
+                    'fifth_person'                  => $quotation->third_person_signature,
+                    'fifth_person_signature'        => $quotation->third_person_signature,
+                    'date'                          => now(),
+                    'created_by'                    => auth()->user()->id
                 ]);
 
                 foreach ($quotation->quotationItems as $key => $value) {
