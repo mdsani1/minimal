@@ -343,7 +343,59 @@
                       <tr>
                           <td style="text-align: center">{{ $item->sl }}</td>
                           <td style="text-align: center; width:30%">{{ $item->item }}</td>
-                          <td style="text-align: center">{!! $item->specification !!}</td>
+                          <?php
+                                      $specificationData = $item->specification;
+                          
+                                      // Check if $specificationData is not empty before processing it
+                                      if (!empty($specificationData)) {
+                                          $dom = new DOMDocument();
+                                          $dom->loadHTML($specificationData);
+                          
+                                          // Use DOMXPath to query the document
+                                          $xpath = new DOMXPath($dom);
+                          
+                                          // Query for the input with class 'length_feet'
+                                          $length_feetinput = $xpath->query('//input[@class="form-control qtyCalculations length_feet mt-2"]')->item(0);
+                                          $length_incheinput = $xpath->query('//input[@class="form-control qtyCalculations length_inche mt-2"]')->item(0);
+                                          $width_feetinput = $xpath->query('//input[@class="form-control qtyCalculations width_feet mt-2"]')->item(0);
+                                          $width_incheinput = $xpath->query('//input[@class="form-control qtyCalculations width_inche mt-2"]')->item(0);
+                                          $height_feetinput = $xpath->query('//input[@class="form-control height_feet mt-2"]')->item(0);
+                                          $height_incheinput = $xpath->query('//input[@class="form-control height_inche mt-2"]')->item(0);
+                          
+                                          // Check if all input fields were found
+                                          if ($length_feetinput && $length_incheinput && $width_feetinput && $width_incheinput) {
+                                              // Extracted dimensions
+                                              $length_feetvalue = $length_feetinput->getAttribute('value');
+                                              $length_inchevalue = $length_incheinput->getAttribute('value');
+                                              $width_feetvalue = $width_feetinput->getAttribute('value');
+                                              $width_inchevalue = $width_incheinput->getAttribute('value');
+                          
+                                              // Concatenate the extracted dimensions into a single string
+                                              $dimensions = "Dimensions: " . $length_feetvalue . "' " . $length_inchevalue . ' (L)'."\" x " . $width_feetvalue . "' " . $width_inchevalue . ' (W)'."\"";
+                          
+                                              // Check if height input fields were found before adding to the dimensions string
+                                              if ($height_feetinput && $height_incheinput) {
+                                                  $height_feetvalue = $height_feetinput->getAttribute('value');
+                                                  $height_inchevalue = $height_incheinput->getAttribute('value');
+                                                  $dimensions .= " x " . $height_feetvalue . "' " . $height_inchevalue . ' (H)'."\"";
+                                              }
+                                          } else {
+                                              // Handle case where input fields are not found
+                                              $dimensions = "";
+                                          }
+                          
+                                          // Remove <div> tags from specification data
+                                          $specificationData = preg_replace('/<div[^>]*>.*?<\/div>/', '', $specificationData);
+                                          $specificationData = preg_replace('/<div[^>]*>/', '', $specificationData);
+                                          $specificationData = preg_replace('/<\/div>/', '', $specificationData);
+                                      } else {
+                                          // Set empty values if specification data is empty
+                                          $specificationData = "";
+                                          $dimensions = "";
+                                      }
+                                  ?>
+                          
+                                  <td style="text-align: center">{!! $specificationData !!} <br> {{ $dimensions }}</td>
                           <td style="text-align: center">{{ $item->qty }}</td>
                           <td style="text-align: center">{{ $item->unit }}</td>
                           <td style="text-align: center">{{ $item->rate }}</td>

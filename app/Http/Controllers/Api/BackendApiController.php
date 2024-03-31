@@ -213,6 +213,15 @@ class BackendApiController extends Controller
                 'date'          => now(),
                 'updated_by'    => auth()->user()->id
             ]);
+
+            $slValues = array_column($request->item_data, 'sl');
+
+            // Step 2: Delete records from the database where 'sl' does not exist in $slValues
+            TemplateItem::where('template_id', $template->id)
+                    ->where('category_id', $request->category_id)
+                    ->where('sub_category_id', $request->sub_category_id)
+                    ->whereNotIn('sl', $slValues)
+                    ->delete();
             
             foreach ($request->item_data as $key => $value) {
 
@@ -236,7 +245,10 @@ class BackendApiController extends Controller
                         'created_by'        => auth()->user()->id
                     ] + $value);
                 }
-            
+
+
+                
+                
                 if ($request->missing_data && $request->missing_data[$key] !== null) { 
                     foreach ($request->missing_data[$key] as $menu => $menudata) {
 
@@ -415,6 +427,24 @@ class BackendApiController extends Controller
             $quoteItemvalue = QuoteItemValue::where('quote_id', $quote->id)->where('category_id', $request->category_id)->where('sub_category_id', $request->sub_category_id)->where('unique_header', $request->headerId)->latest()->get();  
             
             foreach ($quoteItemvalue as $key => $value) {
+                $value->delete();
+            }
+            
+            return response()->json([
+                "message" => "Successfull Delete :)",
+            ]);
+
+        }catch(QueryException $e){
+            return response()->json(['error' => $e->getMessage()]);
+        }
+    }
+
+    public function templateColumnDelete(Request $request){
+        try{
+            $template = Template::find($request->templateId);
+            $templateItemValue = TemplateItemValue::where('template_id', $template->id)->where('category_id', $request->category_id)->where('sub_category_id', $request->sub_category_id)->where('unique_header', $request->headerId)->latest()->get();  
+            
+            foreach ($templateItemValue as $key => $value) {
                 $value->delete();
             }
             

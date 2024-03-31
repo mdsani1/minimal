@@ -1524,34 +1524,34 @@
                     payload = reqData();
                     console.log(payload);
                 
-                $.ajax({
-                    url         : `/api/quotes/update/${$('#quoteId').val()}`,
-                    method      : "PUT",
-                    dataType    : "JSON",
-                    data        : payload,
-                    enctype     : 'multipart/form-data',
-                    headers: {
-                        "X-CSRF-TOKEN": $(document).find('[name="_token"]').val()
-                    },
-                    success(response){
-                        if (response.error !== undefined) { // Check if error is defined in the response
-                            Swal.fire({
-                                icon: "error",
-                                title: response.error, // Show error message
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-                        }
-                    },
-                    error(error){
-                        Swal.fire({
-                            icon: "error",
-                            title: error.responseJSON.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                    }
-                });
+                // $.ajax({
+                //     url         : `/api/quotes/update/${$('#quoteId').val()}`,
+                //     method      : "PUT",
+                //     dataType    : "JSON",
+                //     data        : payload,
+                //     enctype     : 'multipart/form-data',
+                //     headers: {
+                //         "X-CSRF-TOKEN": $(document).find('[name="_token"]').val()
+                //     },
+                //     success(response){
+                //         if (response.error !== undefined) { // Check if error is defined in the response
+                //             Swal.fire({
+                //                 icon: "error",
+                //                 title: response.error, // Show error message
+                //                 showConfirmButton: false,
+                //                 timer: 1500
+                //             });
+                //         }
+                //     },
+                //     error(error){
+                //         Swal.fire({
+                //             icon: "error",
+                //             title: error.responseJSON.message,
+                //             showConfirmButton: false,
+                //             timer: 1500
+                //         });
+                //     }
+                // });
             }
         </script>
     @endpush

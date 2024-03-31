@@ -47,34 +47,66 @@ $(document).ready(function() {
         let headerId = $(this).closest('th').attr('id');
         console.log(headerId);
 
-        $.ajax({
-            method: "post",
-            url: "/api/column/delete",
-            data: {
-                quote_title: $('.quote_title').val(),
-                quotationId: $('.quotationId').val(),
-                category_id: table.find('.categoryId').val(),
-                sub_category_id: table.find('.subCategoryId').val(),
-                headerId: headerId,
-            },
-            headers: {
-                "X-CSRF-TOKEN": $(document).find('[name="_token"]').val()
-            },
-            dataType: "json",
-            success: function (response) {
-                Swal.fire({
-                    icon: "success",
-                    title: response.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-            }
-        });
+        let templateId = $('.templateId').val();
+
+        if(templateId != null || templateId != undefined){
+            $.ajax({
+                method: "post",
+                url: "/api/template-column/delete",
+                data: {
+                    templateId: $('.templateId').val(),
+                    quotationId: $('.quotationId').val(),
+                    category_id: table.find('.categoryId').val(),
+                    sub_category_id: table.find('.subCategoryId').val(),
+                    headerId: headerId,
+                },
+                headers: {
+                    "X-CSRF-TOKEN": $(document).find('[name="_token"]').val()
+                },
+                dataType: "json",
+                success: function (response) {
+                    Swal.fire({
+                        icon: "success",
+                        title: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            });
+        }else{
+            $.ajax({
+                method: "post",
+                url: "/api/column/delete",
+                data: {
+                    quote_title: $('.quote_title').val(),
+                    quotationId: $('.quotationId').val(),
+                    category_id: table.find('.categoryId').val(),
+                    sub_category_id: table.find('.subCategoryId').val(),
+                    headerId: headerId,
+                },
+                headers: {
+                    "X-CSRF-TOKEN": $(document).find('[name="_token"]').val()
+                },
+                dataType: "json",
+                success: function (response) {
+                    Swal.fire({
+                        icon: "success",
+                        title: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            });
+        }
+
+
         
         table.find('tr').each(function() {
             // Remove the column with the matching headerId
             $(this).find(`th[id='${headerId}'], td.${headerId}`).remove();
         });
+
+        // triggerCreate();
     });
     
     

@@ -128,8 +128,8 @@
                                           $length_incheinput = $xpath->query('//input[@class="form-control qtyCalculations length_inche mt-2"]')->item(0);
                                           $width_feetinput = $xpath->query('//input[@class="form-control qtyCalculations width_feet mt-2"]')->item(0);
                                           $width_incheinput = $xpath->query('//input[@class="form-control qtyCalculations width_inche mt-2"]')->item(0);
-                                          $height_feetinput = $xpath->query('//input[@class="form-control qtyCalculations height_feet mt-2"]')->item(0);
-                                          $height_incheinput = $xpath->query('//input[@class="form-control qtyCalculations height_inche mt-2"]')->item(0);
+                                          $height_feetinput = $xpath->query('//input[@class="form-control height_feet mt-2"]')->item(0);
+                                          $height_incheinput = $xpath->query('//input[@class="form-control height_inche mt-2"]')->item(0);
                           
                                           // Check if all input fields were found
                                           if ($length_feetinput && $length_incheinput && $width_feetinput && $width_incheinput) {
@@ -140,13 +140,13 @@
                                               $width_inchevalue = $width_incheinput->getAttribute('value');
                           
                                               // Concatenate the extracted dimensions into a single string
-                                              $dimensions = "Dimensions: " . $length_feetvalue . "' " . $length_inchevalue . "\" x " . $width_feetvalue . "' " . $width_inchevalue . "\"";
+                                              $dimensions = "Dimensions: " . $length_feetvalue . "' " . $length_inchevalue . ' (L)'."\" x " . $width_feetvalue . "' " . $width_inchevalue . ' (W)'."\"";
                           
                                               // Check if height input fields were found before adding to the dimensions string
                                               if ($height_feetinput && $height_incheinput) {
                                                   $height_feetvalue = $height_feetinput->getAttribute('value');
                                                   $height_inchevalue = $height_incheinput->getAttribute('value');
-                                                  $dimensions .= " x " . $height_feetvalue . "' " . $height_inchevalue . "\"";
+                                                  $dimensions .= " x " . $height_feetvalue . "' " . $height_inchevalue . ' (H)'."\"";
                                               }
                                           } else {
                                               // Handle case where input fields are not found
