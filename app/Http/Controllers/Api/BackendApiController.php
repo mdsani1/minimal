@@ -53,17 +53,27 @@ class BackendApiController extends Controller
             '<div class="row">' .
                 '<div class="col-md-6">' .
                     '<label for="length_feet">Length Feet</label>'.
-                    '<input type="number" class="form-control qtyCalculations length_feet mt-2" name="length_feet" contenteditable="true" placeholder="Enter Feet" value="'.$interior->length_feet.'">' .
+                    '<input type="number" class="form-control qtyCalculations length_feet mt-2" name="length_feet" placeholder="Enter Feet" value="'.$interior->length_feet.'">' .
                 '</div>' .
                 '<div class="col-md-6">' .
-                '<label for="length_inche">Length Inches</label>'.
+                    '<label for="length_inche">Length Inches</label>'.
                     '<input type="number" class="form-control qtyCalculations length_inche mt-2" name="length_inche" placeholder="Enter Inches" value="'.$interior->length_inche.'">' .
                 '</div>' .
             '</div>';
 
+            $dimensionText .= '<div class="row">' .
+                '<div class="col-md-6">' .
+                    '<label for="height_feet">Height Feet</label>'.
+                    '<input type="number" class="form-control qtyCalculations height_feet mt-2" name="height_feet" placeholder="Enter Feet" value="'.$interior->height_feet.'">' .
+                '</div>' .
+                '<div class="col-md-6">' .
+                    '<label for="height_inche">Height Inches</label>'.
+                    '<input type="number" class="form-control qtyCalculations height_inche mt-2" name="height_inche" placeholder="Enter Inches" value="'.$interior->height_inche.'">' .
+                '</div>' .
+            '</div>';
 
-            if ($interior->width_feet !== null) {
-                $dimensionText .= '<div class="row">' .
+
+            $dimensionText .= '<div class="row">' .
                 '<div class="col-md-6">' .
                     '<label for="width_feet">Width Feet</label>'.
                     '<input type="number" class="form-control qtyCalculations width_feet mt-2" name="width_feet" placeholder="Enter Feet" value="'.$interior->width_feet.'">' .
@@ -73,20 +83,17 @@ class BackendApiController extends Controller
                     '<input type="number" class="form-control qtyCalculations width_inche mt-2" name="width_inche" placeholder="Enter Inches" value="'.$interior->width_inche.'">' .
                 '</div>' .
             '</div>';
-            }
 
-            if ($interior->height_feet !== null) {
-                $dimensionText .= '<div class="row">' .
+            $dimensionText .= '<div class="row">' .
                 '<div class="col-md-6">' .
-                    '<label for="height_feet">Height Feet</label>'.
-                    '<input type="number" class="form-control height_feet mt-2" name="height_feet" placeholder="Enter Feet" value="'.$interior->height_feet.'">' .
+                    '<label for="depth_feet">Depth Feet</label>'.
+                    '<input type="number" class="form-control qtyCalculations depth_feet mt-2" name="depth_feet" placeholder="Enter Feet" value="">' .
                 '</div>' .
                 '<div class="col-md-6">' .
-                '<label for="height_inche">Height Inches</label>'.
-                    '<input type="number" class="form-control height_inche mt-2" name="height_inche" placeholder="Enter Inches" value="'.$interior->height_inche.'">' .
+                '<label for="depth_inche">Depth Inches</label>'.
+                    '<input type="number" class="form-control qtyCalculations depth_inche mt-2" name="depth_inche" placeholder="Enter Inches" value="">' .
                 '</div>' .
             '</div>';
-        }
         }
 
         // Merging specifications into one array
@@ -333,18 +340,18 @@ class BackendApiController extends Controller
             
             foreach ($request->item_data as $key => $value) {
 
-                $interiorCheck = Interior::where('item',$value['item'])->first();
+                // $interiorCheck = Interior::where('item',$value['item'])->first();
 
-                if($interiorCheck == null) {
-                    if($value['item'] != null) {
-                        $interior = Interior::create([
-                            'item'              => $value['item'],
-                            'specification1'    => $value['specification'],
-                            'unit'              => $value['unit'],
-                            'created_by'        => auth()->user()->id
-                        ]);
-                    }
-                }
+                // if($interiorCheck == null) {
+                //     if($value['item'] != null) {
+                //         $interior = Interior::create([
+                //             'item'              => $value['item'],
+                //             'specification1'    => $value['specification'],
+                //             'unit'              => $value['unit'],
+                //             'created_by'        => auth()->user()->id
+                //         ]);
+                //     }
+                // }
 
                 $quoteItem = QuoteItem::where('quote_id', $quote->id)->where('category_id', $request->category_id)->where('sl', $value['sl'])->latest()->first();
                 if($quoteItem == null) {
@@ -504,87 +511,94 @@ class BackendApiController extends Controller
                 'updated_by'    => auth()->user()->id
             ]);
             
-            $slValues = array_column($request->item_data, 'sl');
+            $slValues = [];
+
+            // Check if $request->item_data is not null before using array_column()
+            if ($request->has('item_data')) {
+                $slValues = array_column($request->item_data, 'sl');
+            }
 
             // Step 2: Delete records from the database where 'sl' does not exist in $slValues
             QuoteItem::where('quote_id', $quote->id)
-                    ->where('category_id', $request->category_id)
-                    ->where('sub_category_id', $request->sub_category_id)
-                    ->whereNotIn('sl', $slValues)
-                    ->delete();
+                ->where('category_id', $request->category_id)
+                ->where('sub_category_id', $request->sub_category_id)
+                ->whereNotIn('sl', $slValues)
+                ->delete();
 
-            foreach ($request->item_data as $key => $value) {
-
-                $interiorCheck = Interior::where('item',$value['item'])->first();
-
-                if($interiorCheck == null) {
-                    if($value['item'] != null) {
-                        $interior = Interior::create([
-                            'item'              => $value['item'],
-                            'specification1'    => $value['specification'],
-                            'unit'              => $value['unit'],
+            if ($request->has('item_data')) {
+                foreach ($request->item_data as $key => $value) {
+    
+                    // $interiorCheck = Interior::where('item',$value['item'])->first();
+    
+                    // if($interiorCheck == null) {
+                    //     if($value['item'] != null) {
+                    //         $interior = Interior::create([
+                    //             'item'              => $value['item'],
+                    //             'specification1'    => $value['specification'],
+                    //             'unit'              => $value['unit'],
+                    //             'created_by'        => auth()->user()->id
+                    //         ]);
+                    //     }
+                    // }
+    
+                    $quoteItem = QuoteItem::where('quote_id', $quote->id)->where('category_id', $request->category_id)->where('sub_category_id', $request->sub_category_id)->where('sl', $value['sl'])->latest()->first();
+                    if($quoteItem == null) {
+                        $quoteItem = QuoteItem::create([
+                            'quote_id'          => $quote->id,
+                            'sub_category_id'   => $request->sub_category_id,
                             'created_by'        => auth()->user()->id
-                        ]);
+                        ] + $value);
+                    } else {
+                        $quoteItem->update([
+                            'quote_id'          => $quote->id,
+                            'sub_category_id'   => $request->sub_category_id,
+                            'created_by'        => auth()->user()->id
+                        ] + $value);
                     }
-                }
-
-                $quoteItem = QuoteItem::where('quote_id', $quote->id)->where('category_id', $request->category_id)->where('sub_category_id', $request->sub_category_id)->where('sl', $value['sl'])->latest()->first();
-                if($quoteItem == null) {
-                    $quoteItem = QuoteItem::create([
-                        'quote_id'          => $quote->id,
-                        'sub_category_id'   => $request->sub_category_id,
-                        'created_by'        => auth()->user()->id
-                    ] + $value);
-                } else {
-                    $quoteItem->update([
-                        'quote_id'          => $quote->id,
-                        'sub_category_id'   => $request->sub_category_id,
-                        'created_by'        => auth()->user()->id
-                    ] + $value);
-                }
-            
-                if ($request->missing_data && $request->missing_data[$key] !== null) { 
-                    foreach ($request->missing_data[$key] as $menu => $menudata) {
-
-                        if(isset($menudata['uniqueHeader']))
-                        {
-                            $quoteItemvalue = QuoteItemValue::where('quote_id', $quote->id)->where('quote_item_id', $quoteItem->id)->where('unique_header', $menudata['uniqueHeader'])->latest()->first(); 
-
-                            if($quoteItemvalue != null) {
-                                foreach ($menudata as $key => $item) {
-                                    if($key != 'uniqueHeader'){
-                                        $quoteItemvalue->update([
-                                            'quote_id'              => $quote->id,
-                                            'quote_item_id'         => $quoteItem->id,
-                                            'category_id'           => $request->category_id,
-                                            'sub_category_id'       => $request->sub_category_id,
-                                            'header'                => $key,
-                                            'value'                 => $item,
-                                        ]);
+                
+                    if ($request->missing_data && $request->missing_data[$key] !== null) { 
+                        foreach ($request->missing_data[$key] as $menu => $menudata) {
+    
+                            if(isset($menudata['uniqueHeader']))
+                            {
+                                $quoteItemvalue = QuoteItemValue::where('quote_id', $quote->id)->where('quote_item_id', $quoteItem->id)->where('unique_header', $menudata['uniqueHeader'])->latest()->first(); 
+    
+                                if($quoteItemvalue != null) {
+                                    foreach ($menudata as $key => $item) {
+                                        if($key != 'uniqueHeader'){
+                                            $quoteItemvalue->update([
+                                                'quote_id'              => $quote->id,
+                                                'quote_item_id'         => $quoteItem->id,
+                                                'category_id'           => $request->category_id,
+                                                'sub_category_id'       => $request->sub_category_id,
+                                                'header'                => $key,
+                                                'value'                 => $item,
+                                            ]);
+                                        }
+                                    }
+                                } else {
+                                    foreach ($menudata as $key => $item) {
+                                        if($key != 'uniqueHeader'){
+                                            $quoteItemvalue = QuoteItemValue::create([
+                                                'quote_id'              => $quote->id,
+                                                'quote_item_id'         => $quoteItem->id,
+                                                'category_id'           => $request->category_id,
+                                                'sub_category_id'       => $request->sub_category_id,
+                                                'unique_header'         => $menudata['uniqueHeader'],
+                                                'header'                => $key,
+                                                'value'                 => $item,
+                                                'created_by'            => auth()->user()->id
+                                            ]);
+                                        }
                                     }
                                 }
-                            } else {
-                                foreach ($menudata as $key => $item) {
-                                    if($key != 'uniqueHeader'){
-                                        $quoteItemvalue = QuoteItemValue::create([
-                                            'quote_id'              => $quote->id,
-                                            'quote_item_id'         => $quoteItem->id,
-                                            'category_id'           => $request->category_id,
-                                            'sub_category_id'       => $request->sub_category_id,
-                                            'unique_header'         => $menudata['uniqueHeader'],
-                                            'header'                => $key,
-                                            'value'                 => $item,
-                                            'created_by'            => auth()->user()->id
-                                        ]);
-                                    }
-                                }
+    
+                                
                             }
-
-                            
                         }
                     }
+                
                 }
-            
             }
 
             DB::commit();

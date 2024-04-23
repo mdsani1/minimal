@@ -134,12 +134,14 @@ class PaymentController extends Controller
                     $payment = Payment::find($paymentId);
                     if ($payment) {
                         $payment->title = $titles[$key];
+                        $payment->sequence = $key;
                         $payment->save();
                     }
                 } else {
                     // If payment ID doesn't exist, create a new payment record
                     $newPayment = new Payment();
                     $newPayment->title = $titles[$key];
+                    $newPayment->sequence = $key;
                     $newPayment->save();
                 }
             }

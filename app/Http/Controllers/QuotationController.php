@@ -648,11 +648,12 @@ class QuotationController extends Controller
         if ($quote) {
             $quotation = Quotation::find($quote->quotation->id);
             $organization = Organization::latest()->first();
-            $payments = Payment::get();
+            $payments = Payment::orderBy('sequence', 'asc')->get();
             $terms = Term::get();
             $bank = Bank::latest()->first();
             $termInfo = TermInfo::latest()->first();
             $quoteItems = QuoteItem::with('quoteItemValues')->where('quote_id',$id)->get()->groupBy('category_id');
+            // dd($quoteItems);
             $groupedItems = $quoteItems->map(function ($group) {
                 return $group->sum('amount');
             });
@@ -685,8 +686,8 @@ class QuotationController extends Controller
             $mpdf = new \Mpdf\Mpdf([
                 'default_font_size' => 9,
                 'format' => 'A4',
-                'margin_left' => 4,
-                'margin_right' => 0,
+                'margin_left' => 15,
+                'margin_right' => 10,
                 'margin_top' => 4,
                 'margin_bottom' => 0,
             ]);

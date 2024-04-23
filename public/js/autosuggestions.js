@@ -152,11 +152,12 @@ function loadSpecificationData(cell) {
         dataType: "json",
         async: false, // Make the AJAX request synchronous
         success: function (response) {
+            console.log(response.suggestions[0]);
             if (response.suggestions.length > 1) {
                 specificationData = response.suggestions;
             } else {
                 // Set the dimensionText to the .specification element of the parentTR
-                parentTR.find('.specification').innerHTML(response.suggestions[0]);
+                parentTR.find('.specification').html(response.suggestions[0]);
             }
 
             // Retrieve dimensions from response

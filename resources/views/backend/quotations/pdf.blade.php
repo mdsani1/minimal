@@ -188,63 +188,66 @@
         @endphp --}}
 
         <?php
-                            function numberToWords($number) {
-                                $words = array(
-                                    '0' => 'zero',
-                                    '1' => 'one',
-                                    '2' => 'two',
-                                    '3' => 'three',
-                                    '4' => 'four',
-                                    '5' => 'five',
-                                    '6' => 'six',
-                                    '7' => 'seven',
-                                    '8' => 'eight',
-                                    '9' => 'nine',
-                                    '10' => 'ten',
-                                    '11' => 'eleven',
-                                    '12' => 'twelve',
-                                    '13' => 'thirteen',
-                                    '14' => 'fourteen',
-                                    '15' => 'fifteen',
-                                    '16' => 'sixteen',
-                                    '17' => 'seventeen',
-                                    '18' => 'eighteen',
-                                    '19' => 'nineteen',
-                                    '20' => 'twenty',
-                                    '30' => 'thirty',
-                                    '40' => 'forty',
-                                    '50' => 'fifty',
-                                    '60' => 'sixty',
-                                    '70' => 'seventy',
-                                    '80' => 'eighty',
-                                    '90' => 'ninety',
-                                );
+          function numberToWords($number) {
+              $words = array(
+                  '0' => 'zero',
+                  '1' => 'one',
+                  '2' => 'two',
+                  '3' => 'three',
+                  '4' => 'four',
+                  '5' => 'five',
+                  '6' => 'six',
+                  '7' => 'seven',
+                  '8' => 'eight',
+                  '9' => 'nine',
+                  '10' => 'ten',
+                  '11' => 'eleven',
+                  '12' => 'twelve',
+                  '13' => 'thirteen',
+                  '14' => 'fourteen',
+                  '15' => 'fifteen',
+                  '16' => 'sixteen',
+                  '17' => 'seventeen',
+                  '18' => 'eighteen',
+                  '19' => 'nineteen',
+                  '20' => 'twenty',
+                  '30' => 'thirty',
+                  '40' => 'forty',
+                  '50' => 'fifty',
+                  '60' => 'sixty',
+                  '70' => 'seventy',
+                  '80' => 'eighty',
+                  '90' => 'ninety',
+              );
 
-                                if ($number < 21) {
-                                    return $words[$number];
-                                }
+              $units = ['', 'thousand', 'million', 'billion', 'trillion']; // Add more as needed
 
-                                if ($number < 100) {
-                                    $tens = floor($number / 10) * 10;
-                                    $units = $number % 10;
-                                    return $words[$tens] . ($units ? '-' . $words[$units] : '');
-                                }
+              if ($number < 21) {
+                  return $words[$number];
+              }
 
-                                if ($number < 1000) {
-                                    $hundreds = floor($number / 100);
-                                    $remainder = $number % 100;
-                                    return $words[$hundreds] . ' hundred' . ($remainder ? ' and ' . numberToWords($remainder) : '');
-                                }
+              if ($number < 100) {
+                  $tens = floor($number / 10) * 10;
+                  $units = $number % 10;
+                  return $words[$tens] . ($units ? '-' . $words[$units] : '');
+              }
 
-                                // Add more cases as needed
+              foreach (array_reverse($units) as $idx => $unit) {
+                  $power = pow(1000, $idx);
+                  if ($number >= $power) {
+                      $num = floor($number / $power);
+                      $remainder = $number % $power;
+                      return numberToWords($num) . ' ' . $unit . ($remainder ? ', ' . numberToWords($remainder) : '');
+                  }
+              }
 
-                                return 'number out of range';
-                            }
+              return 'number out of range';
+          }
 
-                            // Example usage:
-                            $total = round($total ?? 0, 0);
-                            $totalamountofwords = numberToWords($total);
-                            ?>
+          // Example usage:
+          $total = round($total ?? 0, 0);
+          $totalamountofwords = numberToWords($total);
+        ?>
 
         <h3 style="margin-top: 20px">In Words - {{ ucwords($totalamountofwords) }}</h3>
     </div> 
@@ -344,58 +347,98 @@
                           <td style="text-align: center">{{ $item->sl }}</td>
                           <td style="text-align: center; width:30%">{{ $item->item }}</td>
                           <?php
-                                      $specificationData = $item->specification;
+                              $specificationData = $item->specification;
+                  
+                              // Check if $specificationData is not empty before processing it
+                              if (!empty($specificationData)) {
+
+                                  $dom = new DOMDocument();
+                                  $dom->loadHTML($specificationData);
+                  
+                                  // Use DOMXPath to query the document
+                                  $xpath = new DOMXPath($dom);
+
+                                  $dimensions = "";
+
+                                  $length_feetvalue = "";
+                                  $length_inchevalue = "";
+                                  $height_feetvalue = "";
+                                  $height_inchevalue = "";
+                                  $width_feetvalue = "";
+                                  $width_inchevalue = "";
+                                  $depth_feetvalue = "";
+                                  $depth_inchevalue = "";
+                  
+                                  // Query for the input with class 'length_feet'
+                                  $length_feetinput = $xpath->query('//input[@class="form-control qtyCalculations length_feet mt-2"]')->item(0);
+                                  $length_incheinput = $xpath->query('//input[@class="form-control qtyCalculations length_inche mt-2"]')->item(0);
+                                  $height_feetinput = $xpath->query('//input[@class="form-control qtyCalculations height_feet mt-2"]')->item(0);
+                                  $height_incheinput = $xpath->query('//input[@class="form-control qtyCalculations height_inche mt-2"]')->item(0);
+                                  $width_feetinput = $xpath->query('//input[@class="form-control qtyCalculations width_feet mt-2"]')->item(0);
+                                  $width_incheinput = $xpath->query('//input[@class="form-control qtyCalculations width_inche mt-2"]')->item(0);
+                                  $depth_feetinput = $xpath->query('//input[@class="form-control qtyCalculations depth_feet mt-2"]')->item(0);
+                                  $depth_incheinput = $xpath->query('//input[@class="form-control qtyCalculations depth_inche mt-2"]')->item(0);
+
+                                  if ($length_feetinput) {
+                                      $length_feetvalue = $length_feetinput->getAttribute('value');
+                                  }
+                                  if ($length_incheinput) {
+                                      $length_inchevalue = $length_incheinput->getAttribute('value');
+                                  }
+
+                                  if ($height_feetinput) {
+                                      $height_feetvalue = $height_feetinput->getAttribute('value');
+                                  }
+                                  if ($height_incheinput) {
+                                      $height_inchevalue = $height_incheinput->getAttribute('value');
+                                  }
+
+                                  if ($width_feetinput) {
+                                      $width_feetvalue = $width_feetinput->getAttribute('value');
+                                  }
+                                  if ($width_incheinput) {
+                                      $width_inchevalue = $width_incheinput->getAttribute('value');
+                                  }
+
+                                  if ($depth_feetinput) {
+                                      $depth_feetvalue = $depth_feetinput->getAttribute('value');
+                                  }
+                                  if ($depth_incheinput) {
+                                      $depth_inchevalue = $depth_incheinput->getAttribute('value');
+                                  }
+
+                                  if (is_numeric($length_feetvalue) && is_numeric($length_inchevalue)) {
+                                      $dimensions .= "Dimensions: " . $length_feetvalue . "' " . $length_inchevalue . '"' . ' (L)';
+                                  }
+                                  if (is_numeric($height_feetvalue) && is_numeric($height_inchevalue)) {
+                                      $dimensions .= " X " . $height_feetvalue . "' " . $height_inchevalue . '"' . ' (H)';
+                                  }
+                                  if(is_numeric($width_feetvalue) && is_numeric($width_inchevalue)){
+                                    $dimensions .= " X " . $width_feetvalue . "' " . $width_inchevalue . '"' . ' (W)';
+
+                                  } 
+                                  if(is_numeric($depth_feetvalue) && is_numeric($depth_inchevalue)){ {
+                                      $dimensions .= " X " . $depth_feetvalue . "' " . $depth_inchevalue . '"' . ' (D)';
+                                  }
+
+                                }
+                  
+                                  // Remove <div> tags from specification data
+                                  $specificationData = preg_replace('/<div[^>]*>/', '', $specificationData);
+                                  $specificationData = preg_replace('/<\/div>/', '', $specificationData);
+                                  $specificationData = preg_replace('/<label[^>]*>.*?<\/label>/', '', $specificationData);
+                                  $specificationData = preg_replace('/<label[^>]*>.*?<\/label>/', '', $specificationData);
+                                  $specificationData = preg_replace('/<input[^>]*>/', '', $specificationData);
+
+                              } else {
+                                  // Set empty values if specification data is empty
+                                  $specificationData = "";
+                                  $dimensions = "";
+                              }
+                              
+                          ?>
                           
-                                      // Check if $specificationData is not empty before processing it
-                                      if (!empty($specificationData)) {
-                                          $dom = new DOMDocument();
-                                          $dom->loadHTML($specificationData);
-                          
-                                          // Use DOMXPath to query the document
-                                          $xpath = new DOMXPath($dom);
-                          
-                                          // Query for the input with class 'length_feet'
-                                          $length_feetinput = $xpath->query('//input[@class="form-control qtyCalculations length_feet mt-2"]')->item(0);
-                                          $length_incheinput = $xpath->query('//input[@class="form-control qtyCalculations length_inche mt-2"]')->item(0);
-                                          $width_feetinput = $xpath->query('//input[@class="form-control qtyCalculations width_feet mt-2"]')->item(0);
-                                          $width_incheinput = $xpath->query('//input[@class="form-control qtyCalculations width_inche mt-2"]')->item(0);
-                                          $height_feetinput = $xpath->query('//input[@class="form-control height_feet mt-2"]')->item(0);
-                                          $height_incheinput = $xpath->query('//input[@class="form-control height_inche mt-2"]')->item(0);
-                          
-                                          // Check if all input fields were found
-                                          if ($length_feetinput && $length_incheinput && $width_feetinput && $width_incheinput) {
-                                              // Extracted dimensions
-                                              $length_feetvalue = $length_feetinput->getAttribute('value');
-                                              $length_inchevalue = $length_incheinput->getAttribute('value');
-                                              $width_feetvalue = $width_feetinput->getAttribute('value');
-                                              $width_inchevalue = $width_incheinput->getAttribute('value');
-                          
-                                              // Concatenate the extracted dimensions into a single string
-                                              $dimensions = "Dimensions: " . $length_feetvalue . "' " . $length_inchevalue . ' (L)'."\" x " . $width_feetvalue . "' " . $width_inchevalue . ' (W)'."\"";
-                          
-                                              // Check if height input fields were found before adding to the dimensions string
-                                              if ($height_feetinput && $height_incheinput) {
-                                                  $height_feetvalue = $height_feetinput->getAttribute('value');
-                                                  $height_inchevalue = $height_incheinput->getAttribute('value');
-                                                  $dimensions .= " x " . $height_feetvalue . "' " . $height_inchevalue . ' (H)'."\"";
-                                              }
-                                          } else {
-                                              // Handle case where input fields are not found
-                                              $dimensions = "";
-                                          }
-                          
-                                          // Remove <div> tags from specification data
-                                          $specificationData = preg_replace('/<div[^>]*>.*?<\/div>/', '', $specificationData);
-                                          $specificationData = preg_replace('/<div[^>]*>/', '', $specificationData);
-                                          $specificationData = preg_replace('/<\/div>/', '', $specificationData);
-                                      } else {
-                                          // Set empty values if specification data is empty
-                                          $specificationData = "";
-                                          $dimensions = "";
-                                      }
-                                  ?>
-                          
-                                  <td style="text-align: center">{!! $specificationData !!} <br> {{ $dimensions }}</td>
+                          <td style="text-align: center">{!! $specificationData !!} <br> {{ $dimensions }}</td>
                           <td style="text-align: center">{{ $item->qty }}</td>
                           <td style="text-align: center">{{ $item->unit }}</td>
                           <td style="text-align: center">{{ $item->rate }}</td>

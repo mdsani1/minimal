@@ -775,6 +775,7 @@
                                                     <th>SL</th>
                                                     <th class="text-center">Title</th>
                                                     <th class="text-center">Action</th>
+                                                    <th class="text-center">Swap</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="paymentTbody">
@@ -788,6 +789,10 @@
                                                         <td class="text-center">
                                                             <button type="button" class="btn btn-success addPaymentRow"><i class="fas fa-plus-circle"></i></button>
                                                             <button type="button" class="btn btn-danger deletePaymentRow" value="{{ $payment->id }}"><i class="fas fa-times-circle"></i></button>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button type="button" class="btn btn-info swap-up"><i class="fas fa-arrow-up"></i></button>
+                                                            <button type="button" class="btn btn-info swap-down"><i class="fas fa-arrow-down"></i></button>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -1325,21 +1330,160 @@
 
                 // Initial SL number update
                 updateTermSerialNumbers();
+
+                // Swap Rows Up
+                $('.swap-up').on('click', function() {
+                    var currentRow = $(this).closest('tr');
+                    var prevRow = currentRow.prev('tr');
+                    if (prevRow.length !== 0) {
+                        currentRow.insertBefore(prevRow);
+                    }
+                });
+
+                // Swap Rows Down
+                $('.swap-down').on('click', function() {
+                    var currentRow = $(this).closest('tr');
+                    var nextRow = currentRow.next('tr');
+                    if (nextRow.length !== 0) {
+                        currentRow.insertAfter(nextRow);
+                    }
+                });
             });
 
             function qtyCalculation(event) {
                 let el = event.target,
                     tr = $(el).closest('tr');
 
+                let inputName = $(el).attr('name');
+
+                let uniqueNumber = Math.floor(Math.random() * 1000); // Change 1000 to your desired range
+                let uniqueName = inputName + '_' + uniqueNumber;
 
                 // Retrieve dimensions from response
-                let lengthFeet = parseFloat($(el).closest('td').find('.length_feet').val());
-                let lengthInches = parseFloat($(el).closest('td').find('.length_inche').val());
-                let widthFeet = parseFloat($(el).closest('td').find('.width_feet').val());
-                let widthInches = parseFloat($(el).closest('td').find('.width_inche').val());
+                let lengthFeet = parseFloat($(tr).find('.length_feet').val());
+                $(tr).find('.length_feet').parent('div').html(`
+                <label for="length_feet">Length Feet</label>
+                <input type="number" id="length_feet_${uniqueName}" class="form-control qtyCalculations length_feet mt-2" name="length_feet" placeholder="Enter Feet" value="${lengthFeet}">
+                `);
+                if(inputName == 'length_feet'){
+                    $(`#length_feet_${uniqueName}`).focus();
+    
+                    // Move cursor to end of input value
+                    $(`#length_feet_${uniqueName}`).each(function() {
+                        var val = $(this).val();
+                        $(this).val('').val(val);
+                    });
+                }
+                let lengthInches = parseFloat($(tr).find('.length_inche').val());
+                $(tr).find('.length_inche').parent('div').html(`
+                <label for="length_inche">Length Inches</label>
+                <input type="number" id="length_inche_${uniqueName}" class="form-control qtyCalculations length_inche mt-2" name="length_inche" placeholder="Enter Inches" value="${lengthInches}">
+                `);
+                if(inputName == 'length_inche'){
+                    $(`#length_inche_${uniqueName}`).focus();
+    
+                    // Move cursor to end of input value
+                    $(`#length_inche_${uniqueName}`).each(function() {
+                        var val = $(this).val();
+                        $(this).val('').val(val);
+                    });
+                }
+
+                let heightFeet = parseFloat($(tr).find('.height_feet').val());
+                $(tr).find('.height_feet').parent('div').html(`
+                <label for="height_feet">Height Feet</label>
+                <input type="number" id="height_feet_${uniqueName}" class="form-control qtyCalculations height_feet mt-2" name="height_feet" placeholder="Enter Feet" value="${heightFeet}">
+                `);
+                if(inputName == 'height_feet'){
+                    $(`#height_feet_${uniqueName}`).focus();
+    
+                    // Move cursor to end of input value
+                    $(`#height_feet_${uniqueName}`).each(function() {
+                        var val = $(this).val();
+                        $(this).val('').val(val);
+                    });
+                }
+
+                let heightInches = parseFloat($(tr).find('.height_inche').val());
+                $(tr).find('.height_inche').parent('div').html(`
+                <label for="height_inche">Height Inches</label>
+                <input type="number" id="height_inche_${uniqueName}" class="form-control qtyCalculations height_inche mt-2" name="height_inche" placeholder="Enter Inches" value="${heightInches}">
+                `);
+                if(inputName == 'height_inche'){
+                    $(`#height_inche_${uniqueName}`).focus();
+    
+                    // Move cursor to end of input value
+                    $(`#height_inche_${uniqueName}`).each(function() {
+                        var val = $(this).val();
+                        $(this).val('').val(val);
+                    });
+                }
+
+                //second part
+
+                let widthFeet = parseFloat($(tr).find('.width_feet').val());
+                $(tr).find('.width_feet').parent('div').html(`
+                <label for="width_feet">Width Feet</label>
+                <input type="number" id="width_feet_${uniqueName}" class="form-control qtyCalculations width_feet mt-2" name="width_feet" placeholder="Enter Feet" value="${widthFeet}">
+                `);
+                if(inputName == 'width_feet'){
+                    $(`#width_feet_${uniqueName}`).focus();
+    
+                    // Move cursor to end of input value
+                    $(`#width_feet_${uniqueName}`).each(function() {
+                        var val = $(this).val();
+                        $(this).val('').val(val);
+                    });
+                }
+
+
+                let widthInches = parseFloat($(tr).find('.width_inche').val());
+                $(tr).find('.width_inche').parent('div').html(`
+                <label for="width_inche">Width Inches</label>
+                <input type="number" id="width_inche_${uniqueName}" class="form-control qtyCalculations width_inche mt-2" name="width_inche" placeholder="Enter Inches" value="${widthInches}">
+                `);
+                if(inputName == 'width_inche'){
+                    $(`#width_inche_${uniqueName}`).focus();
+    
+                    // Move cursor to end of input value
+                    $(`#width_inche_${uniqueName}`).each(function() {
+                        var val = $(this).val();
+                        $(this).val('').val(val);
+                    });
+                }
+
+                let depthFeet = parseFloat($(tr).find('.depth_feet').val());
+                $(tr).find('.depth_feet').parent('div').html(`
+                <label for="depth_feet">Depth Feet</label>
+                <input type="number" id="depth_feet_${uniqueName}" class="form-control qtyCalculations depth_feet mt-2" name="depth_feet" placeholder="Enter Feet" value="${depthFeet}">
+                `);
+                if(inputName == 'depth_feet'){
+                    $(`#depth_feet_${uniqueName}`).focus();
+    
+                    // Move cursor to end of input value
+                    $(`#depth_feet_${uniqueName}`).each(function() {
+                        var val = $(this).val();
+                        $(this).val('').val(val);
+                    });
+                }
+
+                let depthInches = parseFloat($(tr).find('.depth_inche').val());
+                $(tr).find('.depth_inche').parent('div').html(`
+                <label for="depth_inche">Depth Inches</label>
+                <input type="number" id="depth_inche_${uniqueName}" class="form-control qtyCalculations depth_inche mt-2" name="depth_inche" placeholder="Enter Inches" value="${depthInches}">
+                `);
+                if(inputName == 'depth_inche'){
+                    $(`#depth_inche_${uniqueName}`).focus();
+    
+                    // Move cursor to end of input value
+                    $(`#depth_inche_${uniqueName}`).each(function() {
+                        var val = $(this).val();
+                        $(this).val('').val(val);
+                    });
+                }
 
                 // Check if any of the values are NaN (Not a Number)
-                if (isNaN(lengthFeet) || isNaN(lengthInches) || isNaN(widthFeet) || isNaN(widthInches)) {
+                if (isNaN(lengthFeet) || isNaN(lengthInches) || isNaN(heightFeet) || isNaN(heightInches)) {
                     // Handle the case where any of the values are not valid
                     console.log("Invalid input");
                     return;
@@ -1347,14 +1491,17 @@
 
                 // Convert dimensions to inches
                 let lengthTotalInches = lengthFeet * 12 + lengthInches;
-                let widthTotalInches = widthFeet * 12 + widthInches;
+                let heightTotalInches = heightFeet * 12 + heightInches;
 
                 // Calculate the area in square inches
-                let areaInSquareInches = lengthTotalInches * widthTotalInches;
+                let areaInSquareInches = lengthTotalInches * heightTotalInches;
 
                 // Convert square inches to square feet
                 let areaInSquareFeet = areaInSquareInches / 144;
                 $(tr).find('.qty').text(areaInSquareFeet.toFixed(2));
+
+                subTotal(event);
+                triggerCreate(event);
             }
 
         </script>
@@ -1524,34 +1671,34 @@
                     payload = reqData();
                     console.log(payload);
                 
-                // $.ajax({
-                //     url         : `/api/quotes/update/${$('#quoteId').val()}`,
-                //     method      : "PUT",
-                //     dataType    : "JSON",
-                //     data        : payload,
-                //     enctype     : 'multipart/form-data',
-                //     headers: {
-                //         "X-CSRF-TOKEN": $(document).find('[name="_token"]').val()
-                //     },
-                //     success(response){
-                //         if (response.error !== undefined) { // Check if error is defined in the response
-                //             Swal.fire({
-                //                 icon: "error",
-                //                 title: response.error, // Show error message
-                //                 showConfirmButton: false,
-                //                 timer: 1500
-                //             });
-                //         }
-                //     },
-                //     error(error){
-                //         Swal.fire({
-                //             icon: "error",
-                //             title: error.responseJSON.message,
-                //             showConfirmButton: false,
-                //             timer: 1500
-                //         });
-                //     }
-                // });
+                $.ajax({
+                    url         : `/api/quotes/update/${$('#quoteId').val()}`,
+                    method      : "PUT",
+                    dataType    : "JSON",
+                    data        : payload,
+                    enctype     : 'multipart/form-data',
+                    headers: {
+                        "X-CSRF-TOKEN": $(document).find('[name="_token"]').val()
+                    },
+                    success(response){
+                        if (response.error !== undefined) { // Check if error is defined in the response
+                            Swal.fire({
+                                icon: "error",
+                                title: response.error, // Show error message
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
+                    },
+                    error(error){
+                        Swal.fire({
+                            icon: "error",
+                            title: error.responseJSON.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                });
             }
         </script>
     @endpush

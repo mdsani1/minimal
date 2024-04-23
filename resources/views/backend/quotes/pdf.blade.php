@@ -128,8 +128,8 @@
                                           $length_incheinput = $xpath->query('//input[@class="form-control qtyCalculations length_inche mt-2"]')->item(0);
                                           $width_feetinput = $xpath->query('//input[@class="form-control qtyCalculations width_feet mt-2"]')->item(0);
                                           $width_incheinput = $xpath->query('//input[@class="form-control qtyCalculations width_inche mt-2"]')->item(0);
-                                          $height_feetinput = $xpath->query('//input[@class="form-control height_feet mt-2"]')->item(0);
-                                          $height_incheinput = $xpath->query('//input[@class="form-control height_inche mt-2"]')->item(0);
+                                          $height_feetinput = $xpath->query('//input[@class="form-control qtyCalculations height_feet mt-2"]')->item(0);
+                                          $height_incheinput = $xpath->query('//input[@class="form-control qtyCalculations height_inche mt-2"]')->item(0);
                           
                                           // Check if all input fields were found
                                           if ($length_feetinput && $length_incheinput && $width_feetinput && $width_incheinput) {

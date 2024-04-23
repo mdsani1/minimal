@@ -52,7 +52,7 @@ class DashboardController extends Controller
         $organization = Organization::latest()->first();
         $quotation = Quotation::find($id);
         $quotations = Quotation::latest()->get();
-        $payments = Payment::get();
+        $payments = Payment::orderBy('sequence', 'asc')->get();
         $terms = Term::get();
         $bank = Bank::latest()->first();
         $termInfo = TermInfo::latest()->first();
@@ -137,7 +137,7 @@ class DashboardController extends Controller
         $quotations = Quotation::latest()->get();
         $externalMenus = QuoteItemValue::where('quote_id', $quote->id)->distinct()->pluck('header');
         $quoteItems = QuoteItem::with('quoteItemValues')->where('quote_id',$id)->get()->groupBy('category_id');
-        $payments = Payment::get();
+        $payments = Payment::orderBy('sequence', 'asc')->get();
         $quotation = Quotation::find($quote->quotation_id);
         $terms = Term::get();
         $bank = Bank::latest()->first();
@@ -160,7 +160,7 @@ class DashboardController extends Controller
         $quotations = Quotation::latest()->get();
         $externalMenus = TemplateItemValue::where('template_id', $template->id)->distinct()->pluck('header');
         $templateItems = TemplateItem::with('templateItemValues')->where('template_id',$id)->get()->groupBy('category_id');
-        $payments = Payment::get();
+        $payments = Payment::orderBy('sequence', 'asc')->get();
         $quotation = Quotation::find($template->quotation_id);
         $terms = Term::get();
         $bank = Bank::latest()->first();
@@ -279,8 +279,10 @@ class DashboardController extends Controller
     {
         try{
             $quoteItem = QuoteItem::where('quote_id', $quoteId)->where('sub_category_id', $zoneId)->first();
-            $quoteItem->update(['deleted_by' => auth()->user()->id]);
-            $quoteItem->delete();
+            if($quoteItem != null){
+                $quoteItem->update(['deleted_by' => auth()->user()->id]);
+                $quoteItem->delete();
+            }
 
             return redirect()->back()->withMessage('Successful delete :)');
         }catch(QueryException $e){
