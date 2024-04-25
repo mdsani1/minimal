@@ -18,6 +18,7 @@ use App\Models\Payment;
 use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\QuoteItemValue;
+use App\Models\SubCategory;
 use App\Models\Term;
 use App\Models\TermInfo;
 use Illuminate\Support\Facades\DB;
@@ -652,48 +653,115 @@ class QuotationController extends Controller
             $terms = Term::get();
             $bank = Bank::latest()->first();
             $termInfo = TermInfo::latest()->first();
-            $quoteItems = QuoteItem::with('quoteItemValues')->where('quote_id',$id)->get()->groupBy('category_id');
-            // dd($quoteItems);
+            $data = [];
+
+            foreach ($quotation->quotationItems as $quotationItem) {
+                $categoryTitle = $quotationItem->category->title;
+                $workScope = $quotationItem->work_scope;
+
+                // Check if the work scope is associated with a sub-category
+                $checkSubCategory = SubCategory::where('category_id', $workScope)->first();
+
+                // Retrieve data based on whether it has a sub-category or not
+                $quoteItemsQuery = QuoteItem::with('quoteItemValues')
+                    ->where('quote_id', $id)
+                    ->where('category_id', $workScope);
+
+                if ($checkSubCategory == null) {
+                    // No sub-category
+                    $categoryData = $quoteItemsQuery->get();
+                    if ($categoryData->isNotEmpty()) {
+                        $data[$categoryTitle]['category'] = $categoryData;
+                    }
+                } else {
+                    // With sub-category
+                    $subCategoryData = $quoteItemsQuery->get()->groupBy('sub_category_id');
+                    if ($subCategoryData->isNotEmpty()) {
+                        $data[$categoryTitle]['subcategory'] = $subCategoryData;
+                    }
+                }
+            }
+
+            $quoteItems = QuoteItem::with('quoteItemValues')->orderBy('category_id','asc')->where('quote_id',$id)->get()->groupBy('category_id');
             $groupedItems = $quoteItems->map(function ($group) {
                 return $group->sum('amount');
             });
 
-            $quoteZoneItems = QuoteItem::with('quoteItemValues')
-                ->where('quote_id', $id)
-                ->whereNotNull('sub_category_id')
-                ->get()
-                ->groupBy(['category_id', 'sub_category_id']);
+            // $quoteZoneItems = QuoteItem::with('quoteItemValues')
+            //     ->where('quote_id', $id)
+            //     ->orderBy('category_id','asc')
+            //     ->whereNotNull('sub_category_id')
+            //     ->get()
+            //     ->groupBy(['category_id', 'sub_category_id']);
 
-            // Retrieve QuoteItems with null sub_category_id
-            $quoteWorkItems = QuoteItem::with('quoteItemValues')
-                ->where('quote_id', $id)
-                ->whereNull('sub_category_id')
-                ->get()
-                ->groupBy(['category_id', 'sub_category_id']);
+            // // Retrieve QuoteItems with null sub_category_id
+            // $quoteWorkItems = QuoteItem::with('quoteItemValues')
+            //     ->where('quote_id', $id)
+            //     ->orderBy('category_id','asc')
+            //     ->whereNull('sub_category_id')
+            //     ->get()
+            //     ->groupBy(['category_id', 'sub_category_id']);
 
-            if(!$quoteZoneItems->isEmpty()) {
-                // Merge the two collections, ignoring keys from $quoteWorkItems if they exist in $quoteZoneItems
-                $quoteItems = $quoteZoneItems->merge($quoteWorkItems->except($quoteZoneItems->keys()->all()));
-            } else {
-                $quoteItems = $quoteWorkItems;
-            }
-
+            // if(!$quoteZoneItems->isEmpty()) {
+            //     // Merge the two collections, ignoring keys from $quoteWorkItems if they exist in $quoteZoneItems
+            //     $quoteItems = $quoteZoneItems->merge($quoteWorkItems->except($quoteZoneItems->keys()->all()));
+            // } else {
+            //     $quoteItems = $quoteWorkItems;
+            // }
 
             $externalMenus = QuoteItemValue::where('quote_id', $quote->id)->distinct()->pluck('header');
             $organization = Organization::latest()->first();
 
-            $view = view('backend.quotations.pdf', compact('quotation','organization','payments','terms','bank','termInfo','groupedItems','quote','organization','externalMenus','quoteItems'))->render();
+            $view = view('backend.quotations.pdf', compact('quotation','organization','payments','terms','bank','termInfo','groupedItems','quote','organization','externalMenus','quoteItems','data'))->render();
             $mpdf = new \Mpdf\Mpdf([
                 'default_font_size' => 9,
                 'format' => 'A4',
                 'margin_left' => 15,
                 'margin_right' => 10,
-                'margin_top' => 4,
-                'margin_bottom' => 0,
+                'margin_top' => 42,
+                'margin_bottom' => 10,
             ]);
+
+            $dateString = $quotation->date;
+            $formattedDate = date("F j, Y", strtotime($dateString));
+
+            // Build the HTML string for the header
+            $headerHtml = '
+            <div class="row">
+                <div class="column">
+                    <img src="' . public_path('backend/images/organization/'.$organization->image ?? '') . '" alt="" style="width: 70%">
+                </div>
+                <div class="column organization-details">
+                    <div style="font-size: 8px">' . $organization->address . '</div>
+                    <div>
+                        <p style="font-size: 8px">' . $organization->phone . '</p>
+                        <p style="font-size: 8px">' . $organization->email . '</p>
+                        <p style="font-size: 8px"><a href="' . $organization->facebook . '">' . $organization->facebook . '</a></p>
+                        <p style="font-size: 8px"><a href="' . $organization->website . '" target="_blank">' . $organization->website . '</a></p>
+                        <p style="margin-top: 10px; font-size: 11px">' . $formattedDate . '</p>
+                    </div>
+                </div>
+            </div>
+            ';
+
+            // Set the HTML header
+            $mpdf->SetHTMLHeader($headerHtml);
+
+
+            $mpdf->SetHTMLFooter('
+                <table width="100%">
+                    <tr>
+                        <td style="border:none !important; width:33.3%" align="center" align="left"></td>
+                        <td style="border:none !important; width:33.3%" align="center">Page {PAGENO} of {nb}</td>
+                        <td style="border:none !important; width:33.3%" align="right">MINIMAL LIMITED</td>
+                    </tr>
+                </table>
+            ');
+
             $mpdf->SetTitle('Quotation');
             $mpdf->WriteHTML($view);
             $mpdf->Output(time() . '-quotation' . ".pdf", "I");
+
         } else {
             return redirect()->back();
         }
