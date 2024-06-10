@@ -370,12 +370,27 @@
                             $grandTotal = 0;
                         @endphp
                         @if (isset($quoteItem['category']))
+                        @php
+                            $checkItem = '';
+                            $extraStyle = '';
+                        @endphp
                         @foreach ($quoteItem['category'] as $item)
+
+                            @php
+                                // Initialize the style variable
+                                $extraStyle = '';
+                                // Check the condition and set the style
+                                if($item->item == $checkItem) {
+                                    $extraStyle = 'border-top: 2px solid white';
+                                }
+                            @endphp
                         
-                            
                             <tr>
                                 <td style="font-size:10px; text-align: center; width:5%">{{ $loop->iteration }}</td>
-                                <td style="font-size:10px; text-align: center; width:15%">{{ $item->item }}</td>
+                                <td style="font-size:10px; text-align: center; width:15%; {{ $extraStyle }}">
+                                    {{ $item->item == $checkItem ? '' : $item->item }}
+                                </td>
+                                
                                 <?php
                                     $specificationData = $item->specification;
                         
@@ -478,6 +493,7 @@
                                 @endforeach
                                 @php
                                     $grandTotal += $item->amount;
+                                    $checkItem = $item->item;
                                 @endphp
                             </tr>
                         @endforeach
