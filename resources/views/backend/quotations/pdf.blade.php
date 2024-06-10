@@ -498,17 +498,35 @@
                             </tr>
                         @endforeach
                         @else
+                        
                         @foreach ($quoteItem['subcategory'] as $subcategory)
+                           
+
                             @php
                                 $subTotal = 0;
                             @endphp
                             <tr style="background-color: #ddd">
                                 <td colspan="7" style="text-align: center"><b>{{ $subcategory->first()->subcategory->title }}</b></td>
                             </tr>
+                            @php
+                                $checkSubItem = '';
+                                $extraSubStyle = '';
+                            @endphp
                             @foreach ($subcategory as $item)
+                            @php
+                                // Initialize the style variable
+                                $extraSubStyle = '';
+                                // Check the condition and set the style
+                                if($item->item == $checkSubItem) {
+                                    $extraSubStyle = 'border-top: 2px solid white';
+                                }
+                            @endphp
                             <tr>
                                 <td style="font-size:10px; text-align: center; width:5%">{{ $loop->iteration }}</td>
-                                <td style="font-size:10px; text-align: center; width:15%">{{ $item->item }}</td>
+                                <td style="font-size:10px; text-align: center; width:15%; {{ $extraSubStyle }}">
+                                    {{ $item->item == $checkSubItem ? '' : $item->item }}
+                                </td>
+
                                 <?php
                                     $specificationData = $item->specification;
                         
@@ -612,6 +630,7 @@
                                 @php
                                     $grandTotal += $item->amount;
                                     $subTotal += $item->amount;
+                                    $checkSubItem = $item->item;
                                 @endphp
                             </tr>
                             @endforeach
