@@ -152,7 +152,6 @@ function loadSpecificationData(cell) {
         dataType: "json",
         async: false, // Make the AJAX request synchronous
         success: function (response) {
-            console.log(response.suggestions[0]);
             if (response.suggestions.length > 1) {
                 specificationData = response.suggestions;
             } else {
@@ -184,7 +183,6 @@ function loadSpecificationData(cell) {
                 parentTR.find('.rate').text(response.interior.rate);
                 parentTR.find('.unit').text(response.interior.unit);
             }else{
-                console.log(areaInSquareFeet);
                 parentTR.find('.qty').text(areaInSquareFeet.toFixed(2));
                 parentTR.find('.rate').text(response.interior.rate);
                 parentTR.find('.unit').text(response.interior.unit);

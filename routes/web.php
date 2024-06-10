@@ -56,7 +56,7 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/template-pdf/{id}', [DashboardController::class, 'templatePdf'])->name('template.pdf');
     Route::delete('/template-delete/{id}', [DashboardController::class, 'templateDestroy'])->name('template.delete');
     Route::delete('/templateItem-delete/{id}', [DashboardController::class, 'templateItemDelete'])->name('templateItem-delete');
-    Route::delete('/quotationItemZone-delete/{quoteId}/{zoneId}', [DashboardController::class, 'quotationItemZoneDelete'])->name('quotationItemZone-delete');
+    Route::delete('/quotationItemZone-delete/{quotationId}/{quoteId}/{categoryId}/{zoneId}', [DashboardController::class, 'quotationItemZoneDelete'])->name('quotationItemZone-delete');
     
 
 
@@ -107,6 +107,13 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/quotations-trash/{quotation}', [QuotationController::class, 'restore'])->name('quotations.restore');
     Route::get('/quotations-trash/{quotation}/delete', [QuotationController::class, 'delete'])->name('quotations.delete');
     Route::get('/quotations-pdf/{id}', [QuotationController::class, 'pdf'])->name('quotations.pdf');
+    Route::get('/quotations-zone/{quotagtionId}', [QuotationController::class, 'quotationZone'])->name('quotations-zone');
+    Route::get('/quotations-zone-manage/{quotagtionId}/{categoryId}', [QuotationController::class, 'zoneManage'])->name('quotations-zone-manage');
+    Route::get('/quotations-zone-manage-delete/{quotagtionId}/{categoryId}/{sunCategoryId}', [QuotationController::class, 'deleteZone'])->name('quotations-zone-manage.delete');
+    Route::get('/quotations-zone-manage-trash/{id}', [QuotationController::class, 'restoreZone'])->name('quotations-zone-manage.restore');
+
+
+    Route::get('/quotations-excel/{id}', [QuotationController::class, 'excel'])->name('quotations.excel');
     Route::get('/quotation-to-sheet/{id}', [QuotationController::class, 'quotationToSheet'])->name('quotation-to-sheet');
     Route::get('/quotations-duplicate/{id}', [QuotationController::class, 'duplicate'])->name('quotations.duplicate');
     Route::get('/version-copy/{id}', [QuotationController::class, 'versionCopy'])->name('version-copy');

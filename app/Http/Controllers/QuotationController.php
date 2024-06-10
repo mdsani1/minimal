@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\QuotationExport;
 use Carbon\Carbon;
 use App\Models\Category;
 use App\Models\Quotation;
@@ -15,6 +16,7 @@ use Intervention\Image\Facades\Image;
 use App\Models\ChangeHistories;
 use App\Models\Organization;
 use App\Models\Payment;
+use App\Models\QuotationZoneManage;
 use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\QuoteItemValue;
@@ -22,6 +24,7 @@ use App\Models\SubCategory;
 use App\Models\Term;
 use App\Models\TermInfo;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class QuotationController extends Controller
 {
@@ -464,18 +467,19 @@ class QuotationController extends Controller
             $amounts = $request->input('amount', []);
             $quotationItemIds = $request->input('quotationItemId', []);
 
-            $first_person = nl2br($request->input('first_person'));
-            $second_person = nl2br($request->input('second_person'));
-            $third_person = nl2br($request->input('third_person'));
-            $fourth_person = nl2br($request->input('fourth_person'));
-            $fifth_person = nl2br($request->input('fifth_person'));
+            $first_person = $this->cleanInput($request->input('first_person'));
+            $second_person = $this->cleanInput($request->input('second_person'));
+            $third_person = $this->cleanInput($request->input('third_person'));
+            $fourth_person = $this->cleanInput($request->input('fourth_person'));
+            $fifth_person = $this->cleanInput($request->input('fifth_person'));
+
+
 
             $quotationData['first_person'] = $first_person;
             $quotationData['second_person'] = $second_person;
             $quotationData['third_person'] = $third_person;
             $quotationData['fourth_person'] = $fourth_person;
             $quotationData['fifth_person'] = $fifth_person;
-
 
 
             if ($request->hasFile('first_person_signature')) {
@@ -558,6 +562,12 @@ class QuotationController extends Controller
         } catch (QueryException $e) {
             return redirect()->back()->withInput()->withErrors($e->getMessage());
         }
+    }
+
+    function cleanInput($input) {
+        $input = nl2br($input);
+        $input = preg_replace('/(<br\s*\/?>\s*){2,}/', '<br />', $input);
+        return $input;
     }
 
     public function updateDate(UpdateQuotationRequest $request, $id)
@@ -687,27 +697,6 @@ class QuotationController extends Controller
                 return $group->sum('amount');
             });
 
-            // $quoteZoneItems = QuoteItem::with('quoteItemValues')
-            //     ->where('quote_id', $id)
-            //     ->orderBy('category_id','asc')
-            //     ->whereNotNull('sub_category_id')
-            //     ->get()
-            //     ->groupBy(['category_id', 'sub_category_id']);
-
-            // // Retrieve QuoteItems with null sub_category_id
-            // $quoteWorkItems = QuoteItem::with('quoteItemValues')
-            //     ->where('quote_id', $id)
-            //     ->orderBy('category_id','asc')
-            //     ->whereNull('sub_category_id')
-            //     ->get()
-            //     ->groupBy(['category_id', 'sub_category_id']);
-
-            // if(!$quoteZoneItems->isEmpty()) {
-            //     // Merge the two collections, ignoring keys from $quoteWorkItems if they exist in $quoteZoneItems
-            //     $quoteItems = $quoteZoneItems->merge($quoteWorkItems->except($quoteZoneItems->keys()->all()));
-            // } else {
-            //     $quoteItems = $quoteWorkItems;
-            // }
 
             $externalMenus = QuoteItemValue::where('quote_id', $quote->id)->distinct()->pluck('header');
             $organization = Organization::latest()->first();
@@ -822,6 +811,55 @@ class QuotationController extends Controller
 
             return redirect()->back()->withMessage('Successful update :)');
         } catch (QueryException $e) {
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
+
+    public function excel($id) 
+    {
+        return Excel::download(new QuotationExport($id), 'quotation.xlsx');    
+    }
+
+    public function quotationZone($id)
+    {
+        $categories = Category::orderBY('title','asc')->get();
+
+        $quotation = Quotation::find($id);
+        return view('backend.quotations.zone',compact('quotation','categories'));
+    }
+
+    public function zoneManage($quotagtionId, $categoryId)
+    {
+        $category = Category::find($categoryId);
+        $quotation = Quotation::find($quotagtionId);
+        $quotationZoneManage = QuotationZoneManage::where('quotation_id', $quotagtionId)->where('category_id', $categoryId)->get();
+
+        return view('backend.quotations.zone-manage',compact('quotation','category','quotationZoneManage'));
+    }
+
+    public function deleteZone($quotagtionId, $categoryId, $subCategoryId)
+    {
+        try{
+            $quotationZoneManage = QuotationZoneManage::create([
+                'quotation_id'      => $quotagtionId,
+                'category_id'       => $categoryId,
+                'sub_category_id'   => $subCategoryId
+            ]);
+            $quotationZoneManage->update(['created_by' => auth()->user()->id]);
+            return redirect()->back()->withMessage('Successfully Delete!');
+        }catch(QueryException $e){
+            return redirect()->back()->withInput()->withErrors($e->getMessage());
+        }
+    }
+
+    public function restoreZone($id)
+    {
+        try{
+            $quotationZoneManage = QuotationZoneManage::find($id);
+            $quotationZoneManage->delete();
+            $quotationZoneManage->update(['deleted_by' => auth()->user()->id]);
+            return redirect()->back()->withMessage('Successfully Restore!');
+        }catch(QueryException $e){
             return redirect()->back()->withInput()->withErrors($e->getMessage());
         }
     }

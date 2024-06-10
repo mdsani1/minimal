@@ -9,6 +9,7 @@ use App\Models\Land;
 use App\Models\Organization;
 use App\Models\Payment;
 use App\Models\Quotation;
+use App\Models\QuotationZoneManage;
 use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\QuoteItemValue;
@@ -146,11 +147,13 @@ class DashboardController extends Controller
                             ->toArray();
         $termInfo = TermInfo::latest()->first();
         $quoteItems = QuoteItem::with('quoteItemValues')->where('quote_id',$id)->get()->groupBy('category_id');
+        $quotationZoneManage = QuotationZoneManage::where('quotation_id', $quote->quotation_id)->get();
+
         $groupedItems = $quoteItems->map(function ($group) {
             return $group->sum('amount');
         });
 
-        return view('backend.quotes.edit', compact('quote','quotation','quotations','externalMenus','organization','quoteItems','payments','terms','bank','categories','termInfo','groupedItems'));
+        return view('backend.quotes.edit', compact('quote','quotation','quotations','externalMenus','organization','quoteItems','payments','terms','bank','categories','termInfo','groupedItems','quotationZoneManage'));
     }
 
     public function templateEdit($id)
@@ -275,14 +278,23 @@ class DashboardController extends Controller
         }
     }
 
-    public function quotationItemZoneDelete($quoteId, $zoneId)
+    public function quotationItemZoneDelete($quotationId, $quoteId, $categoryId, $zoneId)
     {
         try{
             $quoteItem = QuoteItem::where('quote_id', $quoteId)->where('sub_category_id', $zoneId)->first();
+
+            $quotationZoneManage = QuotationZoneManage::create([
+                'quotation_id'      => $quotationId,
+                'category_id'       => $categoryId,
+                'sub_category_id'   => $zoneId
+            ]);
+            $quotationZoneManage->update(['created_by' => auth()->user()->id]);
+
             if($quoteItem != null){
                 $quoteItem->update(['deleted_by' => auth()->user()->id]);
                 $quoteItem->delete();
             }
+
 
             return redirect()->back()->withMessage('Successful delete :)');
         }catch(QueryException $e){

@@ -290,7 +290,7 @@
                 <p>{!! $quote->quotation->first_person !!}</p>
             </div>
             @if ($quote->quotation->second_person != null  && $quote->quotation->second_person != '')
-            <div class="column2" style="text-align: right">
+            <div class="column2" style="text-align: {{ $quote->quotation->third_person == null ? 'right' : 'center' }}">
                 <p style="margin-top: 50px;">
                     <span>
                         @isset($quote->quotation->second_person_signature)
@@ -301,7 +301,7 @@
             </div>
             @endif
             @if ($quote->quotation->third_person != null  && $quote->quotation->third_person != '')
-            <div class="column2" style="text-align: right">
+            <div class="column2" style="text-align: {{ $quote->quotation->fourth_person == null ? 'right' : 'center' }}">
                 <p style="margin-top: 50px;">
                     <span>
                         @isset($quote->quotation->third_person_signature)
@@ -312,7 +312,7 @@
             </div>
             @endif
             @if ($quote->quotation->fourth_person != null  && $quote->quotation->fourth_person != '')
-            <div class="column2" style="text-align: right">
+            <div class="column2" style="text-align: {{ $quote->quotation->fifth_person == null ? 'right' : 'center' }}">
                 <p style="margin-top: 50px;">
                     <span>
                         @isset($quote->quotation->fourth_person_signature)
@@ -342,7 +342,7 @@
             @foreach ($data as $key => $quoteItem)
                 <div style="{{ !$loop->first ? 'page-break-before: always;' : '' }}">
                     <div style="margin-bottom: 15px;">
-                        <h3 style="padding: 8px; text-align:center; background-color:#bbb; width:50%; margin-left:30%; font-size: 14px; border:2px solid #09e240">
+                        <h3 style="padding: 8px; text-align:center; background-color:#bbb; width:50%; margin-left:23%; font-size: 14px; border:2px solid #09e240">
                             <span style="background-color:#bbb; "><b>{{ $key }}</b></span>
                         </h3>
                     </div>
@@ -374,7 +374,7 @@
                         
                             
                             <tr>
-                                <td style="font-size:10px; text-align: center; width:5%">{{ $item->sl }}</td>
+                                <td style="font-size:10px; text-align: center; width:5%">{{ $loop->iteration }}</td>
                                 <td style="font-size:10px; text-align: center; width:15%">{{ $item->item }}</td>
                                 <?php
                                     $specificationData = $item->specification;
@@ -491,7 +491,7 @@
                             </tr>
                             @foreach ($subcategory as $item)
                             <tr>
-                                <td style="font-size:10px; text-align: center; width:5%">{{ $item->sl }}</td>
+                                <td style="font-size:10px; text-align: center; width:5%">{{ $loop->iteration }}</td>
                                 <td style="font-size:10px; text-align: center; width:15%">{{ $item->item }}</td>
                                 <?php
                                     $specificationData = $item->specification;

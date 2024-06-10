@@ -28,7 +28,6 @@ $(document).ready(function() {
         if(lastThId == null || lastThId == undefined) {
             columnNo = 1;
         } else {
-            console.log('in2');
             var modifiedString = lastThId.replace(/^column/, '');
             columnNo = parseInt(modifiedString) + 1;
         }
@@ -45,7 +44,6 @@ $(document).ready(function() {
         }
 
         let headerId = $(this).closest('th').attr('id');
-        console.log(headerId);
 
         let templateId = $('.templateId').val();
 
