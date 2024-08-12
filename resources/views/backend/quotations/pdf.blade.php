@@ -351,18 +351,18 @@
                             <th style="text-align: center;font-size: 13px;">SL </th>
                             <th style="text-align: center;font-size: 13px; width:20%">ITEM</th>
                             <th style="text-align: center;font-size: 13px; width:40%">SPECIFICATION</th>
-                            <th style="text-align: center;font-size: 13px;">QTY</th>
-                            <th style="text-align: center;font-size: 13px;">UNIT</th>
-                            <th style="text-align: center;font-size: 13px;">RATE</th>
-                            <th style="text-align: center;font-size: 13px;">AMOUNT</th>
+                            <th style="text-align: center;font-size: 13px; min-width:60px">QTY</th>
+                            <th style="text-align: center;font-size: 13px; min-width:60px">UNIT</th>
+                            <th style="text-align: center;font-size: 13px; min-width:60px">RATE</th>
+                            <th style="text-align: center;font-size: 13px; min-width:100px">AMOUNT</th>
                             @if (isset($quoteItem['category']))
                             @foreach ($quoteItem['category']->first()->quoteItemValues as $data)
-                                <th style="text-align: center">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
+                                <th style="text-align: center; width:100px">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
                             @endforeach
                             @endif
                             @if (isset($quoteItem['subcategory']))
                             @foreach ($quoteItem['subcategory']->first()->first()->quoteItemValues as $data)
-                                <th style="text-align: center">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
+                                <th style="text-align: center; width:100px">{{ ucwords(str_replace('_', ' ', $data->header)) }}</th>
                             @endforeach
                             @endif
                         </tr>
@@ -373,6 +373,9 @@
                         @php
                             $checkItem = '';
                             $extraStyle = '';
+                            $categorySl = 1;
+
+
                         @endphp
                         @foreach ($quoteItem['category'] as $item)
 
@@ -386,7 +389,7 @@
                             @endphp
 
                             <tr>
-                                <td style="font-size:10px; text-align: center; width:5%">{{ $loop->iteration }}</td>
+                                <td style="font-size:10px; text-align: center; width:5%">{{ $categorySl++ }}</td>
                                 <td style="font-size:10px; text-align: center; width:15%; {{ $extraStyle }}">
                                     {{ $item->item == $checkItem ? '' : $item->item }}
                                 </td>
@@ -498,7 +501,9 @@
                             </tr>
                         @endforeach
                         @else
-
+                            @php
+                                $subcategorySl = 1;
+                            @endphp
                         @foreach ($quoteItem['subcategory'] as $subcategory)
 
 
@@ -522,7 +527,7 @@
                                 }
                             @endphp
                             <tr>
-                                <td style="font-size:10px; text-align: center; width:5%">{{ $loop->iteration }}</td>
+                                <td style="font-size:10px; text-align: center; width:5%">{{ $subcategorySl++ }}</td>
                                 <td style="font-size:10px; text-align: center; width:15%; {{ $extraSubStyle }}">
                                     {{ $item->item == $checkSubItem ? '' : $item->item }}
                                 </td>
