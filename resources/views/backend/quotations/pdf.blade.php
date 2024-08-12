@@ -9,7 +9,7 @@
     * {
       box-sizing: border-box;
     }
-    
+
     /* Create two equal columns that float next to each other */
     .column {
       float: left;
@@ -40,19 +40,19 @@
           echo '.column2 { float: left; width: 100%; padding: 0px; }';
       }
       ?>
-    
+
     /* Clear floats after the columns */
     .row:after {
       content: "";
       display: table;
       clear: both;
     }
-    
+
     p {
       padding: 0px;
       margin: 2px;
     }
-    
+
     /* Apply text alignment to the organization details */
     .organization-details {
       text-align: right;
@@ -92,7 +92,7 @@
             <h4 style="font-size: 12px">{{ $quotation->name }}</h4>
             <h4 style="font-size: 12px">{{ $quotation->address }}</h4>
         </div>
-    
+
         <div style="background-color:#bbb; text-align:center; border:3px solid #09e240; width:94%; margin-left:10px">
         <h4 style="font-size: 13px">Financial Proposal For Residence Interior & Electrical Works</h4>
         <h4 style="font-size: 13px">Of</h4>
@@ -116,7 +116,7 @@
                     @php
                         $date = date_create($quotation->date); // $quotation->date ke Date/Time object e convert kora
                         $formatted_date = date_format($date, 'd-m-Y'); // Date/Time object ke desired format e format kora
-                    @endphp 
+                    @endphp
                     <td style="text-align: center; font-size: 12px">{{ $formatted_date }}</td>
                     <td style="text-align: center; font-size: 12px">{{ $sheet->version }}</td>
                     <td style="font-size: 12px">{{ $sheet->change }}</td>
@@ -273,7 +273,7 @@
             ?>
 
             <h3 style="margin-top: 20px; font-size:13px">In Words - {{ ucwords($totalamountofwords) }}</h3>
-        </div> 
+        </div>
 
         <div style="margin-top: 30px;">
         <p style="margin-left: 8px">Sincerely Yours,</p>
@@ -284,7 +284,7 @@
                     <span>
                         @if ($quote && $quote->quotation && $quote->quotation->first_person_signature)
                             <img src="{{ public_path('images/' . $quote->quotation->first_person_signature) }}" alt="" style="width: 200px; height: 100px">
-                        @endif                                
+                        @endif
                     </span>
                 </p>
                 <p>{!! $quote->quotation->first_person !!}</p>
@@ -370,21 +370,36 @@
                             $grandTotal = 0;
                         @endphp
                         @if (isset($quoteItem['category']))
+                        @php
+                            $checkItem = '';
+                            $extraStyle = '';
+                        @endphp
                         @foreach ($quoteItem['category'] as $item)
-                        
-                            
+
+                            @php
+                                // Initialize the style variable
+                                $extraStyle = '';
+                                // Check the condition and set the style
+                                if($item->item == $checkItem) {
+                                    $extraStyle = 'border-top: 2px solid white';
+                                }
+                            @endphp
+
                             <tr>
                                 <td style="font-size:10px; text-align: center; width:5%">{{ $loop->iteration }}</td>
-                                <td style="font-size:10px; text-align: center; width:15%">{{ $item->item }}</td>
+                                <td style="font-size:10px; text-align: center; width:15%; {{ $extraStyle }}">
+                                    {{ $item->item == $checkItem ? '' : $item->item }}
+                                </td>
+
                                 <?php
                                     $specificationData = $item->specification;
-                        
+
                                     // Check if $specificationData is not empty before processing it
                                     if (!empty($specificationData)) {
 
                                         $dom = new DOMDocument();
                                         $dom->loadHTML($specificationData);
-                        
+
                                         // Use DOMXPath to query the document
                                         $xpath = new DOMXPath($dom);
 
@@ -398,7 +413,7 @@
                                         $width_inchevalue = "";
                                         $depth_feetvalue = "";
                                         $depth_inchevalue = "";
-                        
+
                                         // Query for the input with class 'length_feet'
                                         $length_feetinput = $xpath->query('//input[@class="form-control qtyCalculations length_feet mt-2"]')->item(0);
                                         $length_incheinput = $xpath->query('//input[@class="form-control qtyCalculations length_inche mt-2"]')->item(0);
@@ -446,13 +461,13 @@
                                         if(is_numeric($width_feetvalue) && is_numeric($width_inchevalue)){
                                         $dimensions .= " X " . $width_feetvalue . "' " . $width_inchevalue . '"' . ' (W)';
 
-                                        } 
+                                        }
                                         if(is_numeric($depth_feetvalue) && is_numeric($depth_inchevalue)){ {
                                             $dimensions .= " X " . $depth_feetvalue . "' " . $depth_inchevalue . '"' . ' (D)';
                                         }
 
                                     }
-                        
+
                                         // Remove <div> tags from specification data
                                         $specificationData = preg_replace('/<div[^>]*>/', '', $specificationData);
                                         $specificationData = preg_replace('/<\/div>/', '', $specificationData);
@@ -465,9 +480,9 @@
                                         $specificationData = "";
                                         $dimensions = "";
                                     }
-                                    
+
                                 ?>
-                                
+
                                 <td style="font-size:10px; text-align: left; width:50%">{!! $specificationData !!} <br> <b>{{ $dimensions }}</b></td>
                                 <td style="font-size:10px; text-align: center">{{ $item->qty }}</td>
                                 <td style="font-size:10px; text-align: center">{{ $item->unit }}</td>
@@ -478,30 +493,49 @@
                                 @endforeach
                                 @php
                                     $grandTotal += $item->amount;
+                                    $checkItem = $item->item;
                                 @endphp
                             </tr>
                         @endforeach
                         @else
+
                         @foreach ($quoteItem['subcategory'] as $subcategory)
+
+
                             @php
                                 $subTotal = 0;
                             @endphp
                             <tr style="background-color: #ddd">
                                 <td colspan="7" style="text-align: center"><b>{{ $subcategory->first()->subcategory->title }}</b></td>
                             </tr>
+                            @php
+                                $checkSubItem = '';
+                                $extraSubStyle = '';
+                            @endphp
                             @foreach ($subcategory as $item)
+                            @php
+                                // Initialize the style variable
+                                $extraSubStyle = '';
+                                // Check the condition and set the style
+                                if($item->item == $checkSubItem) {
+                                    $extraSubStyle = 'border-top: 2px solid white';
+                                }
+                            @endphp
                             <tr>
                                 <td style="font-size:10px; text-align: center; width:5%">{{ $loop->iteration }}</td>
-                                <td style="font-size:10px; text-align: center; width:15%">{{ $item->item }}</td>
+                                <td style="font-size:10px; text-align: center; width:15%; {{ $extraSubStyle }}">
+                                    {{ $item->item == $checkSubItem ? '' : $item->item }}
+                                </td>
+
                                 <?php
                                     $specificationData = $item->specification;
-                        
+
                                     // Check if $specificationData is not empty before processing it
                                     if (!empty($specificationData)) {
 
                                         $dom = new DOMDocument();
                                         $dom->loadHTML($specificationData);
-                        
+
                                         // Use DOMXPath to query the document
                                         $xpath = new DOMXPath($dom);
 
@@ -515,7 +549,7 @@
                                         $width_inchevalue = "";
                                         $depth_feetvalue = "";
                                         $depth_inchevalue = "";
-                        
+
                                         // Query for the input with class 'length_feet'
                                         $length_feetinput = $xpath->query('//input[@class="form-control qtyCalculations length_feet mt-2"]')->item(0);
                                         $length_incheinput = $xpath->query('//input[@class="form-control qtyCalculations length_inche mt-2"]')->item(0);
@@ -563,13 +597,13 @@
                                         if(is_numeric($width_feetvalue) && is_numeric($width_inchevalue)){
                                         $dimensions .= " X " . $width_feetvalue . "' " . $width_inchevalue . '"' . ' (W)';
 
-                                        } 
+                                        }
                                         if(is_numeric($depth_feetvalue) && is_numeric($depth_inchevalue)){ {
                                             $dimensions .= " X " . $depth_feetvalue . "' " . $depth_inchevalue . '"' . ' (D)';
                                         }
 
                                     }
-                        
+
                                         // Remove <div> tags from specification data
                                         $specificationData = preg_replace('/<div[^>]*>/', '', $specificationData);
                                         $specificationData = preg_replace('/<\/div>/', '', $specificationData);
@@ -582,9 +616,9 @@
                                         $specificationData = "";
                                         $dimensions = "";
                                     }
-                                    
+
                                 ?>
-                                
+
                                 <td style="font-size:10px; text-align: left; width:50%">{!! $specificationData !!} <br> <b>{{ $dimensions }}</b></td>
                                 <td style="font-size:10px; text-align: center">{{ $item->qty }}</td>
                                 <td style="font-size:10px; text-align: center">{{ $item->unit }}</td>
@@ -596,6 +630,7 @@
                                 @php
                                     $grandTotal += $item->amount;
                                     $subTotal += $item->amount;
+                                    $checkSubItem = $item->item;
                                 @endphp
                             </tr>
                             @endforeach
@@ -611,7 +646,7 @@
                             // $totalamountofwords = numberToWords($total);
                             $grandtotalamountofwords = convertNumberToWord($total);
                         ?>
-                        
+
                         <tfoot>
                         <tr>
                             <td colspan="6" style="text-align: right; font-size:16px"><b>GRAND TOTAL</b></td>
