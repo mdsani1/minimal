@@ -368,8 +368,7 @@
                                 $paise = ($decimal > 0) ? "." . ($words[$decimal / 10] . " " . $words[$decimal % 10]) . ' Paise' : '';
                                 return ($Rupees ? $Rupees . 'Taka Only.' : '') . $paise;
                             }
-
-                            // Example usage:
+                            
                             $total = round($total ?? 0, 0);
                             $totalamountofwords = convertNumberToWord($total);
                             ?>
@@ -477,16 +476,14 @@
                         $check = true;
                     @endphp
                     @if (count($quotationItem->category->subcategory) > 0)
-                        @php
-                            $quotationZoneSubCategoryIds = collect($quotationZoneManage->where('category_id', $quotationItem->category->id))->pluck('sub_category_id')->all();
-                        @endphp
                         <ul class="nav nav-tabs border-info" id="myTab" role="tablist">
+                            @php
+                                $quotationZoneSubCategoryIds = collect($quotationZoneManage->where('category_id', $quotationItem->category->id))->pluck('sub_category_id')->all();
+                            @endphp
                             @foreach ($quotationItem->category->subcategory as $subcategory)
-                            @if (!in_array($subcategory->id, $quotationZoneSubCategoryIds)) 
-                            <li class="nav-item" role="presentation">
-                            <button class="nav-link {{ $loop->first ? 'active' : '' }}" id="home-tab-{{ $subcategory->id }}" data-toggle="tab" data-target="#home{{ $subcategory->id }}" type="button" role="tab" aria-controls="home{{ $subcategory->id }}" aria-selected="true">{{ $subcategory->title }}</button>
-                            </li>
-                            @endif
+                                <li class="nav-item" role="presentation">
+                                <button class="nav-link {{ $loop->first ? 'active' : '' }}" id="home-tab-{{ $subcategory->id }}" data-toggle="tab" data-target="#home{{ $subcategory->id }}" type="button" role="tab" aria-controls="home{{ $subcategory->id }}" aria-selected="true">{{ $subcategory->title }}</button>
+                                </li>
                             @endforeach
                         </ul>
                         <div class="tab-content" id="myTabContent">
@@ -630,16 +627,11 @@
 
                 @if ($check == false)
                 @if (count($quotationItem->category->subcategory) > 0)
-                        @php
-                            $quotationZoneSubCategoryIds = collect($quotationZoneManage->where('category_id', $quotationItem->category->id))->pluck('sub_category_id')->all();
-                        @endphp
                         <ul class="nav nav-tabs border-info" id="myTab" role="tablist">
                             @foreach ($quotationItem->category->subcategory as $subcategory)
-                            @if (!in_array($subcategory->id, $quotationZoneSubCategoryIds))
-                            <li class="nav-item" role="presentation">
-                            <button class="nav-link {{ $loop->first ? 'active' : '' }}" id="home-tab-{{ $subcategory->id }}" data-toggle="tab" data-target="#home{{ $subcategory->id }}" type="button" role="tab" aria-controls="home{{ $subcategory->id }}" aria-selected="true">{{ $subcategory->title }}</button>
-                            </li>
-                            @endif
+                                <li class="nav-item" role="presentation">
+                                <button class="nav-link {{ $loop->first ? 'active' : '' }}" id="home-tab-{{ $subcategory->id }}" data-toggle="tab" data-target="#home{{ $subcategory->id }}" type="button" role="tab" aria-controls="home{{ $subcategory->id }}" aria-selected="true">{{ $subcategory->title }}</button>
+                                </li>
                             @endforeach
                         </ul>
                         <div class="tab-content" id="myTabContent">
@@ -647,7 +639,7 @@
                                 <div class="tab-pane zone fade {{ $loop->first ? 'show active' : '' }}" id="home{{ $subcategory->id }}" role="tabpanel" aria-labelledby="home-tab-{{ $subcategory->id }}">
                                     <div class="d-flex justify-content-end mt-3">
                                         <div>
-                                            <form style="display: inline;" action="{{ route('quotationItemZone-delete', [$quotationItem->quotation_id, $quote->id, $quotationItem->category->id, $subcategory->id]) }}" method="POST">
+                                            <form style="display: inline;" action="{{ route('quotationItemZone-delete', [$quotationItem->quotation_id, $quote->id, $quotationItem->category->id, $subcategory->id]]) }}" method="POST">
                                                 @csrf
                                                 @method('delete')
                                                 <button onclick="return confirm('Are you sure you want to delete?')" class="btn btn-danger" type="submit" style="width:100%; text-align:left; padding-left: 22px !important;">Zone Delete</button>
