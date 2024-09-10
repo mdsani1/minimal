@@ -21,9 +21,175 @@ use App\Models\TermInfo;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Google\Client;
+use Google\Service\Drive;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
 {
+    public function databaseBackup()
+    {
+        try {
+            // Define the backup directory
+            $backupDir = storage_path('app/backups/');
+    
+            // Create the backup directory if it doesn't exist
+            if (!file_exists($backupDir) && !mkdir($backupDir, 0755, true) && !is_dir($backupDir)) {
+                Log::error('Failed to create backup directory', ['directory' => $backupDir]);
+                return redirect()->back()->withErrors('Failed to create backup directory.');
+            }
+    
+            // Define the backup file path with a timestamp
+            $backupPath = $backupDir . 'backup_' . now()->format('Y-m-d_H-i-s') . '.sql';
+    
+            // Create a temporary file for MySQL credentials
+            $optionsFile = tempnam(sys_get_temp_dir(), 'mysql_backup');
+            if ($optionsFile === false) {
+                Log::error('Failed to create temporary options file.');
+                return redirect()->back()->withErrors('Failed to create temporary options file.');
+            }
+    
+            // Write MySQL credentials to the temporary file
+            file_put_contents($optionsFile, sprintf(
+                "[client]\nhost=%s\nuser=%s\npassword=%s",
+                env('DB_HOST'),
+                env('DB_USERNAME'),
+                env('DB_PASSWORD')
+            ));
+    
+            // Build the mysqldump command
+            $command = sprintf(
+                'mysqldump --defaults-extra-file=%s %s > %s 2>&1',
+                escapeshellarg($optionsFile),
+                escapeshellarg(env('DB_DATABASE')),
+                escapeshellarg($backupPath)
+            );
+    
+            // Execute the command
+            exec($command, $output, $returnCode);
+    
+            // Remove the temporary file
+            unlink($optionsFile);
+    
+            // Check if the command was successful
+            if ($returnCode !== 0) {
+                Log::error('Database backup command failed', ['command' => $command, 'output' => $output, 'returnCode' => $returnCode]);
+                return redirect()->back()->withErrors('Database backup failed: ' . implode("\n", $output));
+            }
+    
+            // Verify if the backup file was created
+            if (!file_exists($backupPath)) {
+                Log::error('Database backup file was not created', ['backupPath' => $backupPath]);
+                return redirect()->back()->withErrors('Database backup file was not created.');
+            }
+    
+            // Stream the backup file to the browser
+            return response()->download($backupPath)->deleteFileAfterSend(true);
+    
+        } catch (\Exception $e) {
+            // Handle unexpected errors
+            Log::error('An unexpected error occurred during the database backup', ['exception' => $e]);
+            return redirect()->back()->withErrors('An unexpected error occurred: ' . $e->getMessage());
+        }
+    }
+
+    // public function databaseBackup()
+    // {
+    //     try {
+    //         // Define the backup directory and file path
+    //         $backupDir = storage_path('app/backups/');
+    //         if (!file_exists($backupDir) && !mkdir($backupDir, 0755, true) && !is_dir($backupDir)) {
+    //             Log::error('Failed to create backup directory', ['directory' => $backupDir]);
+    //             return;
+    //         }
+    //         $backupPath = $backupDir . 'backup_' . now()->format('Y-m-d_H-i-s') . '.sql';
+
+    //         // Create a temporary file for MySQL credentials
+    //         $optionsFile = tempnam(sys_get_temp_dir(), 'mysql_backup');
+    //         if ($optionsFile === false) {
+    //             Log::error('Failed to create temporary options file.');
+    //             return;
+    //         }
+    //         file_put_contents($optionsFile, sprintf(
+    //             "[client]\nhost=%s\nuser=%s\npassword=%s",
+    //             env('DB_HOST'),
+    //             env('DB_USERNAME'),
+    //             env('DB_PASSWORD')
+    //         ));
+
+    //         // Run the mysqldump command
+    //         $command = sprintf(
+    //             'mysqldump --defaults-extra-file=%s %s > %s 2>&1',
+    //             escapeshellarg($optionsFile),
+    //             escapeshellarg(env('DB_DATABASE')),
+    //             escapeshellarg($backupPath)
+    //         );
+    //         exec($command, $output, $returnCode);
+    //         unlink($optionsFile);
+
+    //         if ($returnCode !== 0) {
+    //             Log::error('Database backup command failed', ['command' => $command, 'output' => $output, 'returnCode' => $returnCode]);
+    //             return;
+    //         }
+
+    //         // Upload to Google Drive
+    //         $this->uploadToGoogleDrive($backupPath);
+
+    //         // Clean up local file
+    //         unlink($backupPath);
+    //     } catch (\Exception $e) {
+    //         Log::error('An unexpected error occurred during the database backup', ['exception' => $e]);
+    //     }
+    // }
+
+    // private function uploadToGoogleDrive($filePath)
+    // {
+    //     try {
+    //         // Initialize Google Client
+    //         $client = new Client();
+    //         $client->setClientId(env('GOOGLE_DRIVE_CLIENT_ID'));
+    //         $client->setClientSecret(env('GOOGLE_DRIVE_CLIENT_SECRET'));
+    //         $client->refreshToken(env('GOOGLE_DRIVE_REFRESH_TOKEN'));
+
+    //         $service = new Drive($client);
+    //         $file = new Drive\DriveFile();
+    //         $file->setName(basename($filePath));
+    //         $file->setParents([env('GOOGLE_DRIVE_FOLDER_ID')]);
+
+    //         // Upload file
+    //         $service->files->create($file, [
+    //             'data' => file_get_contents($filePath),
+    //             'mimeType' => 'application/sql',
+    //             'uploadType' => 'multipart'
+    //         ]);
+
+    //         // Delete old backups (keep only the latest 2)
+    //         $this->deleteOldBackups($service);
+    //     } catch (\Exception $e) {
+    //         Log::error('Failed to upload file to Google Drive', ['exception' => $e]);
+    //     }
+    // }
+
+    // private function deleteOldBackups($service)
+    // {
+    //     try {
+    //         $folderId = env('GOOGLE_DRIVE_FOLDER_ID');
+    //         $files = $service->files->listFiles([
+    //             'q' => "'$folderId' in parents",
+    //             'fields' => 'files(id, name, createdTime)',
+    //             'orderBy' => 'createdTime desc',
+    //         ]);
+
+    //         $filesToDelete = array_slice($files->files, 2); // Keep only the latest 2 backups
+    //         foreach ($filesToDelete as $file) {
+    //             $service->files->delete($file->getId());
+    //         }
+    //     } catch (\Exception $e) {
+    //         Log::error('Failed to delete old backups from Google Drive', ['exception' => $e]);
+    //     }
+    // }
+
     public function index()
     {
         $user = User::where('id', Auth()->user()->id)->first();

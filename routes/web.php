@@ -64,6 +64,10 @@ Route::middleware(['auth','web'])->group(function () {
     Route::resource('navitems', NavItemController::class);
     Route::resource('rolenavitems', RoleNavItemController::class);
 
+
+    Route::get('/database-backup', [DashboardController::class, 'databaseBackup'])->name('database-backup');
+
+    
     //users crud
     Route::resource('users', UserController::class)->except(['create', 'store']);
     Route::get('/users-trash', [UserController::class, 'trash'])->name('users.trash');

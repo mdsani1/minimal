@@ -335,7 +335,7 @@
                                 $totalamountofwords =  $numFormatter->format($number);
                             @endphp --}}
 
-                            <?php
+                            {{-- <?php
                             function convertNumberToWord(float $number)
                             {
                                 $decimal = round($number - ($no = floor($number)), 2) * 100;
@@ -368,11 +368,74 @@
                                 $paise = ($decimal > 0) ? "." . ($words[$decimal / 10] . " " . $words[$decimal % 10]) . ' Paise' : '';
                                 return ($Rupees ? $Rupees . 'Taka Only.' : '') . $paise;
                             }
-
-                            // Example usage:
+                            
                             $total = round($total ?? 0, 0);
-                            $totalamountofwords = convertNumberToWord($total);
-                            ?>
+                            $totalamountofwords = convertNumberToWord(7945898621.0);
+                            ?> --}}
+
+<?php
+function convertNumberToWord(float $number): string
+{
+    $words = array(
+        0 => '', 1 => 'one', 2 => 'two', 3 => 'three', 4 => 'four', 5 => 'five', 
+        6 => 'six', 7 => 'seven', 8 => 'eight', 9 => 'nine', 10 => 'ten', 11 => 'eleven', 
+        12 => 'twelve', 13 => 'thirteen', 14 => 'fourteen', 15 => 'fifteen', 
+        16 => 'sixteen', 17 => 'seventeen', 18 => 'eighteen', 19 => 'nineteen', 
+        20 => 'twenty', 30 => 'thirty', 40 => 'forty', 50 => 'fifty', 60 => 'sixty', 
+        70 => 'seventy', 80 => 'eighty', 90 => 'ninety'
+    );
+    $digits = array('', 'hundred', 'thousand', 'lakh', 'crore', 'thousand crore', 'hundred crore', 'billion');
+
+    // Function to convert a number less than 1000 into words
+    function convertHundreds($number, $words, $digits) {
+        $str = '';
+        if ($number > 99) {
+            $str .= $words[intval($number / 100)] . ' hundred ';
+            $number %= 100;
+        }
+        if ($number > 19) {
+            $str .= $words[intval($number / 10) * 10] . ' ';
+            $number %= 10;
+        }
+        if ($number > 0) {
+            $str .= $words[$number] . ' ';
+        }
+        return $str;
+    }
+
+    $decimal = round($number - ($no = floor($number)), 2) * 100;
+    $str = array();
+    $digits_length = strlen($no);
+    $i = 0;
+    
+    // Convert the integer part of the number to words
+    while ($i < $digits_length) {
+        $divider = ($i == 2) ? 10 : 100;
+        $number = floor($no % $divider);
+        $no = floor($no / $divider);
+        $i += $divider == 10 ? 1 : 2;
+        
+        if ($number) {
+            $plural = ($counter = count($str)) && $number > 9 ? 's' : '';
+            $hundred = ($counter == 1 && $str[0]) ? ' and ' : '';
+            $str[] = convertHundreds($number, $words, $digits) . $digits[$counter] . $plural . $hundred;
+        } else {
+            $str[] = '';
+        }
+    }
+
+    $Rupees = implode('', array_reverse($str));
+    $paise = ($decimal > 0) ? "." . convertHundreds($decimal, $words, $digits) . ' Paise' : '';
+
+    return ($Rupees ? $Rupees . 'Taka Only.' : '') . $paise;
+}
+
+// Example usage
+$total = 7945898621.0;
+$totalamountofwords = convertNumberToWord($total);
+echo $totalamountofwords;
+?>
+
 
                     
                             <h4 style="margin-top: 20px">In Words - {{ ucwords($totalamountofwords) }}</h4>
@@ -938,14 +1001,14 @@
                             </div>
                         </div>
 
-                        <p class="mt-2 text-dark" style="font-weight: 900" data-toggle="modal" data-target="#terminfoEdittModal">Special Note: {{ $termInfo->note }}
+                        <p class="mt-2 text-dark" style="font-weight: 900" data-toggle="modal" data-target="#terminfoEdittModal">Special Note: {{ $termInfo->note ?? '' }}
                         <p class="mt-2 text-dark">Sincerely Yours,</p>
 
-                        <p class="mt-4 text-dark" data-toggle="modal" data-target="#terminfoEdittModal">{{ $termInfo->name }}</p>
+                        <p class="mt-4 text-dark" data-toggle="modal" data-target="#terminfoEdittModal">{{ $termInfo->name ?? '' }}</p>
                         @if ($termInfo->email != null)
-                        <p class="mt-4 text-dark" data-toggle="modal" data-target="#terminfoEdittModal">{{ $termInfo->email }}</p>
+                        <p class="mt-4 text-dark" data-toggle="modal" data-target="#terminfoEdittModal">{{ $termInfo->email ?? '' }}</p>
                         @endif
-                        <p class="text-dark" data-toggle="modal" data-target="#terminfoEdittModal">{{ $termInfo->designation }}</p>
+                        <p class="text-dark" data-toggle="modal" data-target="#terminfoEdittModal">{{ $termInfo->designation ?? '' }}</p>
                         <p class="text-dark">Minimal Limited</p>
 
                         <!-- Modal -->

@@ -13,7 +13,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('backup:database')->weekly();
+        // $schedule->command('backup:database')->weekly();
+        $schedule->call('App\Http\Controllers\DashboardController@databaseBackup')->weekly();
+        $schedule->call('App\Http\Controllers\DashboardController@databaseBackup')->monthly();
+
     }
 
     /**

@@ -23,12 +23,7 @@ function showSuggestions(cell, suggestions) {
     dropdown.style.top = `${cellRect.top + window.scrollY}px`;
 
     // Show the dropdown
-    dropdown.style.zIndex = '1000'; // Ensure the dropdown appears above other elements
-
-    // Show the dropdown using visibility
-    dropdown.style.visibility = 'visible';
-    dropdown.style.opacity = '1';
-    dropdown.style.pointerEvents = 'auto';
+    dropdown.style.display = 'block';
 
     // Keyboard navigation
     let currentIndex = -1; // Initialize with no item focused
@@ -250,14 +245,10 @@ $(document).ready(function () {
         const inputValue = getCellTextWithoutDropdown(cell);
         const cellIndex = cell.cellIndex; // cellIndex is 0-based
         const suggestions = getSuggestions(inputValue, cellIndex);
-        if(inputValue.length > 0){
-            if (suggestions.length > 0) {
-                
-                showSuggestions(cell, suggestions);
-            } else {
-                hideSuggestions(cell);
-            }
-        }else {
+        console.log(inputValue, suggestions.length);
+        if (suggestions.length > 0) {
+            showSuggestions(cell, suggestions);
+        } else {
             hideSuggestions(cell);
         }
     });

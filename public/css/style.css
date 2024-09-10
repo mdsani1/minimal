@@ -74,7 +74,7 @@
     max-height: 150px;
     overflow-y: auto;
     z-index: 1000;
-    display: none; /* Initially hide the dropdown */
+    /* display: none; */
 }
 
 .autosuggestion-dropdown ul {

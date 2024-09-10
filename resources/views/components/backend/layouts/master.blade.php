@@ -17,6 +17,9 @@
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
         <!-- Theme style -->
+        <style>
+            
+        </style>
         @stack('css')
     </head>
     <body class="sb-nav-fixed">

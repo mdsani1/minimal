@@ -370,7 +370,7 @@
                             }
                             
                             $total = round($total ?? 0, 0);
-                            $totalamountofwords = convertNumberToWord($total);
+                            $totalamountofwords = convertNumberToWord();
                             ?>
 
                     

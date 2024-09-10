@@ -39,7 +39,7 @@
                                     {{-- @if (Route::has('password.request'))
                                         <a herf="#" class="text-center text-muted mt-4">{{ __('Forgot your password?') }}</a>
                                     @endif --}}
-                                    <a href="register" id="sign-in" class="text-center text-muted mt-4" style="color: #1A4314;">No Have Account? Register Now</a>
+                                    {{-- <a href="register" id="sign-in" class="text-center text-muted mt-4" style="color: #1A4314;">No Have Account? Register Now</a> --}}
                                     {{-- <a herf="#" class="text-center text-muted terms mt-2">Terms of use.Privacy policy</a> --}}
                                 </div>
                             </form>

@@ -80,6 +80,7 @@
         <div class="card-footer text-center text-muted">
             {{-- <a class="btn btn-sm btn-danger text-left" href="{{ route('users.trash') }}" role="button" style="border-radius: 50%"><i class="fas fa-trash-restore"></i></a> --}}
             <a class="btn btn-sm btn-primary text-left" href="{{ route('users.excel') }}" role="button" style="border-radius: 50%"><i class="fas fa-file-excel"></i></a>
+            <a class="btn btn-sm btn-success text-left" href="register" role="button" style="border-radius: 50%"><i class="fas fa-plus"></i></a>
             <a class="btn btn-sm btn-info text-left" href="{{ route('users.pdf') }}" role="button" style="border-radius: 50%"><i class="fas fa-file-pdf text-white"></i></a>
         </div>
     </div>
