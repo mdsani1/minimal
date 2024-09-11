@@ -23,29 +23,36 @@ class BackendApiController extends Controller
 {
     public function suggestions()
     {
-        $data = Interior::pluck('item')->toArray();
-        $suggestions = $data;
-        $suggestions = array_unique($suggestions);
-        sort($suggestions);
-        if(!$data == null){
-            return response()->json($data, 200);
+        $data = Interior::all(['id', 'item']); // Retrieve both id and item
+        $suggestions = $data->map(function($item) {
+            return [
+                'id' => $item->id,
+                'item' => $item->item
+            ];
+        });
+    
+        // Sort suggestions by item
+        $suggestions = $suggestions->sortBy('item')->values()->all();
+    
+        if(count($suggestions) > 0){
+            return response()->json($suggestions, 200);
         }else{
             return response()->json([
                 "message" => "No Data Found!"
             ], 400);
         }
-    }
+    }   
+    
 
-    public function getSpecification($title)
+    public function getSpecification($id)
     {
         // Fetching specifications from the Interior model
-        $data1 = Interior::where('item', $title)->pluck('specification1')->first();
-        $data2 = Interior::where('item', $title)->pluck('specification2')->first();
-        $data3 = Interior::where('item', $title)->pluck('specification3')->first();
+        $data1 = Interior::where('id', $id)->pluck('specification1')->first();
+        $data2 = Interior::where('id', $id)->pluck('specification2')->first();
+        $data3 = Interior::where('id', $id)->pluck('specification3')->first();
 
         // Fetching associated specifications from the related InteriorSpecification model
-        $interior = Interior::with('interiorSpecifications')->where('item', $title)->first();
-
+        $interior = Interior::with('interiorSpecifications')->where('id', $id)->first();
         $dimensionText = '';
         if ($interior->active == 0) {
 

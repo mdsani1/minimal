@@ -290,7 +290,7 @@
                 <p>{!! $quote->quotation->first_person !!}</p>
             </div>
             @if ($quote->quotation->second_person != null  && $quote->quotation->second_person != '')
-            <div class="column2" style="text-align: {{ $quote->quotation->third_person == null ? 'right' : 'center' }}">
+            <div class="column2" style="text-align: {{ $quote->quotation->third_person == null ? 'left' : 'left' }}">
                 <p style="margin-top: 50px;">
                     <span>
                         @isset($quote->quotation->second_person_signature)
@@ -301,7 +301,7 @@
             </div>
             @endif
             @if ($quote->quotation->third_person != null  && $quote->quotation->third_person != '')
-            <div class="column2" style="text-align: {{ $quote->quotation->fourth_person == null ? 'right' : 'center' }}">
+            <div class="column2" style="text-align: {{ $quote->quotation->fourth_person == null ? 'left' : 'left' }}">
                 <p style="margin-top: 50px;">
                     <span>
                         @isset($quote->quotation->third_person_signature)
@@ -312,7 +312,7 @@
             </div>
             @endif
             @if ($quote->quotation->fourth_person != null  && $quote->quotation->fourth_person != '')
-            <div class="column2" style="text-align: {{ $quote->quotation->fifth_person == null ? 'right' : 'center' }}">
+            <div class="column2" style="text-align: {{ $quote->quotation->fifth_person == null ? 'left' : 'left' }}">
                 <p style="margin-top: 50px;">
                     <span>
                         @isset($quote->quotation->fourth_person_signature)

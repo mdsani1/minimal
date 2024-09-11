@@ -80,8 +80,7 @@ function hideSuggestions(cell) {
     }
 }
 
-let selectedItemId = null;
-
+// Function to create a dropdown for suggestions
 function createDropdown(cell, suggestions) {
     const dropdown = document.createElement('div');
     dropdown.classList.add('autosuggestion-dropdown');
@@ -92,13 +91,12 @@ function createDropdown(cell, suggestions) {
     const suggestionList = document.createElement('ul');
     suggestions.forEach(suggestion => {
         const suggestionItem = document.createElement('li');
-        suggestionItem.textContent = suggestion.item;
+        suggestionItem.textContent = suggestion.item; // Use suggestion.item
         suggestionItem.dataset.id = suggestion.id; // Store id in data attribute
         suggestionItem.addEventListener('click', () => {
-            selectedItemId = suggestion.id; // Update the selected item id
             cell.innerHTML = suggestion.item;
             hideSuggestions(cell);
-            loadSpecificationData(cell); // Call with the selected item id
+            loadSpecificationData(cell);
         });
         suggestionList.appendChild(suggestionItem);
     });
@@ -149,14 +147,9 @@ function selectSuggestionByNumber(number, items) {
 }
 
 function loadSpecificationData(cell) {
-    console.log(selectedItemId);
+    const selectedItemId = cell.querySelector('.autosuggestion-dropdown li:hover')?.dataset.id;
     const parentTR = $(cell).closest('tr'); 
     const parentTbody = $(cell).closest('tbody'); 
-
-    if (!selectedItemId) {
-        console.error('No item selected');
-        return;
-    }
     
     $.ajax({
         method: "GET",

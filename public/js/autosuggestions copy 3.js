@@ -80,25 +80,24 @@ function hideSuggestions(cell) {
     }
 }
 
-let selectedItemId = null;
-
+// Function to create a dropdown for suggestions
 function createDropdown(cell, suggestions) {
     const dropdown = document.createElement('div');
     dropdown.classList.add('autosuggestion-dropdown');
 
+    // Set the width of the dropdown to match the cell width
     const cellWidth = cell.offsetWidth;
     dropdown.style.width = `${cellWidth}px`;
 
+    // Create and append suggestion list
     const suggestionList = document.createElement('ul');
     suggestions.forEach(suggestion => {
         const suggestionItem = document.createElement('li');
-        suggestionItem.textContent = suggestion.item;
-        suggestionItem.dataset.id = suggestion.id; // Store id in data attribute
+        suggestionItem.innerHTML = suggestion;
         suggestionItem.addEventListener('click', () => {
-            selectedItemId = suggestion.id; // Update the selected item id
-            cell.innerHTML = suggestion.item;
+            cell.innerHTML = suggestion;
             hideSuggestions(cell);
-            loadSpecificationData(cell); // Call with the selected item id
+            loadSpecificationData(cell);
         });
         suggestionList.appendChild(suggestionItem);
     });
@@ -107,8 +106,6 @@ function createDropdown(cell, suggestions) {
     cell.appendChild(dropdown);
     return dropdown;
 }
-
-
 
 // Function to visually indicate and scroll to the focused suggestion item
 function updateFocus(items, index) {
@@ -122,21 +119,27 @@ function updateFocus(items, index) {
 }
 
 function getSuggestions(inputValue, cellIndex) {
+    // Define suggestion lists for each column
     const suggestionsForColumn = {
         1: suggestionData,
+        // Add suggestions for the third column if needed
         2: specificationData
     };
 
+    // Get suggestions based on the cell index
     let columnSuggestions = suggestionsForColumn[cellIndex] || [];
-    
+
     // Filter suggestions based on the input value
-    let filteredSuggestions = columnSuggestions.filter(suggestion => 
-        suggestion.item.toLowerCase().includes(inputValue.toLowerCase())
+    // let filteredSuggestions = columnSuggestions.filter(item => 
+    //     item.toLowerCase().startsWith(inputValue.toLowerCase())
+    // );
+
+    let filteredSuggestions = columnSuggestions.filter(item => 
+        item.toLowerCase().includes(inputValue.toLowerCase())
     );
 
     return filteredSuggestions;
 }
-
 
 
 function selectSuggestionByNumber(number, items) {
@@ -149,36 +152,36 @@ function selectSuggestionByNumber(number, items) {
 }
 
 function loadSpecificationData(cell) {
-    console.log(selectedItemId);
     const parentTR = $(cell).closest('tr'); 
     const parentTbody = $(cell).closest('tbody'); 
-
-    if (!selectedItemId) {
-        console.error('No item selected');
-        return;
-    }
-    
     $.ajax({
         method: "GET",
-        url: "/api/get/specification/" + encodeURIComponent(selectedItemId),
+        url: "/api/get/specification/" + cell.innerText.trim(),
         dataType: "json",
-        async: false, 
+        async: false, // Make the AJAX request synchronous
         success: function (response) {
             if (response.suggestions.length > 1) {
                 specificationData = response.suggestions;
             } else {
+                // Set the dimensionText to the .specification element of the parentTR
                 parentTR.find('.specification').html(response.suggestions[0]);
             }
 
+            // Retrieve dimensions from response
             let lengthFeet = parseFloat(response.interior.length_feet);
             let lengthInches = parseFloat(response.interior.length_inche);
             let widthFeet = parseFloat(response.interior.width_feet);
             let widthInches = parseFloat(response.interior.width_inche);
 
+            // Check if any of the values are NaN (Not a Number)
+            // Convert dimensions to inches
             let lengthTotalInches = lengthFeet * 12 + lengthInches;
             let widthTotalInches = widthFeet * 12 + widthInches;
 
+            // Calculate the area in square inches
             let areaInSquareInches = lengthTotalInches * widthTotalInches;
+
+            // Convert square inches to square feet
             let areaInSquareFeet = areaInSquareInches / 144;
 
             let amount = (areaInSquareFeet * parseFloat(response.interior.rate)).toFixed(2);
@@ -187,13 +190,14 @@ function loadSpecificationData(cell) {
                 parentTR.find('.qty').text();
                 parentTR.find('.rate').text(response.interior.rate);
                 parentTR.find('.unit').text(response.interior.unit);
-            } else {
+            }else{
                 parentTR.find('.qty').text(areaInSquareFeet.toFixed(2));
                 parentTR.find('.rate').text(response.interior.rate);
                 parentTR.find('.unit').text(response.interior.unit);
                 parentTR.find('.amount').text(amount);
             }
 
+            // Calculate and update grand total
             let grandTotal = 0;
             $(parentTbody).find('.amount').each(function() {
                 if (!isNaN(parseFloat($(this).text()))) {
@@ -201,14 +205,16 @@ function loadSpecificationData(cell) {
                 }
             });
 
+            // Update the grand total in the footer
             $(parentTbody).closest('table').find('.grandTotal').text(grandTotal.toFixed(2));
+
         },
         error: function (xhr, status, error) {
+            // Handle errors
             console.error('Error:', error);
         }
     });
 }
-
 
 function getCellTextWithoutDropdown(cell) {
     let text = '';
@@ -230,7 +236,6 @@ $(document).ready(function () {
         dataType: "json",
         async: false, // Make the AJAX request synchronous
         success: function (response) {
-            console.log(response);
             suggestionData = response;
         },
         error: function (xhr, status, error) {
