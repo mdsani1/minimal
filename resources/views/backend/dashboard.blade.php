@@ -7,7 +7,10 @@
     <x-slot name="breadcrumb">
         <div class="d-flex justify-content-between">
             <h1 class="mt-4">Dashboard</h1>
+
+            @if (auth()->user()->role_id == 1)
             <a href="/database-backup" class="btn btn-sm btn-success mt-4" style="height: 40px">Database Backup</a>
+            @endif
 
         </div>
         <x-backend.layouts.elements.message :message="session('message')"/>
